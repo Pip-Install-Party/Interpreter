@@ -1,4 +1,4 @@
-# Component 5 - Interpreter
+# Component 5 - Abstract Syntax Tree
 
 This program is not yet functional.
 
