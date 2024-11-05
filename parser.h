@@ -46,7 +46,7 @@ extern std::string tokenType; //= TokenTypes::IDENTIFIER; // or TokenTypes::INTE
 class Parser 
 {
 private:
-    std::vector<std::string> reserved = {"printf", "int", "void", "char", "bool" "string", "procedure", "function"};
+    std::vector<std::string> reserved = {"printf", "int", "void", "char", "bool", "string", "procedure", "function"};
 
     Token *head;
     // Vector holding all of the tokens in order from the tokenizer.
