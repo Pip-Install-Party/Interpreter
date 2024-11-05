@@ -48,4 +48,13 @@ const std::filesystem::path a4Tests[] = {
     "Tests/Program4/programming_assignment_4-test_file_7.c"
 }; 
 
+// Assignment 5
+const std::filesystem::path a5Tests[] = {
+    "Tests/Program5/programming_assignment_5-test_file_1.c",
+    "Tests/Program5/programming_assignment_5-test_file_2.c",
+    "Tests/Program5/programming_assignment_5-test_file_3.c",
+    "Tests/Program5/programming_assignment_5-test_file_4.c",
+    "Tests/Program5/programming_assignment_5-test_file_5.c",
+}; 
+
 #endif // TESTFILES_H
