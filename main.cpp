@@ -8,6 +8,7 @@
 #include "tokenizer.h"
 #include "parser.h"
 #include "table.h"
+#include "tree.h"
 
 #include "testFiles.h"
 
@@ -86,11 +87,29 @@ void symbolTable(std::ifstream& testFile, std::ostringstream& outputFile, int) {
     table->printParameters();
 }
 
+void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
+    CommentDFA *removeComments = new CommentDFA();
+    std::ostringstream tempBuffer;
+    removeComments->begin(testFile, tempBuffer);
+
+    Tokenizer *tokenizer = new Tokenizer();
+    std::istringstream tokenStream(tempBuffer.str());
+    tokenizer->begin(tokenStream);
+    std::vector<Token> tokenList = tokenizer->getTokens();
+
+    Parser *parser = new Parser(tokenList);
+    parser->begin();
+
+    Tree* tree = new Tree(parser->getHead());
+
+}
+
 const assignmentElements assignments[] = {
     {1, a1Tests, std::size(a1Tests), removeComments},
     {2, a2Tests, std::size(a2Tests), tokenize},
     {3, a3Tests, std::size(a3Tests), parse},
-    {4, a4Tests, std::size(a4Tests), symbolTable}
+    {4, a4Tests, std::size(a4Tests), symbolTable},
+    {5, a5Tests, std::size(a5Tests), abstractSyntaxTree}
 };
 
 // chooses test file based on user selection and includes error messages
@@ -113,10 +132,11 @@ int main() {
               << "2 - Tokenize\n"
               << "3 - Parse\n"
               << "4 - Symbol Table\n"
+              << "5 - Abstract Syntax Tree\n"
               << "Selection: ";
     std::cin >> assignmentNum;
 
-    if (assignmentNum < 1 || assignmentNum > 4) {
+    if (assignmentNum < 1 || assignmentNum > 5) {
         std::cerr << "Invalid assignment choice. Exiting.\n";
         return 1;
     }
