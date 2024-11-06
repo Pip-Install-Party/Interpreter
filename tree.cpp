@@ -85,13 +85,18 @@ Token* Tree::handleAssignment(Token* head) {
     } 
     
     // Convert infix to postfix
-    for (Token* token : infixToPostfix(equationAsVec)) {
-        std::string tokenValue = token->getValue();
-        //std::cout << "tokenVal = " << tokenValue << std::endl; // debug method *****
+    std::vector<Token*> postFix = infixToPostfix(equationAsVec);
+    //std::cout << "Size<: " << postFix.size() << std::endl;
+    for (int i = 0; i < postFix.size(); i++) {
+        std::string tokenValue = postFix.at(i)->getValue();
+       // std::cout << "\ncurr token = " << tokenValue << " next token = " << postFix.at(i+1) << std::endl;
+
         // Print token value directly and mark that a space is needed
         if (!tokenValue.empty()) {
             std::cout << tokenValue;
-            std::cout << " ----> ";
+            if (i != postFix.size() - 1) {
+                std::cout << " ----> ";
+            }
         }
     }
 
