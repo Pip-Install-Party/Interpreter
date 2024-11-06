@@ -11,9 +11,9 @@ class Tree {
         void printTree(Token*, Token*);
         bool contains(const std::vector<std::string>, std::string);
         Token* handleAssignment(Token*);
-        int getPrecedence(char op);
-        bool isOperator(char c);
-        std::string infixToPostfix(const std::string& infix);
+        int getPrecedence(std::string op);
+        bool isOperator(std::string c);
+        std::vector<Token*> infixToPostfix(const std::vector<Token*> infix);
 
 
     public: 

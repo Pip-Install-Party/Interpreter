@@ -1,4 +1,5 @@
 #include "tree.h"
+#include <stack>
 
 // Prints the abstract syntax tree to the provided output stream
 void Tree::printTree(Token* head, Token* prevToken){
@@ -18,14 +19,14 @@ void Tree::printTree(Token* head, Token* prevToken){
             head = head->getSibling();
         }
     } else if (head->getValue() == "if"){
-         ignore = false;
+        ignore = false;
         std::cout << "IF ----> ";
         // This needs to break out to handleAssignment();
         head = head->getSibling();
         head = handleAssignment(head); 
         prevToken = nullptr;
         
-    }else if (contains(varTypes, prevToken->getValue())) {
+    } else if (contains(varTypes, prevToken->getValue())) {
         ignore = false;
         std::cout << "DECLARATION";
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
@@ -41,8 +42,8 @@ void Tree::printTree(Token* head, Token* prevToken){
             ignore = false;
             std::cout << "ASSIGNMENT" << " ----> ";
             // This needs to break out to handleAssignment();
-             head = handleAssignment(head); 
-             prevToken = nullptr;
+            head = handleAssignment(head); 
+            prevToken = nullptr;
         } 
     } 
     if (head->getSibling() != nullptr) {
@@ -70,75 +71,87 @@ bool Tree::contains(const std::vector<std::string> reserved, std::string type){
 }
 
 Token* Tree::handleAssignment(Token* head) {
-    std::string equationAsString;
-    equationAsString += head->getValue();
+    std::vector<Token*> equationAsVec;
+    equationAsVec.push_back(head);
     head = head->getSibling();
 
     while(contains(equationOperators, head->getValue()) || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER") {
-        equationAsString += head->getValue();
+        equationAsVec.push_back(head); 
         if (head ->getSibling() != nullptr) {
             head = head->getSibling();
         } else {
             break;
         }
     } 
-        //head = head->getSibling(); // Remove ?
-
-    for (char ch : infixToPostfix(equationAsString)) {
-     //   std::cout << ch << " ----> ";
+    
+    // Convert infix to postfix
+    for (Token* token : infixToPostfix(equationAsVec)) {
+        std::string tokenValue = token->getValue();
+        //std::cout << "tokenVal = " << tokenValue << std::endl; // debug method *****
+        // Print token value directly and mark that a space is needed
+        if (!tokenValue.empty()) {
+            std::cout << tokenValue;
+            std::cout << " ----> ";
+        }
     }
-    std::cout << "Postfix Expression";
+
     return head;
 }
 
-
 // Function to get precedence of operators
-int Tree::getPrecedence(char op) {
-    if (op == '+' || op == '-') return 1;
-    if (op == '*' || op == '/') return 2;
+int Tree::getPrecedence(std::string op) {
+    if (op == "+" || op == "-" || op == ">=" || op == "<=" || op == "==" || op == ">" || op == "<" || op == "==" || op == "&&" || op == "!" || op == "||") return 1;
+    if (op == "*" || op == "/") return 2;
     return 0;
 }
 
 // Function to check if a character is an operator
-bool Tree::isOperator(char c) {
-    return c == '+' || c == '-' || c == '*' || c == '/';
+bool Tree::isOperator(std::string c) {
+    return c == "+" || c == "-" || c == "*" || c == "/" || c == "=";
 }
 
-// Function to convert infix expression to postfix
-std::string Tree::infixToPostfix(const std::string& infix) {
-    std::stack<char> operators;
-    std::string postfix;
+std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix) {
+    std::stack<Token*> operators;
+    std::vector<Token*> postfix;
 
-    for (char c : infix) {
-        // If the character is an operand, add it to postfix output
-        if (std::isdigit(c) || std::isalpha(c)) {
-            postfix += c;
+    for (Token* t : infix) {
+        std::string tokenType = t->getType();
+        std::string tokenValue = t->getValue();
+        
+        // If it's an operand, add it to the postfix output
+        if (tokenType == "INTEGER" || tokenType == "STRING" || tokenType == "CHARACTER" || tokenType == "IDENTIFIER") {
+            postfix.push_back(t);
         }
-        // If the character is '(', push it onto the stack
-        else if (c == '(') {
-            operators.push(c);
+        // If it's a left parenthesis, push it onto the stack
+        else if (tokenType == "L_PAREN") {
+            operators.push(t);
         }
-        // If the character is ')', pop and add operators until '(' is found
-        else if (c == ')') {
-            while (!operators.empty() && operators.top() != '(') {
-                postfix += operators.top();
+        // If it's a right parenthesis, pop until the left parenthesis
+        else if (tokenType == "R_PAREN") {
+            while (!operators.empty() && operators.top()->getValue() != "(") {
+                postfix.push_back(operators.top());
                 operators.pop();
             }
-            operators.pop(); // Pop '(' from the stack
-        }
-        // If the character is an operator
-        else if (isOperator(c)) {
-            while (!operators.empty() && getPrecedence(operators.top()) >= getPrecedence(c)) {
-                postfix += operators.top();
+            if (!operators.empty()) { // Pop the left parenthesis
                 operators.pop();
             }
-            operators.push(c);
+        }
+        // If it's an operator
+        else if (isOperator(tokenValue) || tokenType == "GT_EQUAL" || tokenType == "LT_EQUAL" || tokenType == "GT" || tokenType == "LT" || tokenType == "BOOLEAN_EQUAL" || tokenType == "BOOLEAN_AND" || tokenType == "BOOLEAN_NOT") { // can code this to check for all explicit tokens like prev if checks above... can add other tokens to operators too 
+            // Pop all operators with higher or equal precedence from the stack
+            while (!operators.empty() && operators.top()->getType() != "L_PAREN" &&
+                   getPrecedence(operators.top()->getValue()) >= getPrecedence(tokenValue)) {
+                postfix.push_back(operators.top());
+                operators.pop();
+            }
+            // Push the current operator onto the stack
+            operators.push(t);
         }
     }
 
-    // Pop all remaining operators in the stack
+    // Pop any remaining operators in the stack
     while (!operators.empty()) {
-        postfix += operators.top();
+        postfix.push_back(operators.top());
         operators.pop();
     }
 
