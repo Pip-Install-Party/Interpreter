@@ -20,6 +20,14 @@ void Tree::printTree(Token* head, Token* prevToken){
         ignore = false;
         std::cout << "RETURN";
         head = head->getSibling();
+        while(head->getValue() == "("){
+            head = head->getSibling();
+        }
+        if (head->getSibling() != nullptr && contains(equationOperators, head->getSibling()->getValue())) {
+            std::cout << " ----> ";
+             head = handleAssignment(head); 
+             prevToken = nullptr;
+        }
     } else if (head->getValue() == "procedure" || head->getValue() == "function") {
         std::cout << "DECLARATION\n|\n|\n|\n|\nv\n";
         while(head->getSibling() != nullptr) {
@@ -33,7 +41,18 @@ void Tree::printTree(Token* head, Token* prevToken){
         head = handleAssignment(head); 
         prevToken = nullptr;
         
-    } else if (head->getValue() == "printf"){
+    } else if (head->getValue() == "while"){
+        ignore = false;
+        std::cout << "WHILE ----> ";
+        // This needs to break out to handleAssignment();
+        head = head->getSibling();
+        while(head->getSibling()->getValue() == "("){
+            head = head->getSibling();
+        }
+        head = handleAssignment(head); 
+        prevToken = nullptr;
+        
+    }else if (head->getValue() == "printf"){
         ignore = true;
         std::cout << "PRINTF";
         while (head->getSibling() != nullptr) {
@@ -60,7 +79,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             forCount++;
         }
        
-    } else if (contains(varTypes, prevToken->getValue())) {
+    } else if (prevToken != nullptr && contains(varTypes, prevToken->getValue())) {
         ignore = true; // this was false but i think should be true 
         std::cout << "DECLARATION";
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
@@ -79,7 +98,17 @@ void Tree::printTree(Token* head, Token* prevToken){
             // This needs to break out to handleAssignment();
             head = handleAssignment(head); 
             prevToken = nullptr;
-        } 
+        } else if (isFunction(head->getValue())){
+            ignore = false;
+            isCall = true;
+            std::cout << "CALL";
+            while(head->getSibling() != nullptr) {
+                head = head->getSibling();
+                if (head->getType() == "IDENTIFIER"){
+                    std::cout << " ----> " << head->getValue();
+                }
+            }
+        }
     } else if (head->getSibling() == nullptr && head->getChild() != nullptr && head->getValue() == ";"){
         std::cout << "\n|\n|\n|\n|\nv\n";
     }
@@ -93,6 +122,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         if (!ignore) {
             std::cout << "\n|\n|\n|\n|\nv\n";
         }
+        isCall = false;
         return printTree(head->getChild(), head);
     } 
     return;
@@ -138,26 +168,42 @@ Token* Tree::handleFunction(Token *head, std::vector<Token*>& equationAsVec, boo
 
 Token* Tree::handleAssignment(Token* head) {
     std::vector<Token*> equationAsVec;
-    bool isFunctionCall = false;
-    
+    Token* prev = nullptr;
+    isCall = isFunction(head->getValue());
+
     if (head->getValue() != "(") {
         equationAsVec.push_back(head);
     }
 
+
     head = head->getSibling();
 
-    while(head->getValue() != ";" && (contains(equationOperators, head->getValue()) || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
+    while(head->getValue() != ";" && (contains(equationOperators, head->getValue()) || head->getValue() != ";" || head->getValue() != "[" || head->getValue() != "]" || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
         // Check for function call (identifier with a L_PAREN)
-        if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(") {
-            // Call to handleFunction since we encountered an identifier with a L_PAREN
-            equationAsVec.push_back(head); 
-            head = handleFunction(head, equationAsVec, isFunctionCall);
+        if (isFunction(head->getValue())){
+            isCall = true;
         }
-        else {
+        if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(" && isCall) {
+            // Call to handleFunction since we encountered an identifier with a L_PAREN
+            auto temp = prev;
             equationAsVec.push_back(head); 
+            prev = head;
+            head = handleFunction(head, equationAsVec, isCall);
+            if(temp->getValue() == "!") {
+                equationAsVec.push_back(temp); 
+            }
+        }
+        else if (head->getValue() != "(" && head->getValue() != "!"){
+            if (prev != nullptr && prev->getValue() == "!"){
+                equationAsVec.push_back(head); 
+                equationAsVec.push_back(prev); 
+            } else {
+                equationAsVec.push_back(head); 
+            }
         }
 
         if (head ->getSibling() != nullptr) {
+            prev = head;
             head = head->getSibling();
         } 
         else {
@@ -166,7 +212,7 @@ Token* Tree::handleAssignment(Token* head) {
     } 
     
     // Convert infix to postfix
-    std::vector<Token*> postFix = infixToPostfix(equationAsVec, isFunctionCall);
+    std::vector<Token*> postFix = infixToPostfix(equationAsVec, isCall);
 
     //std::cout << "Size<: " << postFix.size() << std::endl;
     for (int i = 0; i < postFix.size(); i++) {
@@ -211,7 +257,7 @@ std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool i
         std::string tokenValue = t->getValue();
         
         // If it's an operand, add it to the postfix output
-        if (tokenType == "INTEGER" || tokenType == "STRING" || tokenType == "CHARACTER" || tokenType == "IDENTIFIER" || tokenType == "SINGLE_QUOTE" || tokenType == "DOUBLE_QUOTE") {
+        if (tokenType == "INTEGER" || tokenType == "STRING" || tokenType == "CHARACTER" || tokenType == "IDENTIFIER" || tokenType == "SINGLE_QUOTE" || tokenType == "DOUBLE_QUOTE" || tokenValue == "!"){
             postfix.push_back(t);
         }
         // If it's a left parenthesis, push it onto the stack
@@ -239,11 +285,11 @@ std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool i
         }
         // Add array brackets here if it is a function call, if not, it is a normal operator.
         else if (tokenType == "L_BRACKET" || tokenType == "R_BRACKET") {
-            if (isFunctionCall) {
+            //if (isFunctionCall) {
                 postfix.push_back(t);  
-            } else {
-                operators.push(t);  
-            }
+           // } else {
+           //     operators.push(t);  
+          //  }
         }
         // If it's an operator
         else if (isOperator(tokenValue) || tokenType == "GT_EQUAL" || tokenType == "LT_EQUAL" || tokenType == "GT" || tokenType == "LT" || tokenType == "BOOLEAN_EQUAL" || tokenType == "BOOLEAN_AND" || tokenType == "BOOLEAN_NOT") { // can code this to check for all explicit tokens like prev if checks above... can add other tokens to operators too 
@@ -265,4 +311,16 @@ std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool i
     }
 
     return postfix;
+}
+
+
+bool Tree::isFunction(std::string tokenName){
+    Entry* tableHead = symbolTable->getHead();
+    while(tableHead != nullptr) {
+        if ((tableHead->getIDType() == "procedure" || tableHead->getIDType() == "function") && tableHead->getIDName() == tokenName) {
+            return true; 
+        }
+        tableHead = tableHead->getNext();
+    }
+    return false;
 }

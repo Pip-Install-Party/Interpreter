@@ -25,6 +25,7 @@ class Table {
     void begin(Token*);
     void printTable();
     void printParameters();
+    Entry* getHead() {return head;}
     ~Table(){};
 };
 

@@ -100,7 +100,11 @@ void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile,
     Parser *parser = new Parser(tokenList);
     parser->begin();
 
-    Tree* tree = new Tree(parser->getHead());
+    Table *table = new Table;
+
+    table->begin(parser->getHead());
+
+    Tree* tree = new Tree(parser->getHead(), table);
 
 }
 
