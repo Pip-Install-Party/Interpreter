@@ -20,7 +20,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         ignore = false;
         std::cout << "RETURN";
         head = head->getSibling();
-    }else if (head->getValue() == "procedure" || head->getValue() == "function") {
+    } else if (head->getValue() == "procedure" || head->getValue() == "function") {
         std::cout << "DECLARATION\n|\n|\n|\n|\nv\n";
         while(head->getSibling() != nullptr) {
             head = head->getSibling();
@@ -60,7 +60,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             forCount++;
         }
        
-    }else if (contains(varTypes, prevToken->getValue())) {
+    } else if (contains(varTypes, prevToken->getValue())) {
         ignore = true; // this was false but i think should be true 
         std::cout << "DECLARATION";
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
@@ -72,7 +72,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             }
             std::cout << "\n|\n|\n|\n|\nv\n";
         }
-    } else if (head->getType() == "IDENTIFIER") {
+    } else if (head->getType() == "IDENTIFIER") {  
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
             ignore = false;
             std::cout << "ASSIGNMENT" << " ----> ";
@@ -107,24 +107,67 @@ bool Tree::contains(const std::vector<std::string> reserved, std::string type){
     return false;
 }
 
+// Function that handles functions and single normal and single array parameters
+Token* Tree::handleFunction(Token *head, std::vector<Token*>& equationAsVec, bool &isFunctionCall) {
+    head = head->getSibling(); // Should be getting L_PAREN of the function
+    equationAsVec.push_back(head);
+    isFunctionCall = true;  // For infixToPostfix to know we want to eventually output () or []
+
+    while (head->getValue() != ")") {
+        head = head->getSibling();
+        // Array declaration check here, []
+        if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "[") {
+            equationAsVec.push_back(head); // Identifier pushed back
+            head = head->getSibling(); 
+            
+            equationAsVec.push_back(head); // Starting '[' pushed back
+            head = head->getSibling();
+            
+            equationAsVec.push_back(head); // Array size or index here
+            head = head->getSibling();
+            
+            equationAsVec.push_back(head); // Ending ']' pusehd back
+        } 
+        else if (head->getValue() != ")" && head->getValue() != "(") {
+            equationAsVec.push_back(head); // Normal function parameter added ex.func(param)
+        }
+    }
+    equationAsVec.push_back(head); 
+    return head->getSibling(); 
+}
+
 Token* Tree::handleAssignment(Token* head) {
     std::vector<Token*> equationAsVec;
+    bool isFunctionCall = false;
+    
     if (head->getValue() != "(") {
         equationAsVec.push_back(head);
     }
+
     head = head->getSibling();
 
-    while(head->getValue() != ";" &&(contains(equationOperators, head->getValue()) || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
-        equationAsVec.push_back(head); 
+    while(head->getValue() != ";" && (contains(equationOperators, head->getValue()) || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
+        // Check for function call (identifier with a L_PAREN)
+        if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(") {
+            // Call to handleFunction since we encountered an identifier with a L_PAREN
+            equationAsVec.push_back(head); 
+            head = handleFunction(head, equationAsVec, isFunctionCall);
+        }
+        else {
+            equationAsVec.push_back(head); 
+        }
+
         if (head ->getSibling() != nullptr) {
             head = head->getSibling();
-        } else {
+        } 
+        else {
             break;
         }
     } 
     
     // Convert infix to postfix
-    std::vector<Token*> postFix = infixToPostfix(equationAsVec);
+    std::vector<Token*> postFix = infixToPostfix(equationAsVec, isFunctionCall);
+
     //std::cout << "Size<: " << postFix.size() << std::endl;
     for (int i = 0; i < postFix.size(); i++) {
         std::string tokenValue = postFix.at(i)->getValue();
@@ -154,7 +197,7 @@ bool Tree::isOperator(std::string c) {
     return c == "+" || c == "-" || c == "*" || c == "/" || c == "=";
 }
 
-std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix) {
+std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool isFunctionCall) {
     std::stack<Token*> operators;
     std::vector<Token*> postfix;
 
@@ -173,23 +216,40 @@ std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix) {
         }
         // If it's a left parenthesis, push it onto the stack
         else if (tokenType == "L_PAREN") {
-            operators.push(t);
+            if (isFunctionCall) {
+                postfix.push_back(t);  // Push '(' if it's part of a function call to output later
+            } else {
+                operators.push(t);  // Processing a subexpression here (not a function)
+            }
         }
         // If it's a right parenthesis, pop until the left parenthesis
         else if (tokenType == "R_PAREN") {
-            while (!operators.empty() && operators.top()->getValue() != "(") {
-                postfix.push_back(operators.top());
-                operators.pop();
+            if (isFunctionCall) {
+                postfix.push_back(t);  // Push ')' if it's part of a function call to output later
+            } else {
+                // Processing it as a regular subexpression, pop operators until '(' is found
+                while (!operators.empty() && operators.top()->getValue() != "(") {
+                    postfix.push_back(operators.top());
+                    operators.pop();
+                }
+                if (!operators.empty()) {
+                    operators.pop(); 
+                }
             }
-            if (!operators.empty()) { // Pop the left parenthesis
-                operators.pop();
+        }
+        // Add array brackets here if it is a function call, if not, it is a normal operator.
+        else if (tokenType == "L_BRACKET" || tokenType == "R_BRACKET") {
+            if (isFunctionCall) {
+                postfix.push_back(t);  
+            } else {
+                operators.push(t);  
             }
         }
         // If it's an operator
         else if (isOperator(tokenValue) || tokenType == "GT_EQUAL" || tokenType == "LT_EQUAL" || tokenType == "GT" || tokenType == "LT" || tokenType == "BOOLEAN_EQUAL" || tokenType == "BOOLEAN_AND" || tokenType == "BOOLEAN_NOT") { // can code this to check for all explicit tokens like prev if checks above... can add other tokens to operators too 
             // Pop all operators with higher or equal precedence from the stack
             while (!operators.empty() && operators.top()->getType() != "L_PAREN" &&
-                   getPrecedence(operators.top()->getValue()) >= getPrecedence(tokenValue)) {
+                    getPrecedence(operators.top()->getValue()) >= getPrecedence(tokenValue)) {
                 postfix.push_back(operators.top());
                 operators.pop();
             }
