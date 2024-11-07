@@ -2,15 +2,19 @@
 #define TREE_H
 #include <iostream>
 #include "token.h"
+#include "table.h"
 #include <vector>
 
 const std::vector<std::string> varTypes = {"int", "void", "char", "bool", "string", "short", "long"};
-const std::vector<std::string> equationOperators = {"+", "-", "/", "%", "*", "(", ")", "=", "'", "<", ">", "<=", ">=", "&&"};
+const std::vector<std::string> equationOperators = {"+", "-", "/", "%", "*", "(", ")", "=", "==", "'", "<", ">", "<=", ">=", "&&"};
 
 class Tree {
     private:
+        Table* symbolTable;
+        bool isCall = false;
         void printTree(Token*, Token*);
         bool contains(const std::vector<std::string>, std::string);
+        bool isFunction(std::string tokenName);
         Token* handleAssignment(Token*);
         Token* handleFunction(Token *,std::vector<Token*>& equationAsVec, bool& isFunctionCall);
         int getPrecedence(std::string op);
@@ -19,7 +23,7 @@ class Tree {
 
 
     public: 
-        Tree(Token* head) { printTree(head, nullptr); }
+        Tree(Token* head, Table* table) { symbolTable = table; printTree(head, nullptr); }
         ~Tree();
 };
 
