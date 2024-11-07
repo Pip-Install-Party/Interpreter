@@ -33,6 +33,19 @@ void Tree::printTree(Token* head, Token* prevToken){
         head = handleAssignment(head); 
         prevToken = nullptr;
         
+    } else if (head->getValue() == "printf"){
+        ignore = true;
+        std::cout << "PRINTF";
+        while (head->getSibling() != nullptr) {
+            head = head->getSibling();
+            if (head->getType() != "L_PAREN" && head->getType() != "R_PAREN" && head->getType() != "DOUBLE_QUOTE" && head->getType() != "COMMA" && head->getType() != "SEMICOLON") {
+                std::cout << " ----> ";
+                std::cout << head->getValue();
+            }
+        }
+        std::cout << "\n|\n|\n|\n|\nv\n";
+        prevToken = nullptr;
+        
     } else if (head->getValue() == "for"){
         short forCount = 0;
         ignore = false;
@@ -41,12 +54,14 @@ void Tree::printTree(Token* head, Token* prevToken){
             head = head->getSibling();
             head = handleAssignment(head); 
             prevToken = nullptr;
-            std::cout << "\n|\n|\n|\n|\nv\n ";
+            if (forCount+1 < 3) {
+                std::cout << "\n|\n|\n|\n|\nv\n "; 
+            }
             forCount++;
         }
        
     }else if (contains(varTypes, prevToken->getValue())) {
-        ignore = false;
+        ignore = true; // this was false but i think should be true 
         std::cout << "DECLARATION";
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
             while(head->getSibling() != nullptr) {
@@ -55,6 +70,7 @@ void Tree::printTree(Token* head, Token* prevToken){
                     std::cout << "\n|\n|\n|\n|\nv\nDECLARATION";
                 }
             }
+            std::cout << "\n|\n|\n|\n|\nv\n";
         }
     } else if (head->getType() == "IDENTIFIER") {
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
@@ -65,7 +81,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             prevToken = nullptr;
         } 
     } else if (head->getSibling() == nullptr && head->getChild() != nullptr && head->getValue() == ";"){
-        std::cout << "\n|\n|\n|\n|\nv\n ";
+        std::cout << "\n|\n|\n|\n|\nv\n";
     }
     if (head->getSibling() != nullptr) {
         if (!ignore){
@@ -75,7 +91,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         return printTree(head->getSibling(), head);
     } else if (head->getChild() != nullptr) {
         if (!ignore) {
-            std::cout << "\n|\n|\n|\n|\nv\n ";
+            std::cout << "\n|\n|\n|\n|\nv\n";
         }
         return printTree(head->getChild(), head);
     } 
