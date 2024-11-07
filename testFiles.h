@@ -20,7 +20,8 @@ const std::filesystem::path a2Tests[] = {
    "Tests/Program2/programming_assignment_2-test_file_3.c",
    "Tests/Program2/programming_assignment_2-test_file_4.c",
    "Tests/Program2/programming_assignment_2-test_file_5.c",
-   "Tests/Program2/programming_assignment_2-test_file_6.c"
+   "Tests/Program2/programming_assignment_2-test_file_6.c",
+   "Tests/Program2/programming_assignment_2-test_file_7.c"
 };
 
 // Assignment 3

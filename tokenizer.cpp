@@ -228,6 +228,8 @@ void Tokenizer::state5(std::istringstream &inputStream, int &lineCount) {
         // Add the accumulated string as a CHARACTER token, may need to be renamed in the future.
         Token token("CHARACTER", strLiteral, lineCount);
         tokenList.push_back(token);
+        Token endingQuote("SINGLE_QUOTE", "\'", lineCount);
+        tokenList.push_back(endingQuote);
     }
 }
 
