@@ -162,7 +162,7 @@ Rolando Yax - [LinkedIn](linkedin.com/in/rolandoyax)
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <!-- LICENSE -->
-## Acknowledgements
+## Acknowledgments
 
 Test files were provided by Robert Bruce.
 
