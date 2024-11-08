@@ -75,14 +75,15 @@
 Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
 
 <!-- GETTING STARTED -->
+<a id="readme-getting-started"></a>
 ## Getting Started
 
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
-### Running The Program
+## Running The Program
 
-## MacOS / Linux 
+### MacOS / Linux 
   1. Clone the repo
    ```sh
    git clone https://github.com/github_username/repo_name.git
@@ -96,7 +97,7 @@ To get a local copy up and running follow these simple example steps.
    ./interpreter.x
   ```
 
-## Windows 
+### Windows 
  1. Clone the repo
    ```sh
    git clone https://github.com/github_username/repo_name.git
@@ -111,25 +112,12 @@ To get a local copy up and running follow these simple example steps.
   ```
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
 This project was implemented in stages. Each state builds from the last and ultimately constructed an interpreter. 
 
-1️⃣ - [Ignoring Comments](https://github.com/Pip-Install-Party/Ignoring-Comments)  
+1️⃣ - [Comment Removal](https://github.com/Pip-Install-Party/Ignoring-Comments)  
 2️⃣ - [Tokenization](https://github.com/Pip-Install-Party/Tokenization)  
 3️⃣ - [Recursive Descent Parser](https://github.com/Pip-Install-Party/Recursive-Descent-Parser)  
 4️⃣ - [Symbol Table](https://github.com/Pip-Install-Party/Symbol-Table)  
@@ -140,6 +128,24 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- USAGE EXAMPLES -->
+## Usage
+
+The interpreter is capable of producing output for code written in the C language.
+See <p align="right">(<a href="#readme-getting-started">getting-started.</a>)</p>
+
+
+### Testing 
+
+In addition to interpretting code, this program also lets you test its various components. 
+Upon starting the program, the interface will display an option to "test components". 
+Selecting this option will allow you to view the output of the following components:
+
+1. Comment Removal
+2. Tokenization
+3. Recursive Descent Parser
+4. Symbol Table
+5. Abstract Syntax Tree
 
 
 <!-- CONTRIBUTING -->
