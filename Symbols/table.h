@@ -2,7 +2,7 @@
 #define TABLE_H
 
 #include <iostream>
-#include "token.h"
+#include "../Tokens/token.h"
 #include "entry.h"
 #include <vector>
 
