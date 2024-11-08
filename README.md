@@ -13,7 +13,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 
@@ -78,15 +77,14 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 <a id="readme-getting-started"></a>
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+The interpreter is compatible with Windows, MacOS, and Linux. 
 
-## Running The Program
+### Running The Program
 
 ### MacOS / Linux 
   1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/Pip-Install-Party/Interpreter.git
    ```
   2. Run the makefile
   ```sh
@@ -100,7 +98,7 @@ To get a local copy up and running follow these simple example steps.
 ### Windows 
  1. Clone the repo
    ```sh
-   git clone https://github.com/github_username/repo_name.git
+   git clone https://github.com/Pip-Install-Party/Interpreter.git
    ```
   2. Run the makefile
   ```sh
@@ -115,7 +113,7 @@ To get a local copy up and running follow these simple example steps.
 <!-- ROADMAP -->
 ## Roadmap
 
-This project was implemented in stages. Each state builds from the last and ultimately constructed an interpreter. 
+This project was implemented in stages. Each state builds from the last and ultimately constructs an interpreter. 
 
 1️⃣ - [Comment Removal](https://github.com/Pip-Install-Party/Ignoring-Comments)  
 2️⃣ - [Tokenization](https://github.com/Pip-Install-Party/Tokenization)  
@@ -132,7 +130,7 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 ## Usage
 
 The interpreter is capable of producing output for code written in the C language.
-See <p align="right">(<a href="#readme-getting-started">getting-started.</a>)</p>
+See <a href="#readme-getting-started">getting-started</a>.
 
 
 ### Testing 
@@ -158,6 +156,14 @@ Five students worked together to construct the interpreter.
 </a>
 
 
+<!-- CONTACT -->
+### Connect With Us
+
+Blake Marshall - [LinkedIn](linkedin.com/in/blakemarshalll)  
+Brandon Robinson - [LinkedIn](linkedin.com/in/brandon-robinson-uscg)  
+Holden Ea - [LinkedIn](linkedin.com/in/holden-ea-28a535208)  
+Jacob Sellers - [LinkedIn](linkedin.com/in/jacob-sellers-83840826a)  
+Rolando Yax - [LinkedIn](linkedin.com/in/rolandoyax)  
 
 <!-- LICENSE -->
 ## License
@@ -166,32 +172,19 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- CONTACT -->
-## Connect With Us
-
-Blake Marshall - [LinkedIn](linkedin.com/in/blakemarshalll)  
-Brandon Robinson - [LinkedIn](linkedin.com/in/brandon-robinson-uscg)  
-Holden Ea - [LinkedIn](linkedin.com/in/holden-ea-28a535208)  
-Jacob Sellers - [LinkedIn](linkedin.com/in/jacob-sellers-83840826a)  
-Rolando Yax - [LinkedIn](linkedin.com/in/rolandoyax)  
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/github_username/repo_name/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo_name/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[contributors-url]: https://github.com/Pip-Install-Party/Interpreter/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[forks-url]: https://github.com/Pip-Install-Party/Interpreter/network/members
+[stars-shield]: https://img.shields.io/github/stars/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[stars-url]: https://github.com/Pip-Install-Party/Interpreter/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[issues-url]: https://github.com/Pip-Install-Party/Interpreter/issues
+[license-shield]: https://img.shields.io/github/license/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[license-url]: https://github.com/Pip-Install-Party/Interpreter/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
