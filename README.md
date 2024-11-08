@@ -50,10 +50,10 @@
         <li><a href="#running">Running The Program</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#contributors">Contributors</a></li>
+    <li><a href="#connect-with-us">Connect</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -137,7 +137,7 @@ Selecting this option will allow you to view the output of the following compone
 5. Abstract Syntax Tree
 
 
-<!-- CONTRIBUTING -->
+<!-- CONTRIBUTORS -->
 ## Contributors
 
 Five students worked together to construct the interpreter. 
@@ -147,7 +147,7 @@ Five students worked together to construct the interpreter.
 </a>
 
 
-<!-- CONTACT -->
+<!-- CONNECT -->
 ### Connect With Us
 
 Blake Marshall - [LinkedIn](linkedin.com/in/blakemarshalll)  
