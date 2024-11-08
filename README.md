@@ -8,13 +8,15 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+<div align="center">
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 
-
+</div>
 
 <!-- PROJECT LOGO -->
 <br />
@@ -28,11 +30,8 @@
   <p align="center">
     This is an interpreter for the C language. 
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
+    <a href="https://github.com/Pip-Install-Party/Interpreter/blob/main/README.md"><strong>Explore the docs »</strong></a>
   </p>
 </div>
 
@@ -69,9 +68,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
+This program was completed as a final project among five students for CS460 (Programming Languages) at Sonoma State University in fall 2024. 
 
 <!-- GETTING STARTED -->
 <a id="readme-getting-started"></a>
@@ -108,8 +105,6 @@ The interpreter is compatible with Windows, MacOS, and Linux.
   ```sh
    ./interpreter.exe
   ```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- ROADMAP -->
 ## Roadmap
 
@@ -124,12 +119,12 @@ This project was implemented in stages. Each state builds from the last and ulti
 
 See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The interpreter is capable of producing output for code written in the C language.
+The interpreter is capable of producing output for code written in the C language. The program may also work with *some* programs written 
+in C++, however differences in reserved words (such as int) may lead to unexpected output. Results with langages other than C are not guaranteed. 
+
 See <a href="#readme-getting-started">getting-started</a>.
 
 
@@ -182,7 +177,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [stars-url]: https://github.com/Pip-Install-Party/Interpreter/stargazers
 [issues-shield]: https://img.shields.io/github/issues/Pip-Install-Party/Interpreter.svg?style=for-the-badge
 [issues-url]: https://github.com/Pip-Install-Party/Interpreter/issues
-[license-shield]: https://img.shields.io/github/license/Pip-Install-Party/Interpreter.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+
 [license-url]: https://github.com/Pip-Install-Party/Interpreter/blob/main/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [product-screenshot]: images/screenshot.png
