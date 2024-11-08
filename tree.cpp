@@ -1,41 +1,77 @@
 #include "tree.h"
 #include <stack>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <filesystem>
+#include <sstream>
+
+ // Make an output filestream
+std::string filename = "AST_test_file_output.txt";
+std::ofstream ASTOutput(filename);
+
+// Prints an arrow for our output
+void printArrow(int spaces){
+    std::vector<char> arrowCharacters = {'|','|','|','|','v'};
+    ASTOutput << '\n';
+    for (int i =0; i < arrowCharacters.size(); i++){
+        for (int j = 0; j < spaces; j++) {
+            ASTOutput << ' ' ;
+        }
+            ASTOutput << arrowCharacters.at(i) << '\n';
+    }
+    for (int k = 0; k < spaces; k++) {
+	    ASTOutput << ' ';
+    }
+} 
 
 // Prints the abstract syntax tree to the provided output stream
 void Tree::printTree(Token* head, Token* prevToken){
+    
+    int lineNumber = 1;
     bool ignore = true;
+
     if (head == nullptr){
         return;
     }
     if (head->getValue() == "{") {
         ignore = false;
-        std::cout << "BEGIN BLOCK";
+        ASTOutput << "BEGIN BLOCK";
+	spaceCount += 11;
     } else if (head->getValue() == "}") {
         ignore = false;
-        std::cout << "END BLOCK";
+        ASTOutput << "END BLOCK";
+	spaceCount += 9;
     } else if(head->getValue() == "else"){
         ignore = false;
-        std::cout << "ELSE";
+        ASTOutput << "ELSE";
+	spaceCount += 4;
     } else if(head->getValue() == "return"){
         ignore = false;
-        std::cout << "RETURN";
+        ASTOutput << "RETURN";
+	spaceCount += 6;
         head = head->getSibling();
         while(head->getValue() == "("){
             head = head->getSibling();
         }
         if (head->getSibling() != nullptr && contains(equationOperators, head->getSibling()->getValue())) {
-            std::cout << " ----> ";
+            ASTOutput << " ----> ";
+	    spaceCount += 7;
             head = handleAssignment(head); 
             prevToken = nullptr;
         }
     } else if (head->getValue() == "procedure" || head->getValue() == "function") {
-        std::cout << "DECLARATION\n|\n|\n|\n|\nv\n";
+        lineNumber += 6;
+        ASTOutput << "DECLARATION";
+	spaceCount += 11;
+	printArrow(spaceCount);
         while(head->getSibling() != nullptr) {
             head = head->getSibling();
         }
     } else if (head->getValue() == "if"){
         ignore = false;
-        std::cout << "IF ----> ";
+        ASTOutput << "IF ----> ";
+	spaceCount += 9;
         // This needs to break out to handleAssignment();
         head = head->getSibling();
         head = handleAssignment(head); 
@@ -43,7 +79,8 @@ void Tree::printTree(Token* head, Token* prevToken){
         
     } else if (head->getValue() == "while"){
         ignore = false;
-        std::cout << "WHILE ----> ";
+        ASTOutput << "WHILE ----> ";
+	spaceCount += 12;
         // This needs to break out to handleAssignment();
         head = head->getSibling();
         while(head->getSibling()->getValue() == "("){
@@ -54,39 +91,49 @@ void Tree::printTree(Token* head, Token* prevToken){
         
     }else if (head->getValue() == "printf"){
         ignore = true;
-        std::cout << "PRINTF";
+        ASTOutput << "PRINTF";
+	spaceCount += 6;
         while (head->getSibling() != nullptr) {
             head = head->getSibling();
             if (head->getType() != "L_PAREN" && head->getType() != "R_PAREN" && head->getType() != "DOUBLE_QUOTE" && head->getType() != "COMMA" && head->getType() != "SEMICOLON") {
-                std::cout << " ----> ";
-                std::cout << head->getValue();
+                ASTOutput << " ----> ";
+		spaceCount += 7;
+                ASTOutput << head->getValue();
+		spaceCount += head->getValue().length();
             }
         }
-        std::cout << "\n|\n|\n|\n|\nv\n";
+        lineNumber += 6;
+        printArrow(spaceCount);
         prevToken = nullptr;
         
     } else if (head->getValue() == "for"){
         short forCount = 0;
         ignore = false;
         while (forCount < 3){
-            std::cout << "FOR EXPRESSION " << forCount+1 << " ----> ";
+            ASTOutput << "FOR EXPRESSION " << forCount+1 << " ----> ";
+	    spaceCount += 23;
             head = head->getSibling();
             head = handleAssignment(head); 
             prevToken = nullptr;
             if (forCount+1 < 3) {
-                std::cout << "\n|\n|\n|\n|\nv\n "; 
-            }
+                lineNumber += 6;
+                printArrow(spaceCount);
+	    }
             forCount++;
         }
        
     } else if (prevToken != nullptr && contains(varTypes, prevToken->getValue())) {
         ignore = false; // this was false but i think should be true 
-        std::cout << "DECLARATION";
+	ASTOutput << "DECLARATION";
+	spaceCount += 11;
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
             while(head->getSibling() != nullptr) {
                 head = head->getSibling();
                 if (head->getType() == "IDENTIFIER") {
-                    std::cout << "\n|\n|\n|\n|\nv\nDECLARATION";
+        	    lineNumber += 6;
+        	    printArrow(spaceCount);
+		    ASTOutput << "DECLARATION";
+		    spaceCount += 11;
                 }
             } 
         } else {
@@ -95,38 +142,46 @@ void Tree::printTree(Token* head, Token* prevToken){
     } else if (head->getType() == "IDENTIFIER") {  
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
             ignore = false;
-            std::cout << "ASSIGNMENT" << " ----> ";
+            ASTOutput << "ASSIGNMENT" << " ----> ";
+	    spaceCount += 17;
             // This needs to break out to handleAssignment();
             head = handleAssignment(head); 
             prevToken = nullptr;
         } else if (head->getSibling() != nullptr && isIndex(head->getSibling()->getType())){ // checks for "L_BRACKET" to see if assigning an index... if so print extra characters and resume as normal
-            std::cout << "ASSIGNMENT" << " ----> ";
-            head = handleAssignment(head); 
-            std::cout << "\n|\n|\n|\n|\nv\n";
+            ASTOutput << "ASSIGNMENT" << " ----> ";
+	    spaceCount += 17;
+            head = handleAssignment(head);
+            lineNumber += 6;
+            printArrow(spaceCount);
         } else if (isFunction(head->getValue())){
             ignore = false;
             isCall = true;
-            std::cout << "CALL";
+            ASTOutput << "CALL";
+	    spaceCount += 4;
             while(head->getSibling() != nullptr) {
                 if (head->getType() == "IDENTIFIER" || head->getType() == "L_PAREN" || head->getType() == "R_PAREN"){
-                    std::cout << " ----> " << head->getValue();
+                    ASTOutput << " ----> " << head->getValue();
+		    spaceCount += 7 + head->getValue().length();
                 }
                 head = head->getSibling();
             }
         }
     } else if (head->getSibling() == nullptr && head->getChild() != nullptr && head->getValue() == ";"){
-        std::cout << "\n|\n|\n|\n|\nv\n";
+        lineNumber += 6;
+        printArrow(spaceCount);
     }
     if (head->getSibling() != nullptr) {
         if (!ignore){
-            std::cout << " ----> ";
-            std::cout << head->getValue();
+            ASTOutput << " ----> ";
+            ASTOutput << head->getValue();
+	    spaceCount += 7 + head->getValue().length();
         }
         return printTree(head->getSibling(), head);
     } else if (head->getChild() != nullptr) {
         if (!ignore) {
-            std::cout << "\n|\n|\n|\n|\nv\n";
-        }
+        lineNumber += 6;
+        printArrow(spaceCount);
+	}
         isCall = false;
         return printTree(head->getChild(), head);
     } 
@@ -181,7 +236,8 @@ Token* Tree::handleIndex(Token * head, std::vector<Token*>& equationAsVec) {
         head = head->getSibling(); 
         equationAsVec.push_back(head); 
     } else {
-        std::cout << "error incorrectly formatted index" << std::endl;
+	std::cerr << "error incorrectly formatted index" << std::endl;
+	exit (1);
     }
     equationAsVec.push_back(head);  
     return head->getSibling(); 
@@ -192,7 +248,6 @@ Token* Tree::handleAssignment(Token* head) {
     Token* prev = nullptr;
     isCall = isFunction(head->getValue());
     bool isIndex = Tree::isIndex(head->getType());
-
     if (head->getValue() != "(") {
         equationAsVec.push_back(head);
     }
@@ -265,16 +320,16 @@ Token* Tree::handleAssignment(Token* head) {
     
     // Convert infix to postfix
     std::vector<Token*> postFix = infixToPostfix(equationAsVec, isCall);
-    //std::cout << "Size<: " << postFix.size() << std::endl;
     for (int i = 0; i < postFix.size(); i++) {
         std::string tokenValue = postFix.at(i)->getValue();
-       // std::cout << "\ncurr token = " << tokenValue << " next token = " << postFix.at(i+1) << std::endl;
 
         // Print token value directly and mark that a space is needed
         if (!tokenValue.empty()) {
-            std::cout << tokenValue;
+            ASTOutput << tokenValue;
+	    spaceCount += tokenValue.length();
             if (i != postFix.size() - 1) {
-                std::cout << " ----> ";
+                ASTOutput << " ----> ";
+		spaceCount += 7;
             }
         }
     }
@@ -297,11 +352,6 @@ bool Tree::isOperator(std::string c) {
 std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool isFunctionCall) {
     std::stack<Token*> operators;
     std::vector<Token*> postfix;
-
-    // std::cout << "PRINTING: ";
-    //  for (Token* t : infix) {
-    //     std::cout << t->getValue();
-    //  }
 
     for (Token* t : infix) {
         std::string tokenType = t->getType();
@@ -336,11 +386,7 @@ std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool i
         }
         // Add array brackets here if it is a function call, if not, it is a normal operator.
         else if (tokenType == "L_BRACKET" || tokenType == "R_BRACKET") {
-            //if (isFunctionCall) {
                 postfix.push_back(t);  
-           // } else {
-           //     operators.push(t);  
-          //  }
         }
         // If it's an operator
         else if (isOperator(tokenValue) || tokenType == "GT_EQUAL" || tokenType == "LT_EQUAL" || tokenType == "GT" || tokenType == "LT" || tokenType == "BOOLEAN_EQUAL" || tokenType == "BOOLEAN_AND" || tokenType == "BOOLEAN_NOT") { // can code this to check for all explicit tokens like prev if checks above... can add other tokens to operators too 

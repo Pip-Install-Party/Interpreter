@@ -22,7 +22,7 @@ class Tree {
         bool isIndex(std::string);
         bool isOperator(std::string c);
         std::vector<Token*> infixToPostfix(const std::vector<Token*> infix, bool isFunctionCall);
-
+	short spaceCount = 0;
 
     public: 
         Tree(Token* head, Table* table) { symbolTable = table; printTree(head, nullptr); }
