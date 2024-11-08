@@ -1,17 +1,10 @@
 #include "tree.h"
 #include <stack>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <filesystem>
-#include <sstream>
 
- // Make an output filestream
-std::string filename = "AST_test_file_output.txt";
-std::ofstream ASTOutput(filename);
 
 // Prints an arrow for our output
-void printArrow(int spaces){
+void printArrow(int spaces, std::ofstream& ASTOutput){
     std::vector<char> arrowCharacters = {'|','|','|','|','v'};
     ASTOutput << '\n';
     for (int i =0; i < arrowCharacters.size(); i++){
@@ -26,7 +19,7 @@ void printArrow(int spaces){
 } 
 
 // Prints the abstract syntax tree to the provided output stream
-void Tree::printTree(Token* head, Token* prevToken){
+void Tree::printTree(Token* head, Token* prevToken, std::ofstream& ASTOutput){
     
     int lineNumber = 1;
     bool ignore = true;
@@ -57,14 +50,14 @@ void Tree::printTree(Token* head, Token* prevToken){
         if (head->getSibling() != nullptr && contains(equationOperators, head->getSibling()->getValue())) {
             ASTOutput << " ----> ";
 	    spaceCount += 7;
-            head = handleAssignment(head); 
+            head = handleAssignment(head, ASTOutput); 
             prevToken = nullptr;
         }
     } else if (head->getValue() == "procedure" || head->getValue() == "function") {
         lineNumber += 6;
         ASTOutput << "DECLARATION";
 	spaceCount += 11;
-	printArrow(spaceCount);
+	printArrow(spaceCount, ASTOutput);
         while(head->getSibling() != nullptr) {
             head = head->getSibling();
         }
@@ -74,7 +67,7 @@ void Tree::printTree(Token* head, Token* prevToken){
 	spaceCount += 9;
         // This needs to break out to handleAssignment();
         head = head->getSibling();
-        head = handleAssignment(head); 
+        head = handleAssignment(head, ASTOutput); 
         prevToken = nullptr;
         
     } else if (head->getValue() == "while"){
@@ -86,7 +79,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         while(head->getSibling()->getValue() == "("){
             head = head->getSibling();
         }
-        head = handleAssignment(head); 
+        head = handleAssignment(head, ASTOutput); 
         prevToken = nullptr;
         
     }else if (head->getValue() == "printf"){
@@ -103,7 +96,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             }
         }
         lineNumber += 6;
-        printArrow(spaceCount);
+        printArrow(spaceCount, ASTOutput);
         prevToken = nullptr;
         
     } else if (head->getValue() == "for"){
@@ -113,11 +106,11 @@ void Tree::printTree(Token* head, Token* prevToken){
             ASTOutput << "FOR EXPRESSION " << forCount+1 << " ----> ";
 	    spaceCount += 23;
             head = head->getSibling();
-            head = handleAssignment(head); 
+            head = handleAssignment(head, ASTOutput); 
             prevToken = nullptr;
             if (forCount+1 < 3) {
                 lineNumber += 6;
-                printArrow(spaceCount);
+                printArrow(spaceCount, ASTOutput);
 	    }
             forCount++;
         }
@@ -131,7 +124,7 @@ void Tree::printTree(Token* head, Token* prevToken){
                 head = head->getSibling();
                 if (head->getType() == "IDENTIFIER") {
         	    lineNumber += 6;
-        	    printArrow(spaceCount);
+        	    printArrow(spaceCount, ASTOutput);
 		    ASTOutput << "DECLARATION";
 		    spaceCount += 11;
                 }
@@ -145,14 +138,14 @@ void Tree::printTree(Token* head, Token* prevToken){
             ASTOutput << "ASSIGNMENT" << " ----> ";
 	    spaceCount += 17;
             // This needs to break out to handleAssignment();
-            head = handleAssignment(head); 
+            head = handleAssignment(head, ASTOutput); 
             prevToken = nullptr;
         } else if (head->getSibling() != nullptr && isIndex(head->getSibling()->getType())){ // checks for "L_BRACKET" to see if assigning an index... if so print extra characters and resume as normal
             ASTOutput << "ASSIGNMENT" << " ----> ";
 	    spaceCount += 17;
-            head = handleAssignment(head);
+            head = handleAssignment(head, ASTOutput);
             lineNumber += 6;
-            printArrow(spaceCount);
+            printArrow(spaceCount, ASTOutput);
         } else if (isFunction(head->getValue())){
             ignore = false;
             isCall = true;
@@ -168,7 +161,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         }
     } else if (head->getSibling() == nullptr && head->getChild() != nullptr && head->getValue() == ";"){
         lineNumber += 6;
-        printArrow(spaceCount);
+        printArrow(spaceCount, ASTOutput);
     }
     if (head->getSibling() != nullptr) {
         if (!ignore){
@@ -176,14 +169,14 @@ void Tree::printTree(Token* head, Token* prevToken){
             ASTOutput << head->getValue();
 	    spaceCount += 7 + head->getValue().length();
         }
-        return printTree(head->getSibling(), head);
+        return printTree(head->getSibling(), head, ASTOutput);
     } else if (head->getChild() != nullptr) {
         if (!ignore) {
         lineNumber += 6;
-        printArrow(spaceCount);
+        printArrow(spaceCount, ASTOutput);
 	}
         isCall = false;
-        return printTree(head->getChild(), head);
+        return printTree(head->getChild(), head, ASTOutput);
     } 
     return;
 }
@@ -243,7 +236,7 @@ Token* Tree::handleIndex(Token * head, std::vector<Token*>& equationAsVec) {
     return head->getSibling(); 
 }
 
-Token* Tree::handleAssignment(Token* head) {
+Token* Tree::handleAssignment(Token* head, std::ofstream& ASTOutput) {
     std::vector<Token*> equationAsVec;
     Token* prev = nullptr;
     isCall = isFunction(head->getValue());

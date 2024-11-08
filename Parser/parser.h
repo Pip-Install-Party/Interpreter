@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "tokenizer.h"
+#include "../Tokens/tokenizer.h"
 #include <queue>
 
 namespace TokenTypes {
