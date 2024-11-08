@@ -175,33 +175,58 @@ Token* Tree::handleAssignment(Token* head) {
         equationAsVec.push_back(head);
     }
 
-
     head = head->getSibling();
-
-    while(head->getValue() != ";" && (contains(equationOperators, head->getValue()) || head->getValue() != ";" || head->getValue() != "[" || head->getValue() != "]" || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
-        // Check for function call (identifier with a L_PAREN)
-        if (isFunction(head->getValue())){
-            isCall = true;
-        }
-        if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(" && isCall) {
-            // Call to handleFunction since we encountered an identifier with a L_PAREN
+    
+    
+    //while(head != nullptr && head->getValue() != ";" && (contains(equationOperators, head->getValue()) || head->getValue() != ";" || head->getValue() != "[" || head->getValue() != "]" || head->getType() == "IDENTIFIER" || head->getType() == "INTEGER" || head->getType() == "CHARACTER" || head->getType() == "STRING" || head->getType() == "DOUBLE_QUOTE")) {
+    // Tokens processed until semicolon is reached
+    while(head != nullptr && head->getValue() != ";") {
+        
+        // Process head as a function, since it is a function name followed by L_PAREN
+        if (isFunction(head->getValue()) && head->getSibling() && head->getSibling()->getValue() == "("){
+            equationAsVec.push_back(head); // Function's name
+            head = handleFunction(head, equationAsVec, isCall); // Process function parameters
+            
+            // Checking if function has a '!'
+            if (prev != nullptr && prev->getValue() == "!") {
+                equationAsVec.push_back(prev);
+                prev = nullptr; 
+            }
+        
+        } 
+        // Process head as an identifier followed by '('
+        else if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(" && isCall) {
             auto temp = prev;
-            equationAsVec.push_back(head); 
+            equationAsVec.push_back(head); // Add identifier
             prev = head;
-            head = handleFunction(head, equationAsVec, isCall);
-            if(temp->getValue() == "!") {
-                equationAsVec.push_back(temp); 
+            head = handleFunction(head, equationAsVec, isCall); // Process function
+
+            // Checking if function has a '!'
+            if (prev != nullptr && prev->getValue() == "!") {
+                equationAsVec.push_back(prev);
+                prev = nullptr;  
             }
         }
-        else if (head->getValue() != "(" && head->getValue() != "!"){
+        // Checking for a '!' before function or expressions and set to prev until we process function or identifier
+        else if (head->getValue() == "!") {
+            prev = head;
+        }
+        // Checking for parentheses
+        else if (head->getValue() == "(" || head->getValue() == ")") {
+            equationAsVec.push_back(head);  
+        }
+        // Any other operand pushed here
+        else if (head->getValue() != "(" && head->getValue() != "!"){  
+            equationAsVec.push_back(head); 
+
+            // Any '!' before operand
             if (prev != nullptr && prev->getValue() == "!"){
-                equationAsVec.push_back(head); 
                 equationAsVec.push_back(prev); 
-            } else {
-                equationAsVec.push_back(head); 
-            }
+                prev = nullptr;  
+            } 
         }
 
+        // Go to next token or break if none left
         if (head ->getSibling() != nullptr) {
             prev = head;
             head = head->getSibling();
@@ -209,11 +234,11 @@ Token* Tree::handleAssignment(Token* head) {
         else {
             break;
         }
+        
     } 
     
     // Convert infix to postfix
     std::vector<Token*> postFix = infixToPostfix(equationAsVec, isCall);
-
     //std::cout << "Size<: " << postFix.size() << std::endl;
     for (int i = 0; i < postFix.size(); i++) {
         std::string tokenValue = postFix.at(i)->getValue();
