@@ -107,10 +107,10 @@ void Tree::printTree(Token* head, Token* prevToken){
             isCall = true;
             std::cout << "CALL";
             while(head->getSibling() != nullptr) {
-                head = head->getSibling();
                 if (head->getType() == "IDENTIFIER" || head->getType() == "L_PAREN" || head->getType() == "R_PAREN"){
                     std::cout << " ----> " << head->getValue();
                 }
+                head = head->getSibling();
             }
         }
     } else if (head->getSibling() == nullptr && head->getChild() != nullptr && head->getValue() == ";"){
