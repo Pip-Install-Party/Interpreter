@@ -104,7 +104,7 @@ The interpreter is compatible with Windows, MacOS, and Linux.
 <!-- ROADMAP -->
 ## Roadmap
 
-This project was implemented in stages. Each state builds from the last and ultimately constructs an interpreter. 
+This project was implemented in stages. Each stage builds from the last and ultimately constructs an interpreter. 
 
 1️⃣ - [Comment Removal](https://github.com/Pip-Install-Party/Ignoring-Comments)  
 2️⃣ - [Tokenization](https://github.com/Pip-Install-Party/Tokenization)  
@@ -119,7 +119,7 @@ See the [open issues](https://github.com/github_username/repo_name/issues) for a
 ## Usage
 
 The interpreter is capable of producing output for code written in the C language. The program may also work with *some* programs written 
-in C++, however differences in reserved words (such as int) may lead to unexpected output. Results with langages other than C are not guaranteed. 
+in C++, however differences in reserved words (such as string) may lead to unexpected output. Results with langages other than C are not guaranteed. 
 
 See <a href="#readme-getting-started">getting-started</a>.
 
