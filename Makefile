@@ -1,5 +1,5 @@
-tree.x: main.o commentDFA.o tokenizer.o parser.o table.o tree.o
-	g++ -std=c++17 -g main.o commentDFA.o tokenizer.o parser.o table.o tree.o -o tree.x
+interpreter.x: main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o
+	g++ -std=c++17 -g main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o -o interpreter.x
 
 main.o: main.cpp commentDFA.h tokenizer.h parser.h testFiles.h
 	g++ -std=c++17 -g main.cpp -o main.o -c
@@ -19,5 +19,8 @@ table.o: table.cpp table.h
 tree.o: tree.cpp tree.h
 	g++ -std=c++17 -g tree.cpp -o tree.o -c
 
+interpreter.o: interpreter.cpp interpreter.h
+	g++ -std=c++17 -g interpreter.cpp -o interpreter.o -c
+
 clean:
-	rm -f tree.x *.o *.txt
+	rm -f interpreter.x *.o *.txt
