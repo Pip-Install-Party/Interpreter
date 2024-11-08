@@ -80,7 +80,7 @@ void Tree::printTree(Token* head, Token* prevToken){
         }
        
     } else if (prevToken != nullptr && contains(varTypes, prevToken->getValue())) {
-        ignore = true; // this was false but i think should be true 
+        ignore = false; // this was false but i think should be true 
         std::cout << "DECLARATION";
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == ",") {
             while(head->getSibling() != nullptr) {
@@ -88,8 +88,9 @@ void Tree::printTree(Token* head, Token* prevToken){
                 if (head->getType() == "IDENTIFIER") {
                     std::cout << "\n|\n|\n|\n|\nv\nDECLARATION";
                 }
-            }
-            //std::cout << "\n|\n|\n|\n|\nv\n"; // ****** removed for test case 4 
+            } 
+        } else {
+            ignore = true; 
         }
     } else if (head->getType() == "IDENTIFIER") {  
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
