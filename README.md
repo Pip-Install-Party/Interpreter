@@ -113,7 +113,7 @@ This project was implemented in stages. Each stage builds from the last and ulti
 5️⃣ - [Abstract Syntax Tree](https://github.com/Pip-Install-Party/Abstract-Syntax-Tree)  
 6️⃣ - [Interpreter](https://github.com/Pip-Install-Party/Interpreter) (Not Yet Functional)  
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/Pip-Install-Party/Interpreter/issues) for a full list of proposed features (and known issues).
 
 <!-- USAGE EXAMPLES -->
 ## Usage
