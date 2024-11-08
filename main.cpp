@@ -12,14 +12,6 @@
 
 #include "testFiles.h"
 
-#include "lib/ftxui/include/ftxui/component/screen_interactive.hpp" // Add this header for ScreenInteractive
-#include "lib/ftxui/include/ftxui/component/component.hpp"         // For Menu and other components
-#include "lib/ftxui/include/ftxui/screen/screen.hpp"
-#include "lib/ftxui/include/ftxui/dom/elements.hpp"
-#include "lib/ftxui/include/ftxui/component/component.hpp"
-
-using namespace ftxui;
-
 struct assignmentElements {
     int assignmentNum;
     const std::filesystem::path* testFiles;
@@ -138,122 +130,7 @@ std::ifstream openSelectedFile(const assignmentElements& config, int fileNum) {
 
 // main function that handles user prompts, files opening and closing, and initial state
 int main() {
-    auto screen = ScreenInteractive::TerminalOutput();
-
-    std::vector<std::string> menu_options = {"Run Interpreter", "Test Components"};
-    int selected_option = 0;
-
-    // Create the informational content to display
-    auto content = Renderer([] {
-        return vbox({
-            text("C Interpreter") | center,
-            separator(),
-            text("Created for CS460 (Programming Languages) at Sonoma State University in fall 2024.") | center,
-            separator(),
-            text("Press Q to quit at any time.") | center,
-        }) | vcenter;
-    });
-
-    // Create the menu for selection options
-    auto menu = Menu(&menu_options, &selected_option);
-
-    // Create the sub-menu for test components
-    std::vector<std::string> test_components_options = {
-        "Remove Comments",
-        "Tokenize",
-        "Parse",
-        "Symbol Table",
-        "Abstract Syntax Tree"
-    };
-    int selected_test_component = 0;
-
-    auto test_components_menu = Menu(&test_components_options, &selected_test_component);
-
-    // Combine content and menu
-    auto main_layout = Renderer([&] {
-        return vbox({
-            content->Render(),
-            separator(),
-            text("Select an option:") | center,
-            menu->Render() | center,  // Center the menu within the vbox
-        }) | vcenter | center;
-    });
-
-    auto test_components_layout = Renderer([&] {
-        return vbox({
-            text("Test Components") | center,
-            separator(),
-            test_components_menu->Render() | center,  // Center the sub-menu within the vbox
-        }) | vcenter | center;
-    });
-
-    // Wrap the main layout with a quit listener for 'Q' key
-    auto quit_listener = CatchEvent(main_layout, [&](Event event) {
-        if (event == Event::Character('q') || event == Event::Character('Q')) {
-            screen.ExitLoopClosure()();
-            return true;  // Event handled
-        }
-        if (event == Event::Character('w')) { // Move up
-            selected_option = (selected_option - 1 + menu_options.size()) % menu_options.size();
-            return true;
-        }
-        if (event == Event::Character('s')) { // Move down
-            selected_option = (selected_option + 1) % menu_options.size();
-            return true;
-        }
-        if (event == Event::Return) {
-            if (selected_option == 0) {
-                // Handle "Run Interpreter"
-                std::cout << "Running Interpreter..." << std::endl;
-            } else if (selected_option == 1) {
-                // Handle "Test Components" -> display test components menu
-                screen.Loop(test_components_layout);  // Transition to the test components menu
-            }
-            return true;
-        }
-        return false;  // Event not handled
-    });
-
-    // Handle events for Test Components sub-menu
-    auto test_components_listener = CatchEvent(test_components_layout, [&](Event event) {
-        if (event == Event::Character('q') || event == Event::Character('Q')) {
-            screen.ExitLoopClosure()();
-            return true;  // Exit on Q
-        }
-
-        if (event == Event::Character('w')) { // Move up
-            selected_test_component = (selected_test_component - 1 + test_components_options.size()) % test_components_options.size();
-            return true;
-        }
-        if (event == Event::Character('s')) { // Move down
-            selected_test_component = (selected_test_component + 1) % test_components_options.size();
-            return true;
-        }
-        if (event == Event::Return) {
-            // Handle the selected option
-            if (selected_test_component == 0) {
-                std::cout << "Removing Comments..." << std::endl;
-            } else if (selected_test_component == 1) {
-                std::cout << "Tokenizing..." << std::endl;
-            } else if (selected_test_component == 2) {
-                std::cout << "Parsing..." << std::endl;
-            } else if (selected_test_component == 3) {
-                std::cout << "Displaying Symbol Table..." << std::endl;
-            } else if (selected_test_component == 4) {
-                std::cout << "Displaying Abstract Syntax Tree..." << std::endl;
-            }
-            return true;
-        }
-        return false;  // Event not handled
-    });
-
-    // Render the main menu initially
-    screen.Loop(quit_listener);  // Initially load the main menu
-
-    return 0;
-}
-
- /*
+    int assignmentNum;
     std::cout << "Select the assignment:\n"
               << "1 - Remove Comments\n"
               << "2 - Tokenize\n"
@@ -285,4 +162,170 @@ int main() {
     config.processFunction(file, buffer, fileNum); // Pass in the file number
 
     std::cout << buffer.str();
-    */
+    return 0;  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// old main below
+
+/*
+// Main program function that handles user prompt, file opening/closing, and initial state
+int main() {
+    char ch;
+    int assignment_num;
+    int filenum;
+    std::ifstream file;
+    std::ostringstream buffer;
+
+    // Prompt user for what programming assignment they want to test
+    std::cout << "Which programming assignment would you like to test?\n\n"
+         "(1) Programming Assignment 1: Ignore Comments\n"
+         "(2) Programming Assignment 2: Tokenization\n"
+         "(3) Programming Assignment 3: Recursive Descent Parser\n"
+         "(4) Programming Assignment 4: Symbol Table\n"
+         "Selection: ";
+    std::cin >> assignment_num;
+
+    std::cout << "Which file would you like to run the program on?\n\n";
+
+    if (assignment_num == 1) {
+        for (int i = 0; i < std::size(a1Tests); i++) {
+            std::cout << "(" << i+1 << ")" << a1Tests[i] << std::endl;
+        }
+    } else if (assignment_num == 2) {
+         for (int i = 0; i < std::size(a2Tests); i++) {
+            std::cout << "(" << i+1 << ")" << a2Tests[i] << std::endl;
+        }
+    } else if (assignment_num == 3) {
+         for (int i = 0; i < std::size(a3Tests); i++) {
+            std::cout << "(" << i+1 << ")" << a3Tests[i] << std::endl;
+        }
+    } else if (assignment_num == 4) {
+         for (int i = 0; i < std::size(a4Tests); i++) {
+            std::cout << "(" << i+1 << ")" << a4Tests[i] << std::endl;
+        }
+    }
+    std::cout << "Selection: ";
+    std::cin >> filenum;
+
+    filenum -= 1;
+
+    if (assignment_num == 1) {
+        file.open(a1Tests[filenum]);
+        if (!file.is_open()) {  // Check if the file was opened successfully
+            std::cerr << "Error: Could not open the file " << a1Tests[filenum] << std::endl;
+            exit(1);
+        }
+    } else if (assignment_num == 2) {
+        file.open(a2Tests[filenum]);
+        if (!file.is_open()) {  // Check if the file was opened successfully
+            std::cerr << "Error: Could not open the file " << a2Tests[filenum] << std::endl;
+            exit(1);
+         }
+    }   else if (assignment_num == 3) {
+        file.open(a3Tests[filenum]);
+        if (!file.is_open()) {  // Check if the file was opened successfully
+            std::cerr << "Error: Could not open the file " << a3Tests[filenum] << std::endl;
+            exit(1);
+         }
+    } else if (assignment_num == 4) {
+        file.open(a4Tests[filenum]);
+        if (!file.is_open()) {  // Check if the file was opened successfully
+            std::cerr << "Error: Could not open the file " << a4Tests[filenum] << std::endl;
+            exit(1);
+         }
+    } else {
+        std::cerr << "Inavlid file selection... Exiting...";
+        exit(1);
+    }
+    CommentDFA *removeComments = new CommentDFA();
+    // Start in state0 to process the file
+    removeComments->begin(file, buffer);
+    file.close();  // Close the file after processing
+
+    if (assignment_num == 1) {
+        std::cout  << "\nResulting File:" << std::endl;
+        std::cout << buffer.str();
+    }
+    else if(assignment_num == 2) {
+        std::string str = buffer.str();
+        str.erase(str.find_last_not_of(" \n\r\t")+1);  // Remove trailing whitespace or newlines
+        std::istringstream inputStream(str);
+
+        Tokenizer *tokenizer = new Tokenizer();
+
+        tokenizer->begin(inputStream);
+
+        std::vector<Token> tokenList = tokenizer->getTokens();
+
+        std::cout << "Token List\n";
+
+        for (int i = 0; i < tokenList.size(); i++){
+            std::cout << "Token type: " << tokenList[i].getType() << '\n';
+            std::cout << "Token: " << tokenList[i].getValue() << "\nLine Number: " << tokenList[i].getLineNumber() << '\n';
+            std::cout << "\n";
+        }
+    }
+    else if(assignment_num == 3) {
+         std::string str = buffer.str();
+        str.erase(str.find_last_not_of(" \n\r\t")+1);  // Remove trailing whitespace or newlines
+        std::istringstream inputStream(str);
+
+        Tokenizer *tokenizer = new Tokenizer();
+
+        tokenizer->begin(inputStream);
+
+        std::vector<Token> tokenList = tokenizer->getTokens();
+
+        Parser *parser = new Parser(tokenList);
+        parser->begin();
+
+        // Make an output filestream
+        std::ofstream rdpOutput( "test_file_" + std::to_string(filenum + 1) + "_output.txt");
+
+        // Call the print function and pass in the ofstream
+        parser->printTree(rdpOutput);
+    } else if(assignment_num == 4) {
+        std::string str = buffer.str();
+        str.erase(str.find_last_not_of(" \n\r\t")+1);  // Remove trailing whitespace or newlines
+        std::istringstream inputStream(str);
+
+        Tokenizer *tokenizer = new Tokenizer();
+
+        tokenizer->begin(inputStream);
+
+        std::vector<Token> tokenList = tokenizer->getTokens();
+
+        Parser *parser = new Parser(tokenList);
+        parser->begin();
+
+        Table *table = new Table;
+
+        table->begin(parser->getHead());
+        std::cout << "\nPrinting Symbol Table:\n" << std::endl;
+        table->printTable();
+    }
+    else {
+        std::cout << "No matching assignments exist for " << assignment_num << ".\n";
+        return 1;
+    }
+
+    return 0;  // Exit successfully
+}
+*/
