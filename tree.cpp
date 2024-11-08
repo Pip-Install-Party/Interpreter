@@ -25,8 +25,8 @@ void Tree::printTree(Token* head, Token* prevToken){
         }
         if (head->getSibling() != nullptr && contains(equationOperators, head->getSibling()->getValue())) {
             std::cout << " ----> ";
-             head = handleAssignment(head); 
-             prevToken = nullptr;
+            head = handleAssignment(head); 
+            prevToken = nullptr;
         }
     } else if (head->getValue() == "procedure" || head->getValue() == "function") {
         std::cout << "DECLARATION\n|\n|\n|\n|\nv\n";
@@ -89,7 +89,7 @@ void Tree::printTree(Token* head, Token* prevToken){
                     std::cout << "\n|\n|\n|\n|\nv\nDECLARATION";
                 }
             }
-            std::cout << "\n|\n|\n|\n|\nv\n";
+            //std::cout << "\n|\n|\n|\n|\nv\n"; // ****** removed for test case 4 
         }
     } else if (head->getType() == "IDENTIFIER") {  
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
@@ -98,6 +98,10 @@ void Tree::printTree(Token* head, Token* prevToken){
             // This needs to break out to handleAssignment();
             head = handleAssignment(head); 
             prevToken = nullptr;
+        } else if (head->getSibling() != nullptr && isIndex(head->getSibling()->getType())){ // checks for "L_BRACKET" to see if assigning an index... if so print extra characters and resume as normal
+            std::cout << "ASSIGNMENT" << " ----> ";
+            head = handleAssignment(head); 
+            std::cout << "\n|\n|\n|\n|\nv\n";
         } else if (isFunction(head->getValue())){
             ignore = false;
             isCall = true;
@@ -166,10 +170,27 @@ Token* Tree::handleFunction(Token *head, std::vector<Token*>& equationAsVec, boo
     return head->getSibling(); 
 }
 
+Token* Tree::handleIndex(Token * head, std::vector<Token*>& equationAsVec) {
+    while (head->getSibling() != nullptr && head->getSibling()->getType() != "R_BRACKET") {
+        head = head->getSibling(); // Should be getting L_BRACKET of the function first time through
+        equationAsVec.push_back(head); 
+        head = head->getSibling();
+    } 
+    if (head->getSibling()->getType() == "R_BRACKET") {
+        head = head->getSibling(); 
+        equationAsVec.push_back(head); 
+    } else {
+        std::cout << "error incorrectly formatted index" << std::endl;
+    }
+    equationAsVec.push_back(head);  
+    return head->getSibling(); 
+}
+
 Token* Tree::handleAssignment(Token* head) {
     std::vector<Token*> equationAsVec;
     Token* prev = nullptr;
     isCall = isFunction(head->getValue());
+    bool isIndex = Tree::isIndex(head->getType());
 
     if (head->getValue() != "(") {
         equationAsVec.push_back(head);
@@ -194,6 +215,10 @@ Token* Tree::handleAssignment(Token* head) {
             }
         
         } 
+        else if (isIndex) {
+            equationAsVec.push_back(head); // Function's name
+            head = handleIndex(head, equationAsVec);
+        }
         // Process head as an identifier followed by '('
         else if (head->getType() == "IDENTIFIER" && head->getSibling() != nullptr && head->getSibling()->getValue() == "(" && isCall) {
             auto temp = prev;
@@ -346,6 +371,13 @@ bool Tree::isFunction(std::string tokenName){
             return true; 
         }
         tableHead = tableHead->getNext();
+    }
+    return false;
+}
+
+bool Tree::isIndex(std::string headType) {
+    if(headType == "L_BRACKET") {
+        return true;
     }
     return false;
 }

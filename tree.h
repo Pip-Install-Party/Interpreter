@@ -16,8 +16,10 @@ class Tree {
         bool contains(const std::vector<std::string>, std::string);
         bool isFunction(std::string tokenName);
         Token* handleAssignment(Token*);
+        Token* handleIndex(Token *, std::vector<Token*>&);
         Token* handleFunction(Token *,std::vector<Token*>& equationAsVec, bool& isFunctionCall);
         int getPrecedence(std::string op);
+        bool isIndex(std::string);
         bool isOperator(std::string c);
         std::vector<Token*> infixToPostfix(const std::vector<Token*> infix, bool isFunctionCall);
 
