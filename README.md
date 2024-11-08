@@ -28,7 +28,7 @@
 <h3 align="center">Interpreter</h3>
 
   <p align="center">
-    This is an interpreter for the C language. 
+    An interpreter for the C language. 
     <br />
     <br />
     <a href="https://github.com/Pip-Install-Party/Interpreter/blob/main/README.md"><strong>Explore the docs »</strong></a>
