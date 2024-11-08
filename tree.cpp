@@ -108,7 +108,7 @@ void Tree::printTree(Token* head, Token* prevToken){
             std::cout << "CALL";
             while(head->getSibling() != nullptr) {
                 head = head->getSibling();
-                if (head->getType() == "IDENTIFIER"){
+                if (head->getType() == "IDENTIFIER" || head->getType() == "L_PAREN" || head->getType() == "R_PAREN"){
                     std::cout << " ----> " << head->getValue();
                 }
             }
@@ -284,13 +284,13 @@ Token* Tree::handleAssignment(Token* head) {
 // Function to get precedence of operators
 int Tree::getPrecedence(std::string op) {
     if (op == "+" || op == "-" || op == ">=" || op == "<=" || op == "==" || op == ">" || op == "<" || op == "==" || op == "&&" || op == "!" || op == "||") return 1;
-    if (op == "*" || op == "/") return 2;
+    if (op == "*" || op == "/" || op == "%") return 2;
     return 0;
 }
 
 // Function to check if a character is an operator
 bool Tree::isOperator(std::string c) {
-    return c == "+" || c == "-" || c == "*" || c == "/" || c == "=";
+    return c == "+" || c == "-" || c == "*" || c == "/" || c == "=" || c == "%";
 }
 
 std::vector<Token*> Tree::infixToPostfix(const std::vector<Token*> infix, bool isFunctionCall) {
