@@ -1,0 +1,881 @@
+Token List
+Token type: IDENTIFIER
+Token: function
+Line Number: 12
+
+Token type: IDENTIFIER
+Token: int
+Line Number: 12
+
+Token type: IDENTIFIER
+Token: hexdigit2int
+Line Number: 12
+
+Token type: L_PAREN
+Token: (
+Line Number: 12
+
+Token type: IDENTIFIER
+Token: char
+Line Number: 12
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 12
+
+Token type: R_PAREN
+Token: )
+Line Number: 12
+
+Token type: L_BRACE
+Token: {
+Line Number: 13
+
+Token type: IDENTIFIER
+Token: int
+Line Number: 14
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 14
+
+Token type: COMMA
+Token: ,
+Line Number: 14
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 14
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 14
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 16
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 16
+
+Token type: INTEGER
+Token: -1
+Line Number: 16
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 16
+
+Token type: IDENTIFIER
+Token: if
+Line Number: 17
+
+Token type: L_PAREN
+Token: (
+Line Number: 17
+
+Token type: L_PAREN
+Token: (
+Line Number: 17
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 17
+
+Token type: GT_EQUAL
+Token: >=
+Line Number: 17
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 17
+
+Token type: CHARACTER
+Token: 0
+Line Number: 17
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 17
+
+Token type: R_PAREN
+Token: )
+Line Number: 17
+
+Token type: BOOLEAN_AND
+Token: &&
+Line Number: 17
+
+Token type: L_PAREN
+Token: (
+Line Number: 17
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 17
+
+Token type: LT_EQUAL
+Token: <=
+Line Number: 17
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 17
+
+Token type: CHARACTER
+Token: 9
+Line Number: 17
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 17
+
+Token type: R_PAREN
+Token: )
+Line Number: 17
+
+Token type: R_PAREN
+Token: )
+Line Number: 17
+
+Token type: L_BRACE
+Token: {
+Line Number: 18
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 19
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 19
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 19
+
+Token type: MINUS
+Token: -
+Line Number: 19
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 19
+
+Token type: CHARACTER
+Token: 0
+Line Number: 19
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 19
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 19
+
+Token type: R_BRACE
+Token: }
+Line Number: 20
+
+Token type: IDENTIFIER
+Token: else
+Line Number: 21
+
+Token type: L_BRACE
+Token: {
+Line Number: 22
+
+Token type: IDENTIFIER
+Token: if
+Line Number: 23
+
+Token type: L_PAREN
+Token: (
+Line Number: 23
+
+Token type: L_PAREN
+Token: (
+Line Number: 23
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 23
+
+Token type: GT_EQUAL
+Token: >=
+Line Number: 23
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 23
+
+Token type: CHARACTER
+Token: a
+Line Number: 23
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 23
+
+Token type: R_PAREN
+Token: )
+Line Number: 23
+
+Token type: BOOLEAN_AND
+Token: &&
+Line Number: 23
+
+Token type: L_PAREN
+Token: (
+Line Number: 23
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 23
+
+Token type: LT_EQUAL
+Token: <=
+Line Number: 23
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 23
+
+Token type: CHARACTER
+Token: f
+Line Number: 23
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 23
+
+Token type: R_PAREN
+Token: )
+Line Number: 23
+
+Token type: R_PAREN
+Token: )
+Line Number: 23
+
+Token type: L_BRACE
+Token: {
+Line Number: 24
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 25
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 25
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 25
+
+Token type: MINUS
+Token: -
+Line Number: 25
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 25
+
+Token type: CHARACTER
+Token: a
+Line Number: 25
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 25
+
+Token type: PLUS
+Token: +
+Line Number: 25
+
+Token type: INTEGER
+Token: 10
+Line Number: 25
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 25
+
+Token type: R_BRACE
+Token: }
+Line Number: 26
+
+Token type: IDENTIFIER
+Token: else
+Line Number: 27
+
+Token type: L_BRACE
+Token: {
+Line Number: 28
+
+Token type: IDENTIFIER
+Token: if
+Line Number: 29
+
+Token type: L_PAREN
+Token: (
+Line Number: 29
+
+Token type: L_PAREN
+Token: (
+Line Number: 29
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 29
+
+Token type: GT_EQUAL
+Token: >=
+Line Number: 29
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 29
+
+Token type: CHARACTER
+Token: A
+Line Number: 29
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 29
+
+Token type: R_PAREN
+Token: )
+Line Number: 29
+
+Token type: BOOLEAN_AND
+Token: &&
+Line Number: 29
+
+Token type: L_PAREN
+Token: (
+Line Number: 29
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 29
+
+Token type: LT_EQUAL
+Token: <=
+Line Number: 29
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 29
+
+Token type: CHARACTER
+Token: F
+Line Number: 29
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 29
+
+Token type: R_PAREN
+Token: )
+Line Number: 29
+
+Token type: R_PAREN
+Token: )
+Line Number: 29
+
+Token type: L_BRACE
+Token: {
+Line Number: 30
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 31
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 31
+
+Token type: IDENTIFIER
+Token: hex_digit
+Line Number: 31
+
+Token type: MINUS
+Token: -
+Line Number: 31
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 31
+
+Token type: CHARACTER
+Token: A
+Line Number: 31
+
+Token type: SINGLE_QUOTE
+Token: '
+Line Number: 31
+
+Token type: PLUS
+Token: +
+Line Number: 31
+
+Token type: INTEGER
+Token: 10
+Line Number: 31
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 31
+
+Token type: R_BRACE
+Token: }
+Line Number: 32
+
+Token type: R_BRACE
+Token: }
+Line Number: 33
+
+Token type: R_BRACE
+Token: }
+Line Number: 34
+
+Token type: IDENTIFIER
+Token: return
+Line Number: 35
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 35
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 35
+
+Token type: R_BRACE
+Token: }
+Line Number: 36
+
+Token type: IDENTIFIER
+Token: procedure
+Line Number: 40
+
+Token type: IDENTIFIER
+Token: main
+Line Number: 40
+
+Token type: L_PAREN
+Token: (
+Line Number: 40
+
+Token type: IDENTIFIER
+Token: void
+Line Number: 40
+
+Token type: R_PAREN
+Token: )
+Line Number: 40
+
+Token type: L_BRACE
+Token: {
+Line Number: 41
+
+Token type: IDENTIFIER
+Token: char
+Line Number: 42
+
+Token type: IDENTIFIER
+Token: hexnum
+Line Number: 42
+
+Token type: L_BRACKET
+Token: [
+Line Number: 42
+
+Token type: INTEGER
+Token: 9
+Line Number: 42
+
+Token type: R_BRACKET
+Token: ]
+Line Number: 42
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 42
+
+Token type: IDENTIFIER
+Token: int
+Line Number: 43
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 43
+
+Token type: COMMA
+Token: ,
+Line Number: 43
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 43
+
+Token type: COMMA
+Token: ,
+Line Number: 43
+
+Token type: IDENTIFIER
+Token: number
+Line Number: 43
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 43
+
+Token type: IDENTIFIER
+Token: number
+Line Number: 45
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 45
+
+Token type: INTEGER
+Token: 0
+Line Number: 45
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 45
+
+Token type: IDENTIFIER
+Token: hexnum
+Line Number: 46
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 46
+
+Token type: DOUBLE_QUOTE
+Token: "
+Line Number: 46
+
+Token type: STRING
+Token: feed\x0
+Line Number: 46
+
+Token type: DOUBLE_QUOTE
+Token: "
+Line Number: 46
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 46
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 47
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 47
+
+Token type: INTEGER
+Token: 0
+Line Number: 47
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 47
+
+Token type: IDENTIFIER
+Token: for
+Line Number: 48
+
+Token type: L_PAREN
+Token: (
+Line Number: 48
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 48
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 48
+
+Token type: INTEGER
+Token: 0
+Line Number: 48
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 48
+
+Token type: L_PAREN
+Token: (
+Line Number: 48
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 48
+
+Token type: LT
+Token: <
+Line Number: 48
+
+Token type: INTEGER
+Token: 4
+Line Number: 48
+
+Token type: R_PAREN
+Token: )
+Line Number: 48
+
+Token type: BOOLEAN_AND
+Token: &&
+Line Number: 48
+
+Token type: L_PAREN
+Token: (
+Line Number: 48
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 48
+
+Token type: GT
+Token: >
+Line Number: 48
+
+Token type: INTEGER
+Token: -1
+Line Number: 48
+
+Token type: R_PAREN
+Token: )
+Line Number: 48
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 48
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 48
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 48
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 48
+
+Token type: PLUS
+Token: +
+Line Number: 48
+
+Token type: INTEGER
+Token: 1
+Line Number: 48
+
+Token type: R_PAREN
+Token: )
+Line Number: 48
+
+Token type: L_BRACE
+Token: {
+Line Number: 49
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 50
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 50
+
+Token type: IDENTIFIER
+Token: hexdigit2int
+Line Number: 50
+
+Token type: L_PAREN
+Token: (
+Line Number: 50
+
+Token type: IDENTIFIER
+Token: hexnum
+Line Number: 50
+
+Token type: L_BRACKET
+Token: [
+Line Number: 50
+
+Token type: IDENTIFIER
+Token: i
+Line Number: 50
+
+Token type: R_BRACKET
+Token: ]
+Line Number: 50
+
+Token type: R_PAREN
+Token: )
+Line Number: 50
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 50
+
+Token type: IDENTIFIER
+Token: if
+Line Number: 51
+
+Token type: L_PAREN
+Token: (
+Line Number: 51
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 51
+
+Token type: GT
+Token: >
+Line Number: 51
+
+Token type: INTEGER
+Token: -1
+Line Number: 51
+
+Token type: R_PAREN
+Token: )
+Line Number: 51
+
+Token type: L_BRACE
+Token: {
+Line Number: 52
+
+Token type: IDENTIFIER
+Token: number
+Line Number: 53
+
+Token type: ASSIGNMENT_OPERATOR
+Token: =
+Line Number: 53
+
+Token type: IDENTIFIER
+Token: number
+Line Number: 53
+
+Token type: ASTERISK
+Token: *
+Line Number: 53
+
+Token type: INTEGER
+Token: 16
+Line Number: 53
+
+Token type: PLUS
+Token: +
+Line Number: 53
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 53
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 53
+
+Token type: R_BRACE
+Token: }
+Line Number: 54
+
+Token type: R_BRACE
+Token: }
+Line Number: 55
+
+Token type: IDENTIFIER
+Token: if
+Line Number: 56
+
+Token type: L_PAREN
+Token: (
+Line Number: 56
+
+Token type: IDENTIFIER
+Token: digit
+Line Number: 56
+
+Token type: GT
+Token: >
+Line Number: 56
+
+Token type: INTEGER
+Token: -1
+Line Number: 56
+
+Token type: R_PAREN
+Token: )
+Line Number: 56
+
+Token type: L_BRACE
+Token: {
+Line Number: 57
+
+Token type: IDENTIFIER
+Token: printf
+Line Number: 58
+
+Token type: L_PAREN
+Token: (
+Line Number: 58
+
+Token type: DOUBLE_QUOTE
+Token: "
+Line Number: 58
+
+Token type: STRING
+Token: Hex: 0x%s is %d decimal\n
+Line Number: 58
+
+Token type: DOUBLE_QUOTE
+Token: "
+Line Number: 58
+
+Token type: COMMA
+Token: ,
+Line Number: 58
+
+Token type: IDENTIFIER
+Token: hexnum
+Line Number: 58
+
+Token type: COMMA
+Token: ,
+Line Number: 58
+
+Token type: IDENTIFIER
+Token: number
+Line Number: 58
+
+Token type: R_PAREN
+Token: )
+Line Number: 58
+
+Token type: SEMICOLON
+Token: ;
+Line Number: 58
+
+Token type: R_BRACE
+Token: }
+Line Number: 59
+
+Token type: R_BRACE
+Token: }
+Line Number: 60
+
