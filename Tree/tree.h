@@ -33,7 +33,7 @@ class Tree {
         Tree(Token* head, Table* table) { 
             symbolTable = table; 
              // Make an output filestream
-            std::string filename = "AST_test_file_output.txt";
+            std::string filename = "Interpreter_Output.txt";
             std::ofstream ASTOutput(filename);
             printTree(head, nullptr, ASTOutput);    
         }

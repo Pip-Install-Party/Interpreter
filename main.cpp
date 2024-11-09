@@ -9,8 +9,11 @@
 #include "Parser/parser.h"
 #include "Symbols/table.h"
 #include "Tree/tree.h"
-
 #include "Tests/testFiles.h"
+#include <ncurses.h>
+
+std::string filename = "Interpreter_Output.txt";
+std::ofstream interpreterOutput(filename);
 
 struct assignmentElements {
     int assignmentNum;
@@ -22,7 +25,14 @@ struct assignmentElements {
 // function to remove comments
 void removeComments(std::ifstream& testFile, std::ostringstream& outputFile, int) {
     CommentDFA *removeComments = new CommentDFA();
-    removeComments->begin(testFile, outputFile);
+    std::ostringstream tempBuffer;
+    removeComments->begin(testFile, tempBuffer);
+
+    // Copy the buffer
+    std::string str = tempBuffer.str();
+
+    // Write the buffer to the output file
+    interpreterOutput << str;
 }
 
 // function to remove comments then tokenize input
@@ -35,12 +45,12 @@ void tokenize(std::ifstream& testFile, std::ostringstream& outputFile, int) {
     std::istringstream tokenStream(tempBuffer.str());
     tokenizer->begin(tokenStream);
     std::vector<Token> tokenList = tokenizer->getTokens();
-    std::cout << "Token List\n";
+    interpreterOutput << "Token List\n";
 
     for (int i = 0; i < tokenList.size(); i++){
-        std::cout << "Token type: " << tokenList[i].getType() << '\n';
-        std::cout << "Token: " << tokenList[i].getValue() << "\nLine Number: " << tokenList[i].getLineNumber() << '\n';
-        std::cout << "\n";
+        interpreterOutput << "Token type: " << tokenList[i].getType() << '\n';
+        interpreterOutput << "Token: " << tokenList[i].getValue() << "\nLine Number: " << tokenList[i].getLineNumber() << '\n';
+        interpreterOutput << "\n";
     }
 }
 
@@ -58,11 +68,8 @@ void parse(std::ifstream& testFile, std::ostringstream& outputFile, int filenum)
     Parser *parser = new Parser(tokenList);
     parser->begin();
 
-    std::string outputFilename = "test_file_" + std::to_string(filenum + 1) + "_output.txt";
-    std::ofstream rdpOutput(outputFilename);
-
     // Call the print function and pass in the ofstream
-    parser->printTree(rdpOutput);
+    parser->printTree(interpreterOutput);
 }
 
 // function to remove comments, tokenize input, create a CST, and generate symbol tables
@@ -83,8 +90,8 @@ void symbolTable(std::ifstream& testFile, std::ostringstream& outputFile, int) {
 
     table->begin(parser->getHead());
     std::cout << "\nPrinting Symbol Table:\n" << std::endl;
-    table->printTable();
-    table->printParameters();
+    table->printTable(interpreterOutput);
+    table->printParameters(interpreterOutput);
 }
 
 void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
@@ -130,37 +137,89 @@ std::ifstream openSelectedFile(const assignmentElements& config, int fileNum) {
 
 // main function that handles user prompts, files opening and closing, and initial state
 int main() {
-    int assignmentNum;
-    std::cout << "Select the assignment:\n"
-              << "1 - Remove Comments\n"
-              << "2 - Tokenize\n"
-              << "3 - Parse\n"
-              << "4 - Symbol Table\n"
-              << "5 - Abstract Syntax Tree\n"
-              << "Selection: ";
-    std::cin >> assignmentNum;
+    // Initialize ncurses
+    initscr();               // Start ncurses mode
+    cbreak();                // Disable line buffering
+    noecho();                // Disable echoing of typed characters
+    keypad(stdscr, TRUE);    // Enable function keys like arrow keys
 
+    int assignmentNum = 0;
+
+    printw("**********************************************************************************************\n");
+    printw("*                                                                                            *\n");
+    printw("*                                     C Interpreter                                          *\n");
+    printw("*                                                                                            *\n");
+    printw("*  A Project By Blake Marshall, Brandon Robinson, Holden Ea, Jacob Sellers, & Rolando Yax.   *\n");
+    printw("*  Completed To Satisfy The Final Project of CS460 At Sonoma State University In Fall 2024.  *\n");
+    printw("*                                                                                            *\n");
+    printw("*                                                                                            *\n");
+    printw("*  This Program Acts As An Interpreter For The C Language And Was Built Over The Course Of   *\n");
+    printw("*  Six Stages. Each Of These Components Are Testable And Can Be Selected Individially From   *\n");
+    printw("*                                   The Following Page.                                      *\n");
+    printw("*                                                                                            *\n");
+    printw("**********************************************************************************************\n");
+    printw("\nPress any key to continue. . .");
+    getch(); // Wait for user to press a key before continuing
+    refresh();
+    clear();
+
+    printw("Select the assignment:\n");
+    printw("1 - Remove Comments\n");
+    printw("2 - Tokenize\n");
+    printw("3 - Parse\n");
+    printw("4 - Symbol Table\n");
+    printw("5 - Abstract Syntax Tree\n");
+    printw("Selection: ");
+    refresh();
+
+    // Get user input for assignment selection
+    echo();
+    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &assignmentNum);
     if (assignmentNum < 1 || assignmentNum > 5) {
-        std::cerr << "Invalid assignment choice. Exiting.\n";
+        printw("Invalid assignment choice. Exiting.\n");
+        refresh();
+        getch();  // Wait for a key press
+        endwin(); // End ncurses mode
         return 1;
     }
 
     const assignmentElements& config = assignments[assignmentNum - 1];
     
-    int fileNum;
-    std::cout << "Choose a test file:\n";
+    int fileNum = 0;
+    printw("Choose a test file:\n");
     for (int i = 0; i < config.numFiles; ++i) {
-        std::cout << "(" << i + 1 << ") " << config.testFiles[i] << "\n";
+        printw("(%d) %s\n", i + 1, config.testFiles[i].c_str());
     }
-    std::cin >> fileNum;
+    printw("Selection: ");
+    refresh();
+
+    // Get user input for file selection
+    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &fileNum);
     --fileNum;
 
+    // Attempt to open selected file
     std::ifstream file = openSelectedFile(config, fileNum);
+    if (!file.is_open()) {
+        printw("Error: Could not open selected file.\n");
+        refresh();
+        getch();
+        endwin();
+        return 1;
+    }
 
     std::ostringstream buffer;
+    config.processFunction(file, buffer, fileNum); // Process based on selection
+    interpreterOutput.flush();
+    interpreterOutput.close();
 
-    config.processFunction(file, buffer, fileNum); // Pass in the file number
+    // Display the result buffer in ncurses window
+    clear();
+    printw("Results printed to Interpreter_Output.txt");
+    printw("\n\nPress any key to quit. . .");
+    refresh();
+    
+    getch(); // Wait for user to press a key before exiting
+    endwin(); // End ncurses mode
 
-    std::cout << buffer.str();
-    return 0;  
+    return 0;
 }
