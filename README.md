@@ -101,6 +101,10 @@ The interpreter is compatible with Windows, MacOS, and Linux.
   ```sh
    ./interpreter.exe
   ```
+
+### File Output 
+
+Output will be written to ```Interpreter_Output.txt``` in the working directory.
 <!-- ROADMAP -->
 ## Roadmap
 
@@ -119,7 +123,7 @@ See the [open issues](https://github.com/Pip-Install-Party/Interpreter/issues) f
 ## Usage
 
 The interpreter is capable of producing output for code written in the C language. The program may also work with *some* programs written 
-in C++, however differences in reserved words (such as string) may lead to unexpected output. Results with langages other than C are not guaranteed. 
+in C++, however differences in reserved words (such as string) may lead to unexpected output. Results with languages other than C are not guaranteed. 
 
 See <a href="#readme-getting-started">getting-started</a>.
 
@@ -127,8 +131,8 @@ See <a href="#readme-getting-started">getting-started</a>.
 ### Testing 
 
 In addition to interpretting code, this program also lets you test its various components. 
-Upon starting the program, the interface will display an option to "test components". 
-Selecting this option will allow you to view the output of the following components:
+Upon starting the program, the interface will display a series of components to select from.
+The following components can be selected:
 
 1. Comment Removal
 2. Tokenization
