@@ -5,64 +5,64 @@
 
 // Assignment 1
 const std::filesystem::path a1Tests[] = {
-   "Tests/Program1/programming_assignment_1-test_file_1.c",
-   "Tests/Program1/programming_assignment_1-test_file_2.c",
-   "Tests/Program1/programming_assignment_1-test_file_3.c",
-   "Tests/Program1/programming_assignment_1-test_file_4.c",
-   "Tests/Program1/programming_assignment_1-test_file_5.c",
-   "Tests/Program1/programming_assignment_1-test_file_6.c"
+   "Tests/Program1/Test1.c",
+   "Tests/Program1/Test2.c",
+   "Tests/Program1/Test3.c",
+   "Tests/Program1/Test4.c",
+   "Tests/Program1/Test5.c",
+   "Tests/Program1/Test6.c"
 };
 
 // Assignment 2
 const std::filesystem::path a2Tests[] = {
-   "Tests/Program2/programming_assignment_2-test_file_1.c",
-   "Tests/Program2/programming_assignment_2-test_file_2.c",
-   "Tests/Program2/programming_assignment_2-test_file_3.c",
-   "Tests/Program2/programming_assignment_2-test_file_4.c",
-   "Tests/Program2/programming_assignment_2-test_file_5.c",
-   "Tests/Program2/programming_assignment_2-test_file_6.c",
-   "Tests/Program2/programming_assignment_2-test_file_7.c"
+   "Tests/Program2/Test1.c",
+   "Tests/Program2/Test2.c",
+   "Tests/Program2/Test3.c",
+   "Tests/Program2/Test4.c",
+   "Tests/Program2/Test5.c",
+   "Tests/Program2/Test6.c",
+   "Tests/Program2/Test7.c"
 };
 
 // Assignment 3
 const std::filesystem::path a3Tests[] = {
-    "Tests/Program3/programming_assignment_3-test_file_1.c",
-    "Tests/Program3/programming_assignment_3-test_file_2.c",
-    "Tests/Program3/programming_assignment_3-test_file_3.c",
-    "Tests/Program3/programming_assignment_3-test_file_4.c",
-    "Tests/Program3/programming_assignment_3-test_file_5.c",
-    "Tests/Program3/programming_assignment_3-test_file_6.c",
-    "Tests/Program3/programming_assignment_3-test_file_7.c",
-    "Tests/Program3/programming_assignment_3-test_file_8.c",
-    "Tests/Program3/programming_assignment_3-test_file_9.c",
-    "Tests/Program3/programming_assignment_3-test_file_10.c"
+   "Tests/Program3/Test1.c",
+   "Tests/Program3/Test2.c",
+   "Tests/Program3/Test3.c",
+   "Tests/Program3/Test4.c",
+   "Tests/Program3/Test5.c",
+   "Tests/Program3/Test6.c",
+   "Tests/Program3/Test7.c",
+   "Tests/Program3/Test8.c",
+   "Tests/Program3/Test9.c",
+   "Tests/Program3/Test10.c"
 };
 
 // Assignment 4
 const std::filesystem::path a4Tests[] = {
-    "Tests/Program4/programming_assignment_4-test_file_1.c",
-    "Tests/Program4/programming_assignment_4-test_file_2.c",
-    "Tests/Program4/programming_assignment_4-test_file_3.c",
-    "Tests/Program4/programming_assignment_4-test_file_4.c",
-    "Tests/Program4/programming_assignment_4-test_file_5.c",
-    "Tests/Program4/programming_assignment_4-test_file_6.c",
-    "Tests/Program4/programming_assignment_4-test_file_7.c"
+   "Tests/Program4/Test1.c",
+   "Tests/Program4/Test2.c",
+   "Tests/Program4/Test3.c",
+   "Tests/Program4/Test4.c",
+   "Tests/Program4/Test5.c",
+   "Tests/Program4/Test6.c",
+   "Tests/Program4/Test7.c",
 }; 
 
 // Assignment 5
 const std::filesystem::path a5Tests[] = {
-    "Tests/Program5/programming_assignment_5-test_file_1.c",
-    "Tests/Program5/programming_assignment_5-test_file_2.c",
-    "Tests/Program5/programming_assignment_5-test_file_3.c",
-    "Tests/Program5/programming_assignment_5-test_file_4.c",
-    "Tests/Program5/programming_assignment_5-test_file_5.c"
+   "Tests/Program5/Test1.c",
+   "Tests/Program5/Test2.c",
+   "Tests/Program5/Test3.c",
+   "Tests/Program5/Test4.c",
+   "Tests/Program5/Test5.c",
 };
 
-// Assignment 5
+// Assignment 6
 const std::filesystem::path a6Tests[] = {
-    "Tests/Program6/programming_assignment_6-test_file_1.c",
-    "Tests/Program6/programming_assignment_6-test_file_2.c",
-    "Tests/Program6/programming_assignment_6-test_file_3.c"
+   "Tests/Program6/Test1.c",
+   "Tests/Program6/Test2.c",
+   "Tests/Program6/Test3.c",
 }; 
 
 #endif // TESTFILES_H

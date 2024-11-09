@@ -163,18 +163,19 @@ int main() {
     refresh();
     clear();
 
-    printw("Select the assignment:\n");
-    printw("1 - Remove Comments\n");
-    printw("2 - Tokenize\n");
-    printw("3 - Parse\n");
-    printw("4 - Symbol Table\n");
-    printw("5 - Abstract Syntax Tree\n");
+    printw("Select A Component:\n");
+    printw("1 - Comment Removal\n");
+    printw("2 - Tokenization\n");
+    printw("3 - Parsing\n");
+    printw("4 - Symbol Table Generation\n");
+    printw("5 - Abstract Syntax Tree Generation\n");
     printw("Selection: ");
     refresh();
 
     // Get user input for assignment selection
     echo();
     mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &assignmentNum);
+    clear();
     if (assignmentNum < 1 || assignmentNum > 5) {
         printw("Invalid assignment choice. Exiting.\n");
         refresh();
@@ -186,10 +187,7 @@ int main() {
     const assignmentElements& config = assignments[assignmentNum - 1];
     
     int fileNum = 0;
-    printw("Choose a test file:\n");
-    for (int i = 0; i < config.numFiles; ++i) {
-        printw("(%d) %s\n", i + 1, config.testFiles[i].c_str());
-    }
+    printw("Choose A Test File 1 - %d,\n", config.numFiles);  // Just prints the file number
     printw("Selection: ");
     refresh();
 
