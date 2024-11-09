@@ -23,8 +23,8 @@ class Table {
     public:
     Table(){};
     void begin(Token*);
-    void printTable();
-    void printParameters();
+    void printTable(std::ofstream&);
+    void printParameters(std::ofstream&);
     Entry* getHead() {return head;}
     ~Table(){};
 };

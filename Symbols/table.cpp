@@ -1,6 +1,10 @@
 #include <iostream>
 #include "table.h"
 #include <iomanip>
+#include <sstream>
+#include <filesystem>
+#include <fstream>
+
 
 void Table::begin(Token* token){
     if (token->getType() == "IDENTIFIER") {
@@ -209,27 +213,27 @@ void Table::handleInitList(std::string type, Token* token, Entry* prevEntry){
     return handleInitList(type, token->getSibling()->getSibling(), entry);
 }
 
-void Table::printTable(){
+void Table::printTable(std::ofstream& symbolOutput){
     const int colonWidth = 25;
-
     //make temp head pointer
     Entry* tempHead = this->head;
 
     while(tempHead != nullptr){
-        std::cout << std::setw(colonWidth) << std::right << "IDENTIFIER_NAME: " << tempHead->getIDName() << std::endl;
-        std::cout << std::setw(colonWidth) << std::right << "IDENTIFIER_TYPE: " << tempHead->getIDType() << std::endl;
-        std::cout << std::setw(colonWidth) << std::right << "DATATYPE: " << tempHead->getDType() << std::endl;
-        std::cout << std::setw(colonWidth) << std::right << "DATATYPE_IS_ARRAY: " << (tempHead->getIsArray() ? "yes" : "no") << std::endl;
-        std::cout << std::setw(colonWidth) << std::right << "DATATYPE_ARRAY_SIZE: " << tempHead->getArraySize() << std::endl;
-        std::cout << std::setw(colonWidth) << std::right << "SCOPE: " << tempHead->getScope() << std::endl;
-        std::cout << std::endl; 
+
+        symbolOutput << std::setw(colonWidth) << std::right << "IDENTIFIER_NAME: " << tempHead->getIDName() << std::endl;
+        symbolOutput << std::setw(colonWidth) << std::right << "IDENTIFIER_TYPE: " << tempHead->getIDType() << std::endl;
+        symbolOutput << std::setw(colonWidth) << std::right << "DATATYPE: " << tempHead->getDType() << std::endl;
+        symbolOutput<< std::setw(colonWidth) << std::right << "DATATYPE_IS_ARRAY: " << (tempHead->getIsArray() ? "yes" : "no") << std::endl;
+        symbolOutput << std::setw(colonWidth) << std::right << "DATATYPE_ARRAY_SIZE: " << tempHead->getArraySize() << std::endl;
+        symbolOutput << std::setw(colonWidth) << std::right << "SCOPE: " << tempHead->getScope() << std::endl;
+        symbolOutput << std::endl; 
         
         tempHead = tempHead->getNext();
     }
 }
 
 // Print function for any Entries that have parameters
-void Table::printParameters(){
+void Table::printParameters(std::ofstream& symbolOutput){
 
     // make local head pointer
     Entry* tempHead = this->head;
@@ -238,14 +242,14 @@ void Table::printParameters(){
     // Cycle through all entries in the table
     while(tempHead != nullptr){
         if (tempHead->parameters.size() > 0){  // If current entry has parameters...
-            std::cout << std::setw(colonWidth) << std::right << "PARAMETER LIST FOR: " << tempHead->getIDName() << std::endl;
+            symbolOutput << std::setw(colonWidth) << std::right << "PARAMETER LIST FOR: " << tempHead->getIDName() << std::endl;
             for (int i = 0; i < tempHead->parameters.size(); i++) { // Print each parameter
-                std::cout << std::setw(colonWidth) << std::right << "IDENTIFIER_NAME: " << tempHead->parameters.at(i)->getIDName() << std::endl;
-                std::cout << std::setw(colonWidth) << std::right << "DATATYPE: " << tempHead->parameters.at(i)->getDType() << std::endl;
-                std::cout << std::setw(colonWidth) << std::right << "DATATYPE_IS_ARRAY: " << (tempHead->parameters.at(i)->getIsArray() ? "yes" : "no") << std::endl;
-                std::cout << std::setw(colonWidth) << std::right << "DATATYPE_ARRAY_SIZE: " << tempHead->parameters.at(i)->getArraySize() << std::endl;
-                std::cout << std::setw(colonWidth) << std::right << "SCOPE: " << tempHead->parameters.at(i)->getScope() << std::endl;
-                std::cout << std::endl;
+                symbolOutput << std::setw(colonWidth) << std::right << "IDENTIFIER_NAME: " << tempHead->parameters.at(i)->getIDName() << std::endl;
+                symbolOutput << std::setw(colonWidth) << std::right << "DATATYPE: " << tempHead->parameters.at(i)->getDType() << std::endl;
+                symbolOutput << std::setw(colonWidth) << std::right << "DATATYPE_IS_ARRAY: " << (tempHead->parameters.at(i)->getIsArray() ? "yes" : "no") << std::endl;
+                symbolOutput << std::setw(colonWidth) << std::right << "DATATYPE_ARRAY_SIZE: " << tempHead->parameters.at(i)->getArraySize() << std::endl;
+                symbolOutput << std::setw(colonWidth) << std::right << "SCOPE: " << tempHead->parameters.at(i)->getScope() << std::endl;
+                symbolOutput << std::endl;
             }
         }
         tempHead = tempHead->getNext();
