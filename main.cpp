@@ -155,7 +155,11 @@ int main() {
     printw("*                                                                                            *\n");
     printw("*  This Program Acts As An Interpreter For The C Language And Was Built Over The Course Of   *\n");
     printw("*  Six Stages. Each Of These Components Are Testable And Can Be Selected Individially From   *\n");
-    printw("*                                   The Following Page.                                      *\n");
+    printw("*                                  The Following Page.                                       *\n");
+    printw("*                                                                                            *\n");
+    printw("*                                                                                            *\n");
+    printw("*          Great things are done by a series of small things brought together.               *\n");
+    printw("*                                   -Vincent van Gogh                                        *\n");
     printw("*                                                                                            *\n");
     printw("**********************************************************************************************\n");
     printw("\nPress any key to continue. . .");
