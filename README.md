@@ -154,11 +154,11 @@ Five students worked together to construct the interpreter.
 <!-- CONNECT -->
 ### Connect With Us
 
-Blake Marshall - [LinkedIn](linkedin.com/in/blakemarshalll)  
-Brandon Robinson - [LinkedIn](linkedin.com/in/brandon-robinson-uscg)  
-Holden Ea - [LinkedIn](linkedin.com/in/holden-ea-28a535208)  
-Jacob Sellers - [LinkedIn](linkedin.com/in/jacob-sellers-83840826a)  
-Rolando Yax - [LinkedIn](linkedin.com/in/rolandoyax)  
+Blake Marshall - [LinkedIn](https://www.linkedin.com/in/blakemarshalll)  
+Brandon Robinson - [LinkedIn](https://www.linkedin.com/in/brandon-robinson-uscg)  
+Holden Ea - [LinkedIn](https://www.linkedin.com/in/holden-ea-28a535208)  
+Jacob Sellers - [LinkedIn](https://www.linkedin.com/in/jacob-sellers-83840826a)  
+Rolando Yax - [LinkedIn](https://www.linkedin.com/in/rolandoyax)  
 
 <!-- LICENSE -->
 ## License
