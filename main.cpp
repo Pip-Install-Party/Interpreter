@@ -173,6 +173,7 @@ int main() {
     printw("3 - Parsing\n");
     printw("4 - Symbol Table Generation\n");
     printw("5 - Abstract Syntax Tree Generation\n");
+    printw("5 - Full Interpreter\n");
     printw("Selection: ");
     refresh();
 
