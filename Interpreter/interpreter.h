@@ -6,6 +6,7 @@ class Interpreter {
     private:
     public:
     Interpreter();
+    void begin();
     ~Interpreter();
 };
 
