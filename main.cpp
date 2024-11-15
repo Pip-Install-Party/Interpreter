@@ -15,8 +15,8 @@
 std::string filename = "Interpreter_Output.txt";
 std::ofstream interpreterOutput(filename);
 
-struct assignmentElements {
-    int assignmentNum;
+struct componentElements {
+    int componentNum;
     const std::filesystem::path* testFiles;
     int numFiles;
     void (*processFunction)(std::ifstream&, std::ostringstream&, int);
@@ -115,16 +115,54 @@ void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile,
 
 }
 
-const assignmentElements assignments[] = {
-    {1, a1Tests, std::size(a1Tests), removeComments},
-    {2, a2Tests, std::size(a2Tests), tokenize},
-    {3, a3Tests, std::size(a3Tests), parse},
-    {4, a4Tests, std::size(a4Tests), symbolTable},
-    {5, a5Tests, std::size(a5Tests), abstractSyntaxTree}
+void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
+    // CommentDFA *removeComments = new CommentDFA();
+    // std::ostringstream tempBuffer;
+    // removeComments->begin(testFile, tempBuffer);
+
+    // Tokenizer *tokenizer = new Tokenizer();
+    // std::istringstream tokenStream(tempBuffer.str());
+    // tokenizer->begin(tokenStream);
+    // std::vector<Token> tokenList = tokenizer->getTokens();
+
+    // Parser *parser = new Parser(tokenList);
+    // parser->begin();
+
+    // Table *table = new Table;
+
+    // table->begin(parser->getHead());
+
+    // Tree* tree = new Tree(parser->getHead(), table);
+
+
+
+    /*
+        WAIT!!! Before uncommenting this, remove the check in main that causes the output
+
+        "This component is not yet functional.".
+
+        If this function has been implemented, we should print 
+
+        "Results printed to Interpreter_Output.txt"
+
+        regardless of component seleciton. 
+    */
+
+
+
+}
+
+const componentElements components[] = {
+    {1, c1Tests, std::size(c1Tests), removeComments},
+    {2, c2Tests, std::size(c2Tests), tokenize},
+    {3, c3Tests, std::size(c3Tests), parse},
+    {4, c4Tests, std::size(c4Tests), symbolTable},
+    {5, c5Tests, std::size(c5Tests), abstractSyntaxTree},
+    {6, c6Tests, std::size(c6Tests), interpreter}
 };
 
 // chooses test file based on user selection and includes error messages
-std::ifstream openSelectedFile(const assignmentElements& config, int fileNum) {
+std::ifstream openSelectedFile(const componentElements& config, int fileNum) {
     std::ifstream file(config.testFiles[fileNum]);
 
     if (!file.is_open()) {
@@ -143,7 +181,7 @@ int main() {
     noecho();                // Disable echoing of typed characters
     keypad(stdscr, TRUE);    // Enable function keys like arrow keys
 
-    int assignmentNum = 0;
+    int componentNum = 0;
 
     printw("**********************************************************************************************\n");
     printw("*                                                                                            *\n");
@@ -173,23 +211,23 @@ int main() {
     printw("3 - Parsing\n");
     printw("4 - Symbol Table Generation\n");
     printw("5 - Abstract Syntax Tree Generation\n");
-    printw("5 - Full Interpreter\n");
+    printw("6 - Full Interpreter\n");
     printw("Selection: ");
     refresh();
 
-    // Get user input for assignment selection
+    // Get user input for component selection
     echo();
-    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &assignmentNum);
+    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &componentNum);
     clear();
-    if (assignmentNum < 1 || assignmentNum > 5) {
-        printw("Invalid assignment choice. Exiting.\n");
+    if (componentNum < 1 || componentNum > 6) {
+        printw("Invalid component selection. Exiting.\n");
         refresh();
         getch();  // Wait for a key press
         endwin(); // End ncurses mode
         return 1;
     }
 
-    const assignmentElements& config = assignments[assignmentNum - 1];
+    const componentElements& config = components[componentNum - 1];
     
     int fileNum = 0;
     printw("Choose A Test File 1 - %d,\n", config.numFiles);  // Just prints the file number
@@ -217,7 +255,11 @@ int main() {
 
     // Display the result buffer in ncurses window
     clear();
-    printw("Results printed to Interpreter_Output.txt");
+    if (componentNum != 6) {
+        printw("Results printed to Interpreter_Output.txt");
+    } else {
+        printw("This component is not yet functional.");
+    }
     printw("\n\nPress any key to quit. . .");
     refresh();
     

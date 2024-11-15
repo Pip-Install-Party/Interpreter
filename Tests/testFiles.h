@@ -4,7 +4,7 @@
 #include <filesystem>
 
 // Assignment 1
-const std::filesystem::path a1Tests[] = {
+const std::filesystem::path c1Tests[] = {
    "Tests/Program1/Test1.c",
    "Tests/Program1/Test2.c",
    "Tests/Program1/Test3.c",
@@ -14,7 +14,7 @@ const std::filesystem::path a1Tests[] = {
 };
 
 // Assignment 2
-const std::filesystem::path a2Tests[] = {
+const std::filesystem::path c2Tests[] = {
    "Tests/Program2/Test1.c",
    "Tests/Program2/Test2.c",
    "Tests/Program2/Test3.c",
@@ -25,7 +25,7 @@ const std::filesystem::path a2Tests[] = {
 };
 
 // Assignment 3
-const std::filesystem::path a3Tests[] = {
+const std::filesystem::path c3Tests[] = {
    "Tests/Program3/Test1.c",
    "Tests/Program3/Test2.c",
    "Tests/Program3/Test3.c",
@@ -39,7 +39,7 @@ const std::filesystem::path a3Tests[] = {
 };
 
 // Assignment 4
-const std::filesystem::path a4Tests[] = {
+const std::filesystem::path c4Tests[] = {
    "Tests/Program4/Test1.c",
    "Tests/Program4/Test2.c",
    "Tests/Program4/Test3.c",
@@ -50,7 +50,7 @@ const std::filesystem::path a4Tests[] = {
 }; 
 
 // Assignment 5
-const std::filesystem::path a5Tests[] = {
+const std::filesystem::path c5Tests[] = {
    "Tests/Program5/Test1.c",
    "Tests/Program5/Test2.c",
    "Tests/Program5/Test3.c",
@@ -59,7 +59,7 @@ const std::filesystem::path a5Tests[] = {
 };
 
 // Assignment 6
-const std::filesystem::path a6Tests[] = {
+const std::filesystem::path c6Tests[] = {
    "Tests/Program6/Test1.c",
    "Tests/Program6/Test2.c",
    "Tests/Program6/Test3.c",
