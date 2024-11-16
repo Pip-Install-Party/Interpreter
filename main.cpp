@@ -1,8 +1,13 @@
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <filesystem>
 #include <sstream>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <iostream> // Use standard output stream on Windows
+#else
+    #include <ncurses.h> // Use ncurses on Unix-based systems
+#endif
 
 #include "Comments/commentDFA.h"
 #include "Tokens/tokenizer.h"
@@ -10,7 +15,6 @@
 #include "Symbols/table.h"
 #include "Tree/tree.h"
 #include "Tests/testFiles.h"
-#include <ncurses.h>
 
 std::string filename = "Interpreter_Output.txt";
 std::ofstream interpreterOutput(filename);
@@ -89,7 +93,7 @@ void symbolTable(std::ifstream& testFile, std::ostringstream& outputFile, int) {
     Table *table = new Table;
 
     table->begin(parser->getHead());
-    std::cout << "\nPrinting Symbol Table:\n" << std::endl;
+    interpreterOutput << "\nPrinting Symbol Table:\n\n";
     table->printTable(interpreterOutput);
     table->printParameters(interpreterOutput);
 }
@@ -173,98 +177,135 @@ std::ifstream openSelectedFile(const componentElements& config, int fileNum) {
     return file;
 }
 
-// main function that handles user prompts, files opening and closing, and initial state
+void displayMessage(const std::string& message) {
+#if defined(__APPLE__) || defined(__unix__)
+    clear();
+    printw(message.c_str());
+    refresh();
+#else
+    std::cout << message;
+#endif
+}
+
+void waitForInput() {
+#if defined(__APPLE__) || defined(__unix__)
+    getch();  // ncurses-specific wait
+#else
+    std::cin.get();  // For Windows, wait for input via std::cin
+#endif
+}
+
+int getComponentSelection() {
+    int selection = 0;
+#if defined(__APPLE__) || defined(__unix__)
+    echo();
+    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &selection);
+#else
+    std::cin >> selection;
+#endif
+    return selection;
+}
+
+int getFileSelection(int numFiles) {
+    int fileNum = 0;
+    displayMessage("Choose A Test File 1 - " + std::to_string(numFiles) + ",\nSelection: ");
+    
+#if defined(__APPLE__) || defined(__unix__)
+    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &fileNum);
+    --fileNum;
+#else
+    std::cin >> fileNum;
+    --fileNum;
+#endif
+    return fileNum;
+}
+
 int main() {
-    // Initialize ncurses
+    int componentNum = 0;
+
+    // Initialize ncurses for Unix systems
+#if defined(__APPLE__) || defined(__unix__)
     initscr();               // Start ncurses mode
     cbreak();                // Disable line buffering
     noecho();                // Disable echoing of typed characters
     keypad(stdscr, TRUE);    // Enable function keys like arrow keys
+#endif
 
-    int componentNum = 0;
+    // Common introduction message
+    displayMessage("**********************************************************************************************\n"
+                   "*                                                                                            *\n"
+                   "*                                     C Interpreter                                          *\n"
+                   "*                                                                                            *\n"
+                   "*  A Project By Blake Marshall, Brandon Robinson, Holden Ea, Jacob Sellers, & Rolando Yax.   *\n"
+                   "*  Completed To Satisfy The Final Project of CS460 At Sonoma State University In Fall 2024.  *\n"
+                   "*                                                                                            *\n"
+                   "*                                                                                            *\n"
+                   "*  This Program Acts As An Interpreter For The C Language And Was Built Over The Course Of   *\n"
+                   "*  Six Stages. Each Of These Components Are Testable And Can Be Selected Individially From   *\n"
+                   "*                                  The Following Page.                                       *\n"
+                   "*                                                                                            *\n"
+                   "*                                                                                            *\n"
+                   "*          Great things are done by a series of small things brought together.               *\n"
+                   "*                                   -Vincent van Gogh                                        *\n"
+                   "*                                                                                            *\n"
+                   "**********************************************************************************************\n"
+                   "\nPress any key to continue. . .");
 
-    printw("**********************************************************************************************\n");
-    printw("*                                                                                            *\n");
-    printw("*                                     C Interpreter                                          *\n");
-    printw("*                                                                                            *\n");
-    printw("*  A Project By Blake Marshall, Brandon Robinson, Holden Ea, Jacob Sellers, & Rolando Yax.   *\n");
-    printw("*  Completed To Satisfy The Final Project of CS460 At Sonoma State University In Fall 2024.  *\n");
-    printw("*                                                                                            *\n");
-    printw("*                                                                                            *\n");
-    printw("*  This Program Acts As An Interpreter For The C Language And Was Built Over The Course Of   *\n");
-    printw("*  Six Stages. Each Of These Components Are Testable And Can Be Selected Individially From   *\n");
-    printw("*                                  The Following Page.                                       *\n");
-    printw("*                                                                                            *\n");
-    printw("*                                                                                            *\n");
-    printw("*          Great things are done by a series of small things brought together.               *\n");
-    printw("*                                   -Vincent van Gogh                                        *\n");
-    printw("*                                                                                            *\n");
-    printw("**********************************************************************************************\n");
-    printw("\nPress any key to continue. . .");
-    getch(); // Wait for user to press a key before continuing
-    refresh();
-    clear();
+    waitForInput(); // Wait for user input
 
-    printw("Select A Component:\n");
-    printw("1 - Comment Removal\n");
-    printw("2 - Tokenization\n");
-    printw("3 - Parsing\n");
-    printw("4 - Symbol Table Generation\n");
-    printw("5 - Abstract Syntax Tree Generation\n");
-    printw("6 - Full Interpreter\n");
-    printw("Selection: ");
-    refresh();
+    displayMessage("\nSelect A Component:\n"
+                   "1 - Comment Removal\n"
+                   "2 - Tokenization\n"
+                   "3 - Parsing\n"
+                   "4 - Symbol Table Generation\n"
+                   "5 - Abstract Syntax Tree Generation\n"
+                   "6 - Full Interpreter\n"
+                   "Selection: ");
 
-    // Get user input for component selection
-    echo();
-    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &componentNum);
-    clear();
+    componentNum = getComponentSelection();
+
     if (componentNum < 1 || componentNum > 6) {
-        printw("Invalid component selection. Exiting.\n");
-        refresh();
-        getch();  // Wait for a key press
-        endwin(); // End ncurses mode
+        displayMessage("Invalid component selection. Exiting.\n");
+        waitForInput();
+#if defined(__APPLE__) || defined(__unix__)
+        endwin();
+#endif
         return 1;
     }
 
+    // Assuming `components` is an array of structures with `numFiles` and `processFunction` as part of the struct.
     const componentElements& config = components[componentNum - 1];
     
-    int fileNum = 0;
-    printw("Choose A Test File 1 - %d,\n", config.numFiles);  // Just prints the file number
-    printw("Selection: ");
-    refresh();
+    int fileNum = getFileSelection(config.numFiles);
 
-    // Get user input for file selection
-    mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &fileNum);
-    --fileNum;
-
-    // Attempt to open selected file
     std::ifstream file = openSelectedFile(config, fileNum);
     if (!file.is_open()) {
-        printw("Error: Could not open selected file.\n");
-        refresh();
-        getch();
+        displayMessage("Error: Could not open selected file.\n");
+        waitForInput();
+#if defined(__APPLE__) || defined(__unix__)
         endwin();
+#endif
         return 1;
     }
 
     std::ostringstream buffer;
     config.processFunction(file, buffer, fileNum); // Process based on selection
-    interpreterOutput.flush();
-    interpreterOutput.close();
 
-    // Display the result buffer in ncurses window
-    clear();
+    // Display results
     if (componentNum != 6) {
-        printw("Results printed to Interpreter_Output.txt");
+        interpreterOutput.flush();
+        interpreterOutput.close();
+        displayMessage("Results printed to Interpreter_Output.txt\n\n"
+                       "Press any key to quit. . .");
     } else {
-        printw("This component is not yet functional.");
+        displayMessage("This component is not yet functional.\n");
     }
-    printw("\n\nPress any key to quit. . .");
-    refresh();
-    
-    getch(); // Wait for user to press a key before exiting
+
+    waitForInput();  // Wait for user to press a key before exiting
+
+#if defined(__APPLE__) || defined(__unix__)
     endwin(); // End ncurses mode
+#endif
 
     return 0;
 }
