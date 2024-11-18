@@ -2,12 +2,19 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -g
 
-# Define the libraries
-LIBS = -lncurses
+EXT = .exe
+
+ifeq ($(OS),)
+    LIBS = -lncurses  # Use ncurses on Unix-based systems
+    RM = rm -f  # Unix delete command
+	EXT = .x
+endif
+
+TARGET = interpreter$(EXT)
 
 # Final target
-interpreter.x: main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o
-	$(CXX) $(CXXFLAGS) main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o $(LIBS) -o interpreter.x
+$(TARGET): main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o
+	$(CXX) $(CXXFLAGS) main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o $(LIBS) -o $(TARGET)
 
 # Compilation of main.o
 main.o: main.cpp Comments/commentDFA.h Tokens/tokenizer.h Parser/parser.h Tests/testFiles.h
@@ -39,4 +46,4 @@ interpreter.o: Interpreter/interpreter.cpp Interpreter/interpreter.h
 
 # Clean the build
 clean:
-	rm -f interpreter.x *.o *.txt
+	rm -f $(TARGET) *.o *.txt
