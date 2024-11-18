@@ -133,12 +133,15 @@ void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int fi
     // parser->begin();
 
     // Table *table = new Table;
-
     // table->begin(parser->getHead());
 
     // Tree* tree = new Tree(parser->getHead(), table);
 
+    // ^^tree needs to return an actually connected AST
+    //Interpreter* interpreter = new Interpreter();
 
+    // then we pass the root of that tree to the interpreter
+    //interpreter->begin(tree->getHead());
 
     /*
         WAIT!!! Before uncommenting this, remove the check in main that causes the output
