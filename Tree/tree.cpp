@@ -421,3 +421,72 @@ bool Tree::isIndex(std::string headType) {
     }
     return false;
 }
+
+Node* Tree::saveTree(std::ostringstream& buffer){
+    Node* root = nullptr;
+    Node* prevNode = nullptr;
+    std::string tempString;
+    std::string content = buffer.str(); // Convert the buffer to a string
+    
+    if (content.empty()) {
+        return nullptr; // Handle empty buffer case
+    }
+
+    const std::string targets[] = {"---->", "|"}; // Substrings to replace
+    for (const auto& target : targets) {
+        size_t pos;
+        while ((pos = content.find(target)) != std::string::npos) {
+            content.replace(pos, target.length(), " "); // Replace with a single space
+        }
+    }
+
+    // Print to check validity
+    for (char ch : content) {
+        std::cout << "Reading character: " << ch << std::endl;
+    }
+
+    // Iterate through each character of the buffer
+    for (char ch : content) {
+        if(ch == ' ') { // If we reach a space (delimiter)
+            if (tempString != "") { // Make sure the string is not empty before creating a node
+                Node* node = new Node(tempString, false);
+                if (isReserved(tempString)) { // If it is reserved, it must be a child (or the first)
+                    if (root != nullptr) { // Set as the child of the previous node
+                        prevNode->setChild(node); 
+                    } else { // Set as the root of the tree if no other nodes exist
+                        root = node;
+                    }
+                    prevNode = node; // Set the current node as the previous node for future iterations 
+                } else { // If it is not a reserved word, it must be a sibling and cannot be a root
+                    prevNode->setSibling(node);
+                }
+            }
+            tempString = ""; // Reset the string for the next word
+        } else {
+            tempString += ch; // If we have not reached a space, we must still be reading a string
+        }
+    }
+    // Check to see if there is anything at the end since the file likely doesn't end with a space
+    if (tempString != "") {
+        Node* node = new Node(tempString, false);
+        if (isReserved(tempString)) {
+            if (root != nullptr) {
+                prevNode->setChild(node);
+            } 
+            prevNode = node;
+        } else {
+            prevNode->setSibling(node);
+        }
+    }
+
+    return root;
+}
+
+bool isReserved(std::string word) {
+    for (std::string rword : reservedTypes) {
+        if( rword == word) {
+            return true;
+        }
+    }
+    return false;
+}
