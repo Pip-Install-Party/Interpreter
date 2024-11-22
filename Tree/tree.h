@@ -20,7 +20,8 @@ class Tree {
     private:
         Table* symbolTable;
         bool isCall = false;
-        void printTree(Token*, Token*, std::ostringstream&);
+        void buildTree(Token*, Token*, std::ostringstream&);
+        void printTree(Node*);
         void printArrow(int, std::ostringstream&);
         bool contains(const std::vector<std::string>, std::string);
         bool isFunction(std::string);
@@ -40,8 +41,8 @@ class Tree {
              // Make an output filestream
             //std::string filename = "Interpreter_Output.txt";
             std::ostringstream ASTOutput;
-            printTree(head, nullptr, ASTOutput);
-            saveTree(ASTOutput);
+            buildTree(head, nullptr, ASTOutput);
+            printTree(saveTree(ASTOutput));
         }
         ~Tree();
 };

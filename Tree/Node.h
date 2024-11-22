@@ -17,6 +17,7 @@ public:
     Node* getChild() { return this->lChild; }
     void setSibling( Node* sibling ) { this->rSibling = sibling; }
     void setChild( Node* child ) { this->lChild = child; }
+    std::string getValue() { return name; }
     ~Node(); 
 };
 #endif // NODE_H
