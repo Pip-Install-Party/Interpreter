@@ -19,7 +19,7 @@ void Tree::printArrow(int spaces, std::ostringstream& ASTOutput){
 }
 
 // Prints the abstract syntax tree to the provided output stream
-void Tree::printTree(Token* head, Token* prevToken, std::ostringstream& ASTOutput){
+void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutput){
     
     int lineNumber = 1;
     bool ignore = true;
@@ -169,14 +169,14 @@ void Tree::printTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
             ASTOutput << head->getValue();
 	    spaceCount += 7 + head->getValue().length();
         }
-        return printTree(head->getSibling(), head, ASTOutput);
+        return buildTree(head->getSibling(), head, ASTOutput);
     } else if (head->getChild() != nullptr) {
         if (!ignore) {
         lineNumber += 6;
         printArrow(spaceCount, ASTOutput);
 	}
         isCall = false;
-        return printTree(head->getChild(), head, ASTOutput);
+        return buildTree(head->getChild(), head, ASTOutput);
     } 
     return;
 }
@@ -440,18 +440,20 @@ Node* Tree::saveTree(std::ostringstream& buffer){
         }
     }
 
-    std::cout << "Reading characters: \n";
+    //std::cout << "Reading characters: \n";
     // Print to check validity
     for (char ch : content) {
-        std::cout << ch;
+      // std::cout << ch;
     }
 
     // Iterate through each character of the buffer
     for (char ch : content) {
-        if(ch == ' ') { // If we reach a space (delimiter)
+        if(ch == ' ' || ch == '\n') { // If we reach a space (delimiter)
             if (tempString != "") { // Make sure the string is not empty before creating a node
-                Node* node = new Node(tempString, false);
+           // std::cout << "|" << tempString << "|" << std::endl;
                 if (isReserved(tempString)) { // If it is reserved, it must be a child (or the first)
+               // std::cout << "Reserved here!!!" << std::endl;
+                    Node* node = new Node(tempString, true);
                     if (root != nullptr) { // Set as the child of the previous node
                         prevNode->setChild(node); 
                     } else { // Set as the root of the tree if no other nodes exist
@@ -459,9 +461,13 @@ Node* Tree::saveTree(std::ostringstream& buffer){
                     }
                     prevNode = node; // Set the current node as the previous node for future iterations 
                 } else { // If it is not a reserved word, it must be a sibling and cannot be a root
+                //                std::cout << "Not here!!!" << std::endl;
+
+                    Node* node = new Node(tempString, false);
                     if (root != nullptr) {
                         prevNode->setSibling(node);
                     }
+                    prevNode = node; // Set the current node as the previous node for future iterations 
                 }
             }
             tempString = ""; // Reset the string for the next word
@@ -492,4 +498,18 @@ bool Tree::isReserved(std::string word) {
         }
     }
     return false;
+}
+
+void Tree::printTree(Node* currNode) { 
+    if (currNode == nullptr) {
+        std::cout << "Done Top\n";
+        return;
+    }
+    std::cout << currNode->getValue() << "     ";
+    if ( currNode->getSibling() != nullptr ) {
+        return printTree(currNode->getSibling());
+    } else if ( currNode->getChild() != nullptr ) {
+        std::cout << std::endl << std::endl;
+        return printTree(currNode->getChild() );
+    }
 }
