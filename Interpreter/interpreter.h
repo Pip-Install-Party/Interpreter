@@ -2,32 +2,45 @@
 #define INTERPRETER_H
 #include <iostream>
 #include <stack>
+#include "../Symbols/entry.h"
 #include "../Tree/tree.h"
+#include "../Tree/Node.h"
 
 class Interpreter {
     private:
-        ASTNode* programCounter;    // keeps track of AST's current instruction
+        Node* programCounter = nullptr;    // keeps track of AST's current instruction
+        Tree* ast = nullptr;
         std::stack<int> expressionStack;    // stack to evaluate expressions
-        Table* symbolTable;         // stores variable values
+        std::unordered_map<std::string, Entry> symbolTable;         // stores variable values
 
 
     public:
-        Interpreter();
-        ~Interpreter();
+        Interpreter(Table* table, Tree* tree) {
+            ast = tree;
+            symbolTable = convertTable(table);
+        }
 
-        void begin(ASTNode* head);
-        void executeStatement(ASTNode* node);
+        void begin(Node*);
+        void executeStatement(Node*);
 
-        void handleDeclaration(ASTNode*);
-        void handleAssignment(ASTNode*);
-        void handleIteration(ASTNode*);
-        void handleSelection(ASTNode*);
-        void handlePrintf(ASTNode*);
-        void handleReturn(ASTNode*);
-        void handleFunction(ASTNode*);
-        void handleProcedure(ASTNode*);   
+        Node* nextStatement();
+        void handleDeclaration(Node*);
+        void handleAssignment(Node*);
+        void handleIteration(Node*);
+        void handleSelection(Node*);
+        void handlePrintf(Node*);
+        void handleReturn(Node*);
+        void handleFunction(Node*);
+        void handleProcedure(Node*);   
 
         /* ... add more functions as needed */
+
+        // Helper functions
+        std::unordered_map<std::string, Entry> convertTable(Table*);
+        bool isOperator(const std::string&);
+        int performPostfixOperation(int, int, const std::string&)
+
+        ~Interpreter();
 };
 
 #endif // INTERPRETER_H

@@ -20,6 +20,7 @@ class Tree {
     private:
         Table* symbolTable;
         bool isCall = false;
+        Node* root;
         void buildTree(Token*, Token*, std::ostringstream&);
         void printTree(Node*);
         void printArrow(int, std::ostringstream&);
@@ -42,8 +43,10 @@ class Tree {
             //std::string filename = "Interpreter_Output.txt";
             std::ostringstream ASTOutput;
             buildTree(head, nullptr, ASTOutput);
-            printTree(saveTree(ASTOutput));
+            root = saveTree(ASTOutput);
+            //printTree(saveTree(ASTOutput));
         }
+        Node* getHead() { return root; }
         ~Tree();
 };
 

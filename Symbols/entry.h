@@ -9,6 +9,7 @@ class Entry {
     std::string idName = "";
     std::string idType = "";
     std::string dType = "";
+    std::string val = "";
     bool isArray = false;
     int arraySize = 0;
     short scope;
@@ -22,6 +23,8 @@ class Entry {
     std::string getIDName(){ return idName; }
     std::string getIDType(){ return idType; }
     std::string getDType() { return dType; }
+    std::string getValue() { return val; }
+    void setValue(std::string value) { val = value; }
     void setIsArray() { this->isArray = true; };
     bool getIsArray() { return isArray; }
     int getArraySize() { return arraySize; }

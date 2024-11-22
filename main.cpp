@@ -16,6 +16,7 @@
 #include "Symbols/table.h"
 #include "Tree/tree.h"
 #include "Tests/testFiles.h"
+#include "Interpreter/interpreter.h"
 
 std::string filename = "Interpreter_Output.txt";
 std::ofstream interpreterOutput(filename);
@@ -121,28 +122,26 @@ void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile,
 }
 
 void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
-    // CommentDFA *removeComments = new CommentDFA();
-    // std::ostringstream tempBuffer;
-    // removeComments->begin(testFile, tempBuffer);
+    CommentDFA *removeComments = new CommentDFA();
+    std::ostringstream tempBuffer;
+    removeComments->begin(testFile, tempBuffer);
 
-    // Tokenizer *tokenizer = new Tokenizer();
-    // std::istringstream tokenStream(tempBuffer.str());
-    // tokenizer->begin(tokenStream);
-    // std::vector<Token> tokenList = tokenizer->getTokens();
+    Tokenizer *tokenizer = new Tokenizer();
+    std::istringstream tokenStream(tempBuffer.str());
+    tokenizer->begin(tokenStream);
+    std::vector<Token> tokenList = tokenizer->getTokens();
 
-    // Parser *parser = new Parser(tokenList);
-    // parser->begin();
+    Parser *parser = new Parser(tokenList);
+    parser->begin();
 
-    // Table *table = new Table;
-    // table->begin(parser->getHead());
+    Table *table = new Table;
+    table->begin(parser->getHead());
 
-    // Tree* tree = new Tree(parser->getHead(), table);
+    Tree* tree = new Tree(parser->getHead(), table);
 
-    // ^^tree needs to return an actually connected AST
-    //Interpreter* interpreter = new Interpreter();
+    Interpreter* interpreter = new Interpreter();
 
-    // then we pass the root of that tree to the interpreter
-    //interpreter->begin(tree->getHead());
+    interpreter->begin(tree->getHead());
 
     /*
         WAIT!!! Before uncommenting this, remove the check in main that causes the output
@@ -302,14 +301,10 @@ int main() {
     config.processFunction(file, buffer, fileNum); // Process based on selection
 
     // Display results
-    if (componentNum != 6) {
         //interpreterOutput.flush();
         //interpreterOutput.close();
         //displayMessage("Results printed to Interpreter_Output.txt\n\n"
                        //"Press any key to quit. . .");
-    } else {
-        displayMessage("This component is not yet functional.\n");
-    }
 
     waitForInput();  // Wait for user to press a key before exiting
 
