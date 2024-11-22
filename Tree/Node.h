@@ -11,12 +11,12 @@ private:
     std::string name = "";
     bool reserved = false;
 public:
-    Node(std::string id, bool isReserved) { name = id, reserved = isReserved; }
-    bool isReserved() { return reserved; }
-    Node* getSibling() { return rSibling; }
-    Node* getChild() { return lChild; }
-    void setSibling( Node* sibling ) { rSibling = sibling; }
-    void setChild( Node* child ) { lChild = child; }
+    Node(std::string id, bool isReserved) { this->name = id, this->reserved = isReserved; }
+    bool isReserved() { return this->reserved; }
+    Node* getSibling() { return this->rSibling; }
+    Node* getChild() { return this->lChild; }
+    void setSibling( Node* sibling ) { this->rSibling = sibling; }
+    void setChild( Node* child ) { this->lChild = child; }
     ~Node(); 
 };
 #endif // NODE_H

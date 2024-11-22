@@ -4,8 +4,8 @@
 
 
 // Prints an arrow for our output
-void printArrow(int spaces, std::ofstream& ASTOutput){
-    std::vector<char> arrowCharacters = {'|','|','|','|','v'};
+void Tree::printArrow(int spaces, std::ostringstream& ASTOutput){
+    std::vector<char> arrowCharacters = {'|','|','|','|'};
     ASTOutput << '\n';
     for (int i =0; i < arrowCharacters.size(); i++){
         for (int j = 0; j < spaces; j++) {
@@ -16,10 +16,10 @@ void printArrow(int spaces, std::ofstream& ASTOutput){
     for (int k = 0; k < spaces; k++) {
 	    ASTOutput << ' ';
     }
-} 
+}
 
 // Prints the abstract syntax tree to the provided output stream
-void Tree::printTree(Token* head, Token* prevToken, std::ofstream& ASTOutput){
+void Tree::printTree(Token* head, Token* prevToken, std::ostringstream& ASTOutput){
     
     int lineNumber = 1;
     bool ignore = true;
@@ -29,11 +29,11 @@ void Tree::printTree(Token* head, Token* prevToken, std::ofstream& ASTOutput){
     }
     if (head->getValue() == "{") {
         ignore = false;
-        ASTOutput << "BEGIN BLOCK";
+        ASTOutput << "BEGIN_BLOCK";
 	spaceCount += 11;
     } else if (head->getValue() == "}") {
         ignore = false;
-        ASTOutput << "END BLOCK";
+        ASTOutput << "END_BLOCK";
 	spaceCount += 9;
     } else if(head->getValue() == "else"){
         ignore = false;
@@ -103,7 +103,7 @@ void Tree::printTree(Token* head, Token* prevToken, std::ofstream& ASTOutput){
         short forCount = 0;
         ignore = false;
         while (forCount < 3){
-            ASTOutput << "FOR EXPRESSION " << forCount+1 << " ----> ";
+            ASTOutput << "FOR_EXPRESSION " << forCount+1 << " ----> ";
 	    spaceCount += 23;
             head = head->getSibling();
             head = handleAssignment(head, ASTOutput); 
@@ -236,7 +236,7 @@ Token* Tree::handleIndex(Token * head, std::vector<Token*>& equationAsVec) {
     return head->getSibling(); 
 }
 
-Token* Tree::handleAssignment(Token* head, std::ofstream& ASTOutput) {
+Token* Tree::handleAssignment(Token* head, std::ostringstream& ASTOutput) {
     std::vector<Token*> equationAsVec;
     Token* prev = nullptr;
     isCall = isFunction(head->getValue());
@@ -434,15 +434,16 @@ Node* Tree::saveTree(std::ostringstream& buffer){
 
     const std::string targets[] = {"---->", "|"}; // Substrings to replace
     for (const auto& target : targets) {
-        size_t pos;
+        std::size_t pos;
         while ((pos = content.find(target)) != std::string::npos) {
             content.replace(pos, target.length(), " "); // Replace with a single space
         }
     }
 
+    std::cout << "Reading characters: \n";
     // Print to check validity
     for (char ch : content) {
-        std::cout << "Reading character: " << ch << std::endl;
+        std::cout << ch;
     }
 
     // Iterate through each character of the buffer
@@ -458,7 +459,9 @@ Node* Tree::saveTree(std::ostringstream& buffer){
                     }
                     prevNode = node; // Set the current node as the previous node for future iterations 
                 } else { // If it is not a reserved word, it must be a sibling and cannot be a root
-                    prevNode->setSibling(node);
+                    if (root != nullptr) {
+                        prevNode->setSibling(node);
+                    }
                 }
             }
             tempString = ""; // Reset the string for the next word
@@ -472,7 +475,7 @@ Node* Tree::saveTree(std::ostringstream& buffer){
         if (isReserved(tempString)) {
             if (root != nullptr) {
                 prevNode->setChild(node);
-            } 
+            }
             prevNode = node;
         } else {
             prevNode->setSibling(node);
@@ -482,7 +485,7 @@ Node* Tree::saveTree(std::ostringstream& buffer){
     return root;
 }
 
-bool isReserved(std::string word) {
+bool Tree::isReserved(std::string word) {
     for (std::string rword : reservedTypes) {
         if( rword == word) {
             return true;

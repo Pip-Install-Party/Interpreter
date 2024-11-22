@@ -20,10 +20,11 @@ class Tree {
     private:
         Table* symbolTable;
         bool isCall = false;
-        void printTree(Token*, Token*, std::ofstream&);
+        void printTree(Token*, Token*, std::ostringstream&);
+        void printArrow(int, std::ostringstream&);
         bool contains(const std::vector<std::string>, std::string);
         bool isFunction(std::string);
-        Token* handleAssignment(Token*, std::ofstream&);
+        Token* handleAssignment(Token*, std::ostringstream&);
         Token* handleIndex(Token *, std::vector<Token*>&);
         Token* handleFunction(Token *,std::vector<Token*>&, bool&);
         int getPrecedence(std::string op);
@@ -37,9 +38,10 @@ class Tree {
         Tree(Token* head, Table* table) { 
             symbolTable = table; 
              // Make an output filestream
-            std::string filename = "Interpreter_Output.txt";
-            std::ofstream ASTOutput(filename);
-            printTree(head, nullptr, ASTOutput);    
+            //std::string filename = "Interpreter_Output.txt";
+            std::ostringstream ASTOutput;
+            printTree(head, nullptr, ASTOutput);
+            saveTree(ASTOutput);
         }
         ~Tree();
 };
