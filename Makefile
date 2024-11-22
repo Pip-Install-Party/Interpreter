@@ -1,49 +1,27 @@
-# Define the compiler and flags
-CXX = g++
-CXXFLAGS = -std=c++17 -g
+all: tree.x
 
-EXT = .exe
+# Linking ncurses with the target binary
+tree.x: main.o commentDFA.o tokenizer.o parser.o table.o tree.o
+	g++ -std=c++17 -g main.o commentDFA.o tokenizer.o parser.o table.o tree.o -o tree.x -lncurses
 
-ifeq ($(OS),)
-    LIBS = -lncurses  # Use ncurses on Unix-based systems
-    RM = rm -f  # Unix delete command
-	EXT = .x
-endif
-
-TARGET = interpreter$(EXT)
-
-# Final target
-$(TARGET): main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o
-	$(CXX) $(CXXFLAGS) main.o commentDFA.o tokenizer.o parser.o table.o tree.o interpreter.o $(LIBS) -o $(TARGET)
-
-# Compilation of main.o
 main.o: main.cpp Comments/commentDFA.h Tokens/tokenizer.h Parser/parser.h Tests/testFiles.h
-	$(CXX) $(CXXFLAGS) -c main.cpp -o main.o
+	g++ -std=c++17 -g -I./Comments -I./Tokens -I./Parser -I./Tests -I./Symbols -I./Tree main.cpp -o main.o -c
 
-# Compilation of commentDFA.o
 commentDFA.o: Comments/commentDFA.cpp Comments/commentDFA.h
-	$(CXX) $(CXXFLAGS) -c Comments/commentDFA.cpp -o commentDFA.o
+	g++ -std=c++17 -g -I./Comments Comments/commentDFA.cpp -o commentDFA.o -c
 
-# Compilation of tokenizer.o
 tokenizer.o: Tokens/tokenizer.cpp Tokens/tokenizer.h
-	$(CXX) $(CXXFLAGS) -c Tokens/tokenizer.cpp -o tokenizer.o
+	g++ -std=c++17 -g -I./Tokens Tokens/tokenizer.cpp -o tokenizer.o -c
 
-# Compilation of parser.o
 parser.o: Parser/parser.cpp Parser/parser.h
-	$(CXX) $(CXXFLAGS) -c Parser/parser.cpp -o parser.o
+	g++ -std=c++17 -g -I./Parser Parser/parser.cpp -o parser.o -c
 
-# Compilation of table.o
 table.o: Symbols/table.cpp Symbols/table.h
-	$(CXX) $(CXXFLAGS) -c Symbols/table.cpp -o table.o
+	g++ -std=c++17 -g -I./Symbols Symbols/table.cpp -o table.o -c
 
-# Compilation of tree.o
 tree.o: Tree/tree.cpp Tree/tree.h
-	$(CXX) $(CXXFLAGS) -c Tree/tree.cpp -o tree.o
+	g++ -std=c++17 -g -I./Tree Tree/tree.cpp -o tree.o -c
 
-# Compilation of interpreter.o
-interpreter.o: Interpreter/interpreter.cpp Interpreter/interpreter.h
-	$(CXX) $(CXXFLAGS) -c Interpreter/interpreter.cpp -o interpreter.o
-
-# Clean the build
+# Clean the compiled files
 clean:
-	rm -f $(TARGET) *.o *.txt
+	rm -f tree.x *.o *.txt

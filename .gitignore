@@ -5,3 +5,4 @@ main.dSYM/
 *.x
 *.exe
 Interpreter_Output.txt
+.idea/
