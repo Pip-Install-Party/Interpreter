@@ -505,11 +505,9 @@ void Tree::printTree(Node* currNode) {
         std::cout << "Done Top\n";
         return;
     }
-    std::cout << currNode->getValue() << "     ";
     if ( currNode->getSibling() != nullptr ) {
         return printTree(currNode->getSibling());
     } else if ( currNode->getChild() != nullptr ) {
-        std::cout << std::endl << std::endl;
         return printTree(currNode->getChild() );
     }
 }

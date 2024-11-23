@@ -9,7 +9,7 @@ class Entry {
     std::string idName = "";
     std::string idType = "";
     std::string dType = "";
-    std::string val = "";
+    std::string val = "0";
     bool isArray = false;
     int arraySize = 0;
     short scope;

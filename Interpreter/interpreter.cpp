@@ -1,6 +1,9 @@
 #include "interpreter.h"
 #include <iostream>
 
+std::string file = "Interpreter_Output.txt";
+std::ofstream output(file);
+
 void Interpreter::begin(Node* node /*pass AST head here*/){
     programCounter = node /*AST head*/;
 
@@ -8,7 +11,7 @@ void Interpreter::begin(Node* node /*pass AST head here*/){
         executeStatement(programCounter);   // pass to executeStatement for further processing
         programCounter = nextStatement(); // need logic to get next statement
     } 
-    std::cout << "This component is not yet functional.";
+    std::cout << "Execution completed. Results may not be complete as this component is not fully functional." << std::endl;
 }
 
 Node* Interpreter::nextStatement(){
@@ -68,36 +71,9 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
 void Interpreter::handleDeclaration(Node* node/*pass current AST node here*/){
 
 }
-void Interpreter::handleAssignment(Node* node/*pass current AST node here*/){
-    std::stack<int> stack;
-    Node* symbol = node->getSibling();
-    Node* current = node;
-    while (current != nullptr) {
-        const std::string& token = current->getValue();
 
-        if (!token.empty() && std::isdigit(token[0])) {
-            // If the token is a number, push it onto the stack
-            stack.push(std::stoi(token));
-        } else if (isOperator(token)) {
-            // If the token is an operator, pop two elements and apply the operator
-            if (stack.size() < 2) {
-                throw std::runtime_error("Invalid postfix expression");
-            }
-            int b = stack.top(); stack.pop();
-            int a = stack.top(); stack.pop();
-            int result = performPostfixOperation(a, b, token);
-            stack.push(result);
-        } else {
-            throw std::invalid_argument("Invalid token in expression");
-        }
-
-        current = current->getSibling();
-    }
-
-    if (stack.size() != 1) {
-        throw std::runtime_error("Invalid postfix expression");
-    }
-    symbolTable.at(symbol->getValue()).setValue(std::to_string(stack.top())); 
+void Interpreter::handleAssignment(Node* node /* pass current AST node here */) {
+   evaluatePostfix(node->getSibling());
 }
 
 void Interpreter::handleIteration(Node* node/*pass current AST node here*/){
@@ -107,6 +83,16 @@ void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
 
 void Interpreter::handlePrintf(Node* node/*pass current AST node here*/){
+    Node* curNode = node->getSibling();
+
+    while ( curNode != nullptr ) {
+        if( symbolTable.find(curNode->getValue()) != symbolTable.end()) {
+            output << symbolTable.at(curNode->getValue())->getValue();
+        } else {
+            output << curNode->getValue();
+        }
+        curNode = curNode->getSibling();
+   }
 }
 
 void Interpreter::handleReturn(Node* node/*pass current AST node here*/){
@@ -132,12 +118,78 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
     throw std::invalid_argument("Invalid operator");
 }
 
-std::unordered_map<std::string, Entry> Interpreter::convertTable(Table* table) {
-    std::unordered_map<std::string, Entry> symbolMap;
+std::unordered_map<std::string, Entry*> Interpreter::convertTable(Table* table) {
+    std::unordered_map<std::string, Entry*> symbolMap;
     Entry* head = table->getHead();
     while( head != nullptr) {
         symbolMap.emplace(head->getIDName(), head);
         head = head->getNext();
     }
     return symbolMap;
+}
+
+
+
+
+
+std::string Interpreter::evaluatePostfix(Node* node) {
+    std::stack<int> stack;
+    Node* current = node->getSibling();
+
+    // This segment will print the expression being evaluated
+    // auto temp = current;
+    // while (temp != nullptr) {
+    //     std::cout << temp->getValue() << " ";
+    //     temp = temp->getSibling();
+    // }
+    // std::cout << std::endl;
+
+    while (current != nullptr) {
+        // std::cout << "Token: " << current->getValue() << std::endl; This will print the current symbol being processed
+        const std::string& token = current->getValue();
+
+        try {
+            // Check if the token is a variable in the symbol table
+            auto it = symbolTable.find(token);
+            if (it != symbolTable.end()) {
+                Entry* entry = it->second;
+                if (entry != nullptr) {
+                    auto idType = entry->getIDType();
+                    if (idType == "procedure" || idType == "function") { // This if block will need to be adapted since there is a CALL
+                        std::cout << "Skipping assignment since CALL not yet implemented" << std::endl;
+                        return "0";
+                    }
+
+                    stack.push(std::stoi(entry->getValue()));
+                } else {
+                    std::cerr << "Error: Null entry found for token: " << token << std::endl;
+                }
+            } else if (isOperator(token)) {
+                // Handle operator
+                if (stack.size() < 2) {
+                    throw std::runtime_error("Invalid postfix expression: not enough operands for operator");
+                }
+                int b = stack.top(); stack.pop();
+                int a = stack.top(); stack.pop();
+                stack.push(performPostfixOperation(a, b, token));
+            } else if (token == "=") {
+                // Assignment operator (end of expression)
+                if (stack.size() != 1) {
+                    throw std::runtime_error("Invalid postfix expression: stack size mismatch at '='");
+                }
+                return std::to_string(stack.top());
+            } else {
+                // Attempt to convert token to a number
+                stack.push(std::stoi(token));
+            }
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Invalid token in expression: " + token);
+        } catch (const std::out_of_range&) {
+            throw std::runtime_error("Number out of range: " + token);
+        }
+
+        current = current->getSibling();
+    }
+
+    throw std::runtime_error("Invalid postfix expression: missing '='");
 }

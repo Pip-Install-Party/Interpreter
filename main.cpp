@@ -139,7 +139,7 @@ void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int fi
 
     Tree* tree = new Tree(parser->getHead(), table);
 
-    Interpreter* interpreter = new Interpreter();
+    Interpreter* interpreter = new Interpreter(table, tree);
 
     interpreter->begin(tree->getHead());
 

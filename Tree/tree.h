@@ -44,7 +44,7 @@ class Tree {
             std::ostringstream ASTOutput;
             buildTree(head, nullptr, ASTOutput);
             root = saveTree(ASTOutput);
-            //printTree(saveTree(ASTOutput));
+            printTree(saveTree(ASTOutput));
         }
         Node* getHead() { return root; }
         ~Tree();

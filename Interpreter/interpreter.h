@@ -2,17 +2,18 @@
 #define INTERPRETER_H
 #include <iostream>
 #include <stack>
+#include <unordered_map>
 #include "../Symbols/entry.h"
 #include "../Tree/tree.h"
 #include "../Tree/Node.h"
+
 
 class Interpreter {
     private:
         Node* programCounter = nullptr;    // keeps track of AST's current instruction
         Tree* ast = nullptr;
         std::stack<int> expressionStack;    // stack to evaluate expressions
-        std::unordered_map<std::string, Entry> symbolTable;         // stores variable values
-
+        std::unordered_map<std::string, Entry*> symbolTable;         // stores variable values
 
     public:
         Interpreter(Table* table, Tree* tree) {
@@ -36,9 +37,11 @@ class Interpreter {
         /* ... add more functions as needed */
 
         // Helper functions
-        std::unordered_map<std::string, Entry> convertTable(Table*);
+        std::unordered_map<std::string, Entry*> convertTable(Table*);
         bool isOperator(const std::string&);
-        int performPostfixOperation(int, int, const std::string&)
+        std::string evaluatePostfix(Node* node);
+        int performPostfixOperation(int, int, const std::string&);
+        
 
         ~Interpreter();
 };
