@@ -7,13 +7,11 @@ std::ofstream output(file);
 void Interpreter::begin(Node* node /*pass AST head here*/){
     programCounter = node /*AST head*/;
 
-    std::cout << "This component is not yet functional.";
-
     while(programCounter != nullptr){
         executeStatement(programCounter);   // pass to executeStatement for further processing
         programCounter = nextStatement(); // need logic to get next statement
     } 
-
+    std::cout << "Execution completed. Results may not be complete as this component is not fully functional." << std::endl;
 }
 
 Node* Interpreter::nextStatement(){
@@ -94,7 +92,7 @@ void Interpreter::handlePrintf(Node* node/*pass current AST node here*/){
             output << curNode->getValue();
         }
         curNode = curNode->getSibling();
-    }
+   }
 }
 
 void Interpreter::handleReturn(Node* node/*pass current AST node here*/){
@@ -135,32 +133,37 @@ std::unordered_map<std::string, Entry*> Interpreter::convertTable(Table* table) 
 
 
 std::string Interpreter::evaluatePostfix(Node* node) {
-     std::stack<int> stack;
+    std::stack<int> stack;
     Node* current = node->getSibling();
 
-    auto temp = current;
+    // This segment will print the expression being evaluated
+    // auto temp = current;
+    // while (temp != nullptr) {
+    //     std::cout << temp->getValue() << " ";
+    //     temp = temp->getSibling();
+    // }
+    // std::cout << std::endl;
 
-    while(temp != nullptr) {
-        std::cout << temp->getValue() << " ";
-        temp = temp->getSibling();
-    }
-    std::cout << std::endl;
     while (current != nullptr) {
+        // std::cout << "Token: " << current->getValue() << std::endl; This will print the current symbol being processed
         const std::string& token = current->getValue();
-
-        // This if block will be removed once was can CALL
-         if (symbolTable.find(token) != symbolTable.end()) {
-               if (symbolTable.find(token)->second->getIDType() == "procedure" || symbolTable.find(token)->second->getIDType() == "function") {
-                    std::cout << "Skipping assignment since Call not yet implemented";
-                    return 0; 
-               }
-            }
 
         try {
             // Check if the token is a variable in the symbol table
-            if (symbolTable.find(token) != symbolTable.end()) {
-                std::cout << symbolTable.at(token)->getValue() << std::endl;
-                stack.push(std::stoi(symbolTable.at(token)->getValue()));
+            auto it = symbolTable.find(token);
+            if (it != symbolTable.end()) {
+                Entry* entry = it->second;
+                if (entry != nullptr) {
+                    auto idType = entry->getIDType();
+                    if (idType == "procedure" || idType == "function") { // This if block will need to be adapted since there is a CALL
+                        std::cout << "Skipping assignment since CALL not yet implemented" << std::endl;
+                        return "0";
+                    }
+
+                    stack.push(std::stoi(entry->getValue()));
+                } else {
+                    std::cerr << "Error: Null entry found for token: " << token << std::endl;
+                }
             } else if (isOperator(token)) {
                 // Handle operator
                 if (stack.size() < 2) {
@@ -177,7 +180,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                 return std::to_string(stack.top());
             } else {
                 // Attempt to convert token to a number
-                    stack.push(std::stoi(token));
+                stack.push(std::stoi(token));
             }
         } catch (const std::invalid_argument&) {
             throw std::runtime_error("Invalid token in expression: " + token);

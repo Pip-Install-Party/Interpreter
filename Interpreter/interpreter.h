@@ -2,6 +2,7 @@
 #define INTERPRETER_H
 #include <iostream>
 #include <stack>
+#include <unordered_map>
 #include "../Symbols/entry.h"
 #include "../Tree/tree.h"
 #include "../Tree/Node.h"
