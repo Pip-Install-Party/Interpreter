@@ -39,7 +39,7 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "SELECTION"){    /*❌*/
         return handleSelection(curNode);
     }
-    else if(curNode->getValue() == "PRINTF"){       /*❌*/
+    else if(curNode->getValue() == "PRINTF"){       /*✅*/
         return handlePrintf(curNode);
     }
     else if(curNode->getValue() == "RETURN"){       /*❌*/
