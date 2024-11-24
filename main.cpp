@@ -118,7 +118,6 @@ void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile,
     table->begin(parser->getHead());
 
     Tree* tree = new Tree(parser->getHead(), table);
-
 }
 
 void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {

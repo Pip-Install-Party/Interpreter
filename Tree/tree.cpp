@@ -440,10 +440,23 @@ Node* Tree::saveTree(std::ostringstream& buffer){
         }
     }
 
-    //std::cout << "Reading characters: \n";
+    // std::cout << "Reading characters: \n";
     // Print to check validity
-    for (char ch : content) {
-      // std::cout << ch;
+    // for (char ch : content) {
+    //    std::cout << ch;
+    // }
+
+    // temporary output file for the AST to help with Interpreter
+    std::ofstream outFile("ASToutput.txt"); // Open the file for writing
+
+    if (outFile.is_open()) {  // Check if the file opened successfully
+        for (char ch : content) {
+            outFile << ch; // Write each character to the file
+        }
+        outFile.close(); // Close the file when done
+    } 
+    else {
+        std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
     }
 
     // Iterate through each character of the buffer

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stack>
 #include <unordered_map>
+#include <map>
 #include "../Symbols/entry.h"
 #include "../Tree/tree.h"
 #include "../Tree/Node.h"
@@ -14,6 +15,8 @@ class Interpreter {
         Tree* ast = nullptr;
         std::stack<int> expressionStack;    // stack to evaluate expressions
         std::unordered_map<std::string, Entry*> symbolTable;         // stores variable values
+        std::vector<std::string> insertOrder = {};
+        int curTableIndex = 0;
 
     public:
         Interpreter(Table* table, Tree* tree) {
@@ -33,6 +36,10 @@ class Interpreter {
         void handleReturn(Node*);
         void handleFunction(Node*);
         void handleProcedure(Node*);   
+        void handleIf(Node*);   
+        void handleElse(Node*);   
+        void handleWhile(Node*);   
+
 
         /* ... add more functions as needed */
 
@@ -41,7 +48,8 @@ class Interpreter {
         bool isOperator(const std::string&);
         std::string evaluatePostfix(Node* node);
         int performPostfixOperation(int, int, const std::string&);
-        
+        Entry* getEntryByIndex(int, std::vector<std::string>&);
+
 
         ~Interpreter();
 };
