@@ -32,6 +32,7 @@ class Entry {
     Entry* getNext() { return nextEntry; }
     void setArray(int size){ isArray = true; arraySize = size; }
     std::vector<Entry*> parameters;
+    std::vector<Entry*> getParameterList() { return parameters; }
 };
 
 #endif // ENTRY_H

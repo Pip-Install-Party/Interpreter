@@ -5,6 +5,7 @@ std::string file = "Interpreter_Output.txt";
 std::ofstream output(file);
 
 void Interpreter::begin(Node* node /*pass AST head here*/){
+    
     programCounter = node /*AST head*/;
 
     while(programCounter != nullptr){
@@ -15,10 +16,6 @@ void Interpreter::begin(Node* node /*pass AST head here*/){
 }
 
 Node* Interpreter::nextStatement(){
-    // implement logic to find the next statement here
-    // this should traverse right and then down until another declaration, assignment, iteration, etc. is found
-    // return next statement node
-
     while( programCounter->getSibling() != nullptr ) {
         programCounter = programCounter->getSibling();
     }
@@ -27,7 +24,8 @@ Node* Interpreter::nextStatement(){
 
 // processes a single AST node
 void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
-    if(curNode->getValue() == "DECLARATION"){       /*❌*/
+    
+    if(curNode->getValue() == "DECLARATION"){       /*❌IN PROGRESS*/
         return handleDeclaration(curNode);
     }
     else if(curNode->getValue() == "ASSIGNMENT"){   /*✅*/
@@ -45,30 +43,62 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "RETURN"){       /*❌*/
         return handleReturn(curNode);
     }
-    else if(curNode->getValue() == "FUNCTION"){     /*❌*/
-        return handleFunction(curNode);
-    }
-    else if(curNode->getValue() == "PROCEDURE"){    /*❌*/
-        return handleProcedure(curNode);        
-    } else if(curNode->getValue() == "IF"){         /*❌*/
-        return handleProcedure(curNode);        
-    } else if(curNode->getValue() == "ELSE"){       /*❌*/
-        return handleProcedure(curNode);        
-    }else if(curNode->getValue() == "BEGIN_BLOCK"){ /*❌*/
-        // Do we need to do anything considering scope is changing? 
+    // else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
+    //     return handleFunction(curNode);
+    // }
+    // else if(curNode->getValue() == "PROCEDURE"){    /*❌*/
+    //     return handleProcedure(curNode);        
+    // } 
+    else if(curNode->getValue() == "IF"){         /*❌*/
+        return handleIf(curNode);        
+    } 
+    else if(curNode->getValue() == "ELSE"){       /*❌*/
+        return handleElse(curNode);        
+    } 
+    else if(curNode->getValue() == "WHILE"){        /*❌*/
+        return handleWhile(curNode);
+    } 
+    else if(curNode->getValue() == "BEGIN_BLOCK"){ /*❌*/
         return;    
-    } else if(curNode->getValue() == "END_BLOCK"){  /*❌*/
-        // Do we need to do anything considering scope is changing? 
+    } 
+    else if(curNode->getValue() == "END_BLOCK"){  /*❌*/
+        // Do we need to do anything considering scope is changing?
+        // No, since we preserve the order of the symbol table using the strings we can just omit this or keep the return probably 
         return;        
     }
     /* ... add other types here */
-    else{
+    else {
         std::cerr << "Statement type not recognized: " << curNode->getValue() << std::endl;
         exit(3);
     }
 }
 
-void Interpreter::handleDeclaration(Node* node/*pass current AST node here*/){
+// Gets the symbol table entry associated with the current DECLARATION from the AST
+void Interpreter::handleDeclaration(Node* node){
+    Entry* currentEntry = getEntryByIndex(curTableIndex, insertOrder);    // get the entry from the symbol table corresponding to the iterator
+    curTableIndex++;
+    std::cout << "Found declaration for " << currentEntry->getIDName() << std::endl;
+
+    if(currentEntry->getIDType() == "function"){
+        std::vector <Entry*> parameters = currentEntry->getParameterList();
+
+        Entry* paramList = getParamListForEntry(parameters, currentEntry->getIDName(), currentEntry->getScope());   //this function needs to return the parameter list for the specific entry
+
+        std::cout << "Parameter list for " << currentEntry->getIDName() << std::endl;
+        std::cout << paramList->getIDName() << std::endl;
+        std::cout << paramList->getDType() << std::endl;
+        std::cout << (paramList->getIsArray() ? "yes" : "no") << std::endl;
+        std::cout << paramList->getArraySize() << std::endl;
+        std::cout << paramList->getScope() << std::endl;
+    }
+    else if(currentEntry->getIDType() == "procedure"){
+        // needs implementation
+    }
+    else if(currentEntry->getIDType() == "datatype"){
+        // needs implementation
+    }
+
+    // full implementation still needed
 
 }
 
@@ -99,9 +129,19 @@ void Interpreter::handleReturn(Node* node/*pass current AST node here*/){
 }
 
 void Interpreter::handleFunction(Node* node/*pass current AST node here*/){
+
 }
 
 void Interpreter::handleProcedure(Node* node/*pass current AST node here*/){
+}
+
+void Interpreter::handleIf(Node* node/*pass current AST node here*/){
+}
+
+void Interpreter::handleElse(Node* node/*pass current AST node here*/){
+}
+
+void Interpreter::handleWhile(Node* node/*pass current AST node here*/){
 }
 
 // Helper functions 
@@ -118,19 +158,61 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
     throw std::invalid_argument("Invalid operator");
 }
 
+
+// Function called in the interpreter.h to initialize symbolTable
+// IMPORTANT, unordered maps are hashed, so their order does not correspond to insertion order 
 std::unordered_map<std::string, Entry*> Interpreter::convertTable(Table* table) {
+    
     std::unordered_map<std::string, Entry*> symbolMap;
+
     Entry* head = table->getHead();
+
     while( head != nullptr) {
         symbolMap.emplace(head->getIDName(), head);
+
+        // pushes symbol table entry's identifier's name into insertOrder to preserve CORRECT symbol table order
+        insertOrder.push_back(head->getIDName());   
+
         head = head->getNext();
     }
+
     return symbolMap;
 }
 
+// Function that returns an entry corresponding to the current symbol table index
+Entry* Interpreter::getEntryByIndex(int curTableIndex, std::vector<std::string>& insertOrder) {
+    if (curTableIndex < 0 || curTableIndex >= insertOrder.size()) {
+        std::cout << "Current Symbol Table index is out of bounds." << std::endl;
+        exit(3);
+    }
+
+    // uses the vector of strings of identifier names to return correct identifier name
+    std::string identifierName = insertOrder[curTableIndex];
+
+    // identifier name then used to look up Entry in UNORDERED map
+    auto iterator = symbolTable.find(identifierName);
+
+    if (iterator != symbolTable.end()) {
+        return iterator->second;    // returns second part of the map, which is the symbol table Entry
+    }
+    else {
+        std::cout << "Entry not found with identifier name " << identifierName << " and index " << curTableIndex << "." << std::endl;
+        exit(3);
+    }
+}
 
 
-
+Entry* Interpreter::getParamListForEntry(std::vector<Entry*> parameters, std::string entryName, int scope) {
+        
+        for(int i = 0; i < parameters.size(); i++) {
+            Entry* curEntry = parameters.at(i);
+            if(curEntry->getIDName() == entryName && curEntry->getScope() == scope){
+                return curEntry;
+            }   
+        }
+        std::cout << "Parameter list for " << entryName << " not found.";
+        exit(3);
+    };
 
 std::string Interpreter::evaluatePostfix(Node* node) {
     std::stack<int> stack;
