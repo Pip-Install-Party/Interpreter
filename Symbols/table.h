@@ -25,6 +25,7 @@ class Table {
     void begin(Token*);
     void printTable(std::ofstream&);
     void printParameters(std::ofstream&);
+
     Entry* getHead() {return head;}
     ~Table(){};
 };

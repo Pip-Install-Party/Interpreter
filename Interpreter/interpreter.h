@@ -49,6 +49,7 @@ class Interpreter {
         std::string evaluatePostfix(Node* node);
         int performPostfixOperation(int, int, const std::string&);
         Entry* getEntryByIndex(int, std::vector<std::string>&);
+        Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
 
 
         ~Interpreter();

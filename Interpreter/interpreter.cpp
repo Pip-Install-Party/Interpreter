@@ -43,12 +43,12 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "RETURN"){       /*❌*/
         return handleReturn(curNode);
     }
-    else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
-        return handleFunction(curNode);
-    }
-    else if(curNode->getValue() == "PROCEDURE"){    /*❌*/
-        return handleProcedure(curNode);        
-    } 
+    // else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
+    //     return handleFunction(curNode);
+    // }
+    // else if(curNode->getValue() == "PROCEDURE"){    /*❌*/
+    //     return handleProcedure(curNode);        
+    // } 
     else if(curNode->getValue() == "IF"){         /*❌*/
         return handleIf(curNode);        
     } 
@@ -78,6 +78,25 @@ void Interpreter::handleDeclaration(Node* node){
     Entry* currentEntry = getEntryByIndex(curTableIndex, insertOrder);    // get the entry from the symbol table corresponding to the iterator
     curTableIndex++;
     std::cout << "Found declaration for " << currentEntry->getIDName() << std::endl;
+
+    if(currentEntry->getIDType() == "function"){
+        std::vector <Entry*> parameters = currentEntry->getParameterList();
+
+        Entry* paramList = getParamListForEntry(parameters, currentEntry->getIDName(), currentEntry->getScope());   //this function needs to return the parameter list for the specific entry
+
+        std::cout << "Parameter list for " << currentEntry->getIDName() << std::endl;
+        std::cout << paramList->getIDName() << std::endl;
+        std::cout << paramList->getDType() << std::endl;
+        std::cout << (paramList->getIsArray() ? "yes" : "no") << std::endl;
+        std::cout << paramList->getArraySize() << std::endl;
+        std::cout << paramList->getScope() << std::endl;
+    }
+    else if(currentEntry->getIDType() == "procedure"){
+        // needs implementation
+    }
+    else if(currentEntry->getIDType() == "datatype"){
+        // needs implementation
+    }
 
     // full implementation still needed
 
@@ -181,6 +200,19 @@ Entry* Interpreter::getEntryByIndex(int curTableIndex, std::vector<std::string>&
         exit(3);
     }
 }
+
+
+Entry* Interpreter::getParamListForEntry(std::vector<Entry*> parameters, std::string entryName, int scope) {
+        
+        for(int i = 0; i < parameters.size(); i++) {
+            Entry* curEntry = parameters.at(i);
+            if(curEntry->getIDName() == entryName && curEntry->getScope() == scope){
+                return curEntry;
+            }   
+        }
+        std::cout << "Parameter list for " << entryName << " not found.";
+        exit(3);
+    };
 
 std::string Interpreter::evaluatePostfix(Node* node) {
     std::stack<int> stack;
