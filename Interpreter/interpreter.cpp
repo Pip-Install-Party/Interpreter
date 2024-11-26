@@ -59,7 +59,7 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "ELSE"){       /*❌*/
         return handleElse(curNode);        
     } 
-    else if(curNode->getValue() == "WHILE"){        /*❌*/
+    else if(curNode->getValue() == "WHILE"){        /*❌IN PROG*/
         return handleWhile(curNode);
     } 
     else if(curNode->getValue() == "BEGIN_BLOCK"){ /*❌*/
@@ -98,7 +98,7 @@ void Interpreter::handleDeclaration(Node* node){
     else if(currentEntry->getIDType() == "procedure"){
         // needs implementation
     }
-    else if(currentEntry->getIDType() == "datatype"){
+    else if(currentEntry->getIDType() == "datatype"){ // I don't think this should ever be "datatye". The datatype is the 
         // needs implementation
     }
 

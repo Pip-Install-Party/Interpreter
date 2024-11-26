@@ -103,7 +103,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
         short forCount = 0;
         ignore = false;
         while (forCount < 3){
-            ASTOutput << "FOR_EXPRESSION " << forCount+1 << " ----> ";
+            ASTOutput << "FOR_EXPRESSION" << forCount+1 << " ----> ";
 	    spaceCount += 23;
             head = head->getSibling();
             head = handleAssignment(head, ASTOutput); 

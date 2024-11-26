@@ -6,3 +6,4 @@ main.dSYM/
 *.exe
 Interpreter_Output.txt
 .idea/
+ASToutput.txt
