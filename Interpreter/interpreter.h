@@ -44,7 +44,7 @@ class Interpreter {
         Entry* getEntryByIndex(int, std::vector<std::string>&);
         Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
         bool evaluateBooleanPostfix(Node*);
-        bool performBooleanOperation(bool, bool, const std::string&);
+        bool performBooleanOperation(int, int, const std::string&);
 
 
     public:

@@ -35,9 +35,14 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "WHILE"){    /*❌need to add a "handle body" to the handle while*/
         return handleWhile(curNode);
     }
-    else if (curNode->getValue().find("FOR_EXPRESSION") != std::string::npos) {    /*❌IN PROG*/
-      //return handleFor(curNode); Causing seg faulting.
-      return;
+    else if (curNode->getValue() == "FOR_EXPRESSION1") {    /*❌IN PROG*/
+      return handleFor(curNode); 
+    }
+    else if (curNode->getValue() == "FOR_EXPRESSION2") {    /*❌IN PROG*/
+      return; //skip, already handled above in for expr1
+    }
+    else if (curNode->getValue() == "FOR_EXPRESSION3") {    /*❌IN PROG*/
+      return; //skip, already handled above in for expr1
     }
     else if(curNode->getValue() == "SELECTION"){    /*❌*/
         return handleSelection(curNode);
@@ -61,7 +66,14 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
         return handleElse(curNode);        
     } 
     else if(curNode->getValue() == "WHILE"){        /*❌IN PROG*/
-        return handleWhile(curNode);
+        handleWhile(curNode);
+        for (int i = 0; i < 2; i++) {
+            while (curNode->getSibling() != nullptr) { // move passed expr2 and 3 
+                curNode = curNode->getSibling();
+            }
+            curNode = curNode->getChild();
+        }
+        
     } 
     else if(curNode->getValue() == "BEGIN_BLOCK"){ /*❌*/
         return;    
@@ -125,24 +137,25 @@ void Interpreter::handleWhile(Node* node){
 
 void Interpreter::handleFor(Node* node) {
     // Get the three expressions
-    Node* expr1 = node->getChild();  // initialization
-    Node* expr2 = expr1->getChild();  // condition
-    Node* expr3 = expr2->getChild();  // iteration
-
-    // Evaluate the first expression (initialization)
-    std::string result1 = evaluatePostfix(expr1);  // Evaluate the initialization expression
-    std::cout << "value found = " << result1 << std::endl; // **** debug
-    Node* targetVar1 = expr1->getChild();  // The target variable (leftmost child in expr1)
-    if (targetVar1 != nullptr) {
-        const std::string& varName = targetVar1->getValue();
-        auto it = symbolTable.find(varName);
-        if (it != symbolTable.end() && it->second != nullptr) {
-            it->second->setValue(result1);  // Save the initialization result as a string
-        } else {
-            std::cerr << "Error: Variable '" << varName << "' not found in symbol table during initialization.\n";
-        }
+    Node* temp = node;
+    Node* expr1 = node->getSibling();  // initialization... point to the var 
+    while (temp->getSibling() != nullptr) {
+        temp = temp->getSibling();
     }
+    temp = temp->getChild(); 
+    Node* expr2 = temp;  // condition
+    while (temp->getSibling() != nullptr) {
+        temp = temp->getSibling();
+    }
+    temp = temp->getChild(); 
+    Node* expr3 = temp->getSibling();  // iteration... point to the var
 
+   
+
+    // Evaluate the first expression (initialization) and set the val of the variable 
+    std::string result1 = evaluatePostfix(expr1);  // Evaluate the initialization expression sending it the 'i' so it looks at the '0' first
+    symbolTable.find(expr1->getValue())->second->setValue(result1);
+   
     // Evaluate the second expression (condition)
     while (evaluateBooleanPostfix(expr2)) {
         // handle body function needed here ****
@@ -150,16 +163,7 @@ void Interpreter::handleFor(Node* node) {
 
         // Evaluate the third expression (iteration)
         std::string result3 = evaluatePostfix(expr3);  // Evaluate the iteration expression
-        Node* targetVar3 = expr3->getChild();  // The target variable (leftmost child in expr3)
-        if (targetVar3 != nullptr) {
-            const std::string& varName = targetVar3->getValue();
-            auto it = symbolTable.find(varName);
-            if (it != symbolTable.end() && it->second != nullptr) {
-                it->second->setValue(result3);  // Save the iteration result as a string
-            } else {
-                std::cerr << "Error: Variable '" << varName << "' not found in symbol table during iteration.\n";
-            }
-        }
+        symbolTable.find(expr3->getValue())->second->setValue(result3);
     }
 }
 
@@ -217,12 +221,14 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
     throw std::invalid_argument("Invalid operator");
 }
 
-bool Interpreter::performBooleanOperation(bool a, bool b, const std::string& op) {
+bool Interpreter::performBooleanOperation(int a, int b, const std::string& op) {
     if (op == "&&") return a && b;
     if (op == "||") return a || b;
     if (op == "!") return !a;
     if (op == "<=") return a <= b;
     if (op == ">=") return a >= b;
+    if (op == "<") return a < b;
+    if (op == ">") return a > b;
     if (op == "==") return a == b;
 
     throw std::invalid_argument("Invalid boolean operator");
@@ -296,7 +302,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
     // std::cout << std::endl;
 
     while (current != nullptr) {
-        // std::cout << "Token: " << current->getValue() << std::endl; This will print the current symbol being processed
+        //std::cout << "Token: " << current->getValue() << std::endl; //This will print the current symbol being processed ****
         const std::string& token = current->getValue();
 
         try {
@@ -346,7 +352,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
 }
 
 bool Interpreter::evaluateBooleanPostfix(Node* node) {
-    std::stack<bool> stack;
+    std::stack<int> stack;  // Use int stack to align with treating booleans as integers (0 or 1)
     Node* current = node->getSibling();
 
     while (current != nullptr) {
@@ -358,15 +364,16 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
             if (it != symbolTable.end()) {
                 Entry* entry = it->second;
                 if (entry != nullptr) {
-                    stack.push(entry->getValue() == "1");  // Assuming "1" is true, "0" is false
+                    int value = std::stoi(entry->getValue());
+                    stack.push(value);
                 } else {
                     std::cerr << "Error: Null entry found for token: " << token << std::endl;
                 }
-            } 
+            }
             // Handle operators
             else if (isOperator(token)) {
-                bool b = false;
-                bool a = false;
+                int a = -1;
+                int b = -1;
 
                 if (token == "!") {
                     // Unary operator: only one operand is needed
@@ -375,6 +382,7 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
                     }
                     a = stack.top();
                     stack.pop();
+                    std::cout << "Applying '!': operand = " << a << std::endl;
                     stack.push(!a);  // Apply negation for '!'
                 } else {
                     // Binary operators: two operands are needed
@@ -383,11 +391,13 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
                     }
                     b = stack.top(); stack.pop();
                     a = stack.top(); stack.pop();
-                    stack.push(performBooleanOperation(a, b, token));  // Perform logical operation (&&, ||, etc.)
+                    int result = performBooleanOperation(a, b, token);
+                    stack.push(result);
                 }
             } else {
-                // Attempt to convert token to a boolean (0 or 1)
-                stack.push(token == "1");
+                // Attempt to convert token to an integer
+                int value = std::stoi(token);
+                stack.push(value);
             }
         } catch (const std::invalid_argument&) {
             throw std::runtime_error("Invalid token in expression: " + token);
@@ -401,8 +411,6 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
     if (stack.size() != 1) {
         throw std::runtime_error("Invalid boolean postfix expression: stack size mismatch");
     }
-
-    std::cout << "Got final boolean value for while: " << stack.top() << std::endl; // **** debug 
 
     return stack.top();  // Return the final boolean value 
 }
