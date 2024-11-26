@@ -18,13 +18,6 @@ class Interpreter {
         std::vector<std::string> insertOrder = {};
         int curTableIndex = 0;
 
-    public:
-        Interpreter(Table* table, Tree* tree) {
-            ast = tree;
-            symbolTable = convertTable(table);
-        }
-
-        void begin(Node*);
         void executeStatement(Node*);
 
         Node* nextStatement();
@@ -46,15 +39,20 @@ class Interpreter {
         // Helper functions
         std::unordered_map<std::string, Entry*> convertTable(Table*);
         bool isOperator(const std::string&);
-        std::string evaluatePostfix(Node* node);
+        std::string evaluatePostfix(Node*);
         int performPostfixOperation(int, int, const std::string&);
         Entry* getEntryByIndex(int, std::vector<std::string>&);
         Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
-        bool evaluateBooleanPostfix(Node* node);
-        bool performBooleanOperation(bool a, bool b, const std::string& op);
+        bool evaluateBooleanPostfix(Node*);
+        bool performBooleanOperation(bool, bool, const std::string&);
 
 
-
+    public:
+        Interpreter(Table* table, Tree* tree) {
+            ast = tree;
+            symbolTable = convertTable(table);
+        }
+        void begin(Node*);
         ~Interpreter();
 };
 
