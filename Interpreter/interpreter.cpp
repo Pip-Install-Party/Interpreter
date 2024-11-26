@@ -35,8 +35,9 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     else if(curNode->getValue() == "WHILE"){    /*❌need to add a "handle body" to the handle while*/
         return handleWhile(curNode);
     }
-    else if(curNode->getValue() == "FOR_EXPRESSION1"){    /*❌IN PROG*/
-        return handleFor(curNode);
+    else if (curNode->getValue().find("FOR_EXPRESSION") != std::string::npos) {    /*❌IN PROG*/
+      //return handleFor(curNode); Causing seg faulting.
+      return;
     }
     else if(curNode->getValue() == "SELECTION"){    /*❌*/
         return handleSelection(curNode);
@@ -107,7 +108,10 @@ void Interpreter::handleDeclaration(Node* node){
 }
 
 void Interpreter::handleAssignment(Node* node) {
-    evaluatePostfix(node->getSibling()); // we sure we should get sib BEFORE making the call??
+    if (symbolTable.find(node->getValue()) != symbolTable.end()) {
+        symbolTable.find(node->getValue())->second->setValue(evaluatePostfix(node->getSibling())); // we sure we should get sib BEFORE making the call??
+        // Yes, because we are assigning it above. evaluatePostifx() is not compatible with passing the variable being assigned.
+    }
 }
 
 void Interpreter::handleWhile(Node* node){
@@ -158,9 +162,6 @@ void Interpreter::handleFor(Node* node) {
         }
     }
 }
-
-
-
 
 void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
