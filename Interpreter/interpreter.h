@@ -30,15 +30,15 @@ class Interpreter {
         Node* nextStatement();
         void handleDeclaration(Node*);
         void handleAssignment(Node*);
-        void handleIteration(Node*);
         void handleSelection(Node*);
         void handlePrintf(Node*);
         void handleReturn(Node*);
         void handleFunction(Node*);
         void handleProcedure(Node*);   
         void handleIf(Node*);   
-        void handleElse(Node*);   
+        void handleElse(Node*);  
         void handleWhile(Node*);   
+        void handleFor(Node*);  
 
 
         /* ... add more functions as needed */
@@ -50,6 +50,9 @@ class Interpreter {
         int performPostfixOperation(int, int, const std::string&);
         Entry* getEntryByIndex(int, std::vector<std::string>&);
         Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
+        bool evaluateBooleanPostfix(Node* node);
+        bool performBooleanOperation(bool a, bool b, const std::string& op);
+
 
 
         ~Interpreter();
