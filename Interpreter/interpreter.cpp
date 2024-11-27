@@ -24,10 +24,10 @@ Node* Interpreter::nextStatement(){
 
 // processes a single AST node
 void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
-    std::cout << "token value is " << curNode->getValue() << std::endl; // **** debug 
+    std::cout << "token value is a " << curNode->getValue() << std::endl; // **** debug 
 
     if(curNode->getValue() == "DECLARATION"){       /*❌IN PROGRESS*/
-        //return handleDeclaration(curNode);
+        return handleDeclaration(curNode);
     }
     else if(curNode->getValue() == "ASSIGNMENT"){   /*✅ might have an error in test case 2 double check */
         //return handleAssignment(curNode);
@@ -94,19 +94,22 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
 void Interpreter::handleDeclaration(Node* node){
     Entry* currentEntry = getEntryByIndex(curTableIndex, insertOrder);    // get the entry from the symbol table corresponding to the iterator
     curTableIndex++;
-    std::cout << "Found declaration for " << currentEntry->getIDName() << std::endl;
+    std::cout << "      DECLARATION name: " << currentEntry->getIDName() << std::endl;
+    std::cout << "      " << currentEntry->getIDName() << " is a " << currentEntry->getIDType() << std::endl;
 
     if(currentEntry->getIDType() == "function"){
         std::vector <Entry*> parameters = currentEntry->getParameterList();
 
         Entry* paramList = getParamListForEntry(parameters, currentEntry->getIDName(), currentEntry->getScope());   //this function needs to return the parameter list for the specific entry
 
-        std::cout << "Parameter list for " << currentEntry->getIDName() << std::endl;
-        std::cout << paramList->getIDName() << std::endl;
-        std::cout << paramList->getDType() << std::endl;
-        std::cout << (paramList->getIsArray() ? "yes" : "no") << std::endl;
-        std::cout << paramList->getArraySize() << std::endl;
-        std::cout << paramList->getScope() << std::endl;
+        std::cout << std::endl << "      parameter(s) for " << currentEntry->getIDName() << ": " << std::endl;
+        std::cout << "          " << paramList->getDType() << " " << paramList->getIDName() << std::endl;
+        std::cout << (paramList->getIsArray() ? "               is an array" : "            is not an array") << std::endl;
+        std::cout << "            array size is : " << paramList->getArraySize() << std::endl;
+        std::cout << "            scope is " << paramList->getScope() << std::endl;
+        std::cout << std::endl;
+
+        // logic needed to actually do something with this information
     }
     else if(currentEntry->getIDType() == "procedure"){
         // needs implementation
@@ -278,14 +281,16 @@ Entry* Interpreter::getEntryByIndex(int curTableIndex, std::vector<std::string>&
 
 
 Entry* Interpreter::getParamListForEntry(std::vector<Entry*> parameters, std::string entryName, int scope) {
-        
         for(int i = 0; i < parameters.size(); i++) {
             Entry* curEntry = parameters.at(i);
-            if(curEntry->getIDName() == entryName && curEntry->getScope() == scope){
+
+            // for parameter Entries, ID type stores the function or procedure that holds the parameters
+            std::cout << "      looking up parameter list for " << curEntry->getIDType() << " in symbol table..."<< std::endl;
+            if(curEntry->getIDType() == entryName && curEntry->getScope() == scope){
                 return curEntry;
             }   
         }
-        std::cout << "Parameter list for " << entryName << " not found.";
+        std::cout << "      parameter list for " << entryName << " not found, exiting";
         exit(3);
     };
 

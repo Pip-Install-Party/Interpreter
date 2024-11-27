@@ -119,7 +119,8 @@ void Table::build(Token* token, Token* prevToken, Entry* prevEntry) {
                 exists(token, scope);
                 
                 // Entry created for a parameter
-                Entry *newEntry = new Entry(token->getValue(), "parameter", prevToken->getValue(), false, 0, scope);
+                // Parameter Entry uses IDType spot to hold what function or procedure is holding the parameter
+                Entry *newEntry = new Entry(token->getValue(), entry->getIDName(), prevToken->getValue(), false, 0, scope);
                 
                 // Processes an array parameter
                 if (token->getSibling()->getValue() == "["){
