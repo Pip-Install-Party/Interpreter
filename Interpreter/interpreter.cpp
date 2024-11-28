@@ -22,6 +22,17 @@ Node* Interpreter::nextStatement(){
     return programCounter->getChild(); 
 }
 
+void Interpreter::setProgramCounter(Node* node){
+    programCounter = node;
+}
+
+Node* Interpreter::nextNode(Node* node){
+    while( node->getSibling() != nullptr ) {
+        node = node->getSibling();
+    }
+    return node->getChild(); 
+}
+
 // processes a single AST node
 void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     std::cout << "token value is a " << curNode->getValue() << std::endl; // **** debug 
@@ -59,11 +70,8 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     // else if(curNode->getValue() == "PROCEDURE"){    /*❌*/
     //     return handleProcedure(curNode);        
     // } 
-    else if(curNode->getValue() == "IF"){         /*❌*/
-        return handleIf(curNode);        
-    } 
-    else if(curNode->getValue() == "ELSE"){       /*❌*/
-        return handleElse(curNode);        
+    else if(curNode->getValue() == "IF"){         /*❌ needs to handle entire if else no matter which is actually ends up executing*/
+        return handleIf(curNode); 
     } 
     else if(curNode->getValue() == "WHILE"){        /*❌IN PROG*/
         handleWhile(curNode);
@@ -124,51 +132,75 @@ void Interpreter::handleDeclaration(Node* node){
 
 void Interpreter::handleAssignment(Node* node) {
     if (symbolTable.find(node->getValue()) != symbolTable.end()) {
-        symbolTable.find(node->getValue())->second->setValue(evaluatePostfix(node->getSibling())); // we sure we should get sib BEFORE making the call??
-        // Yes, because we are assigning it above. evaluatePostifx() is not compatible with passing the variable being assigned.
+        symbolTable.find(node->getValue())->second->setValue(evaluatePostfix(node->getSibling())); 
     }
 }
 
-void Interpreter::handleWhile(Node* node){
-    bool result = evaluateBooleanPostfix(node);
-    if(result) {
-        //handle body
-    } else {
-        //skip to end block 
+void Interpreter::handleWhile(Node* node) {
+    Node* tempNode;
+    loopStack.push(1);
+    int stackCount = loopStack.size();
+    while( evaluateBooleanPostfix(node) ) {
+        tempNode = nextNode(node);
+        while( !(tempNode->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
+            if (tempNode->getValue() == "END_BLOCK") {
+                loopStack.pop();
+            }
+            if (loopStack.size() == stackCount) {
+                executeStatement(tempNode);
+            }
+            tempNode = nextNode(tempNode); 
+        }
+    }
+    if (loopStack.size() == stackCount) {
+        setProgramCounter(tempNode);
     }
 }
 
 void Interpreter::handleFor(Node* node) {
     // Get the three expressions
     Node* temp = node;
-    Node* expr1 = node->getSibling();  // initialization... point to the var 
+    Node* expr1 = node->getSibling();  // Initialization (pointing to the variable to be initialized)
     while (temp->getSibling() != nullptr) {
         temp = temp->getSibling();
     }
-    temp = temp->getChild(); 
-    Node* expr2 = temp;  // condition
+    temp = temp->getChild();
+    Node* expr2 = temp;  // Condition
     while (temp->getSibling() != nullptr) {
         temp = temp->getSibling();
     }
-    temp = temp->getChild(); 
-    Node* expr3 = temp->getSibling();  // iteration... point to the var
-
-   
-
-    // Evaluate the first expression (initialization) and set the val of the variable 
-    std::string result1 = evaluatePostfix(expr1);  // Evaluate the initialization expression sending it the 'i' so it looks at the '0' first
+    temp = temp->getChild();
+    Node* expr3 = temp->getSibling();  // Iteration (pointing to the variable to be initialized)
+    
+    // Evaluate the first expression (initialization) and set the value of the variable
+    std::string result1 = evaluatePostfix(expr1);
     symbolTable.find(expr1->getValue())->second->setValue(result1);
-   
-    // Evaluate the second expression (condition)
-    while (evaluateBooleanPostfix(expr2)) {
-        // handle body function needed here ****
-        std::cout << "Executing loop body...\n";
 
-        // Evaluate the third expression (iteration)
-        std::string result3 = evaluatePostfix(expr3);  // Evaluate the iteration expression
-        symbolTable.find(expr3->getValue())->second->setValue(result3);
+    // Push the current loop to the stack to handle nested loops
+    loopStack.push(1);  
+    int stackCount = loopStack.size();
+    // Loop on the second expression (condition)
+    Node* tempNode; 
+    while (evaluateBooleanPostfix(expr2)) {
+        // Handle the body of the loop 
+        tempNode = nextNode(expr3); 
+        while( !(tempNode->getValue() == "END_BLOCK" && loopStack.size() == stackCount) ) {
+            if (tempNode->getValue() == "END_BLOCK") {
+                loopStack.pop();
+            }
+            if (loopStack.size() == stackCount) {
+                executeStatement(tempNode);
+            }
+            tempNode = nextNode(tempNode); 
+        }
+        // Evaluate the third expression (iteration) to continue loop
+        symbolTable.find(expr3->getValue())->second->setValue(evaluatePostfix(expr3));
+    }
+    if (loopStack.size() == stackCount) {
+        setProgramCounter(tempNode);
     }
 }
+
 
 void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
@@ -196,10 +228,53 @@ void Interpreter::handleFunction(Node* node/*pass current AST node here*/){
 void Interpreter::handleProcedure(Node* node/*pass current AST node here*/){
 }
 
-void Interpreter::handleIf(Node* node/*pass current AST node here*/){
+void Interpreter::handleIf(Node* node){
+    //new attempt at this function V
+    Node* ifNode = node;
+    if (evaluateBooleanPostfix(ifNode)) {
+
+    } 
+    else { // skip the if logic and find the next 
+
+    }
+    //new attempt at this function ^
+    
+    //First attempt at this function V
+    //Node* ifNode = node;
+    node = nextNode(node);
+    loopStack.push(1);
+    int stackCount = loopStack.size();
+    while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
+        if (node->getValue() == "END_BLOCK") {
+            loopStack.pop();
+        }
+        if (evaluateBooleanPostfix(ifNode) && loopStack.size() == stackCount) {
+            executeStatement(node);
+        } 
+        node = nextNode(node);
+    }
+    if (loopStack.size() == stackCount) {
+        setProgramCounter(node);
+    }
 }
 
-void Interpreter::handleElse(Node* node/*pass current AST node here*/){
+void Interpreter::handleElse(Node* node){
+    Node* elseNode = node;
+    node = nextNode(node);
+    loopStack.push(1);
+    int stackCount = loopStack.size();
+    while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
+        if (node->getValue() == "END_BLOCK") {
+            loopStack.pop();
+        }
+        if (evaluateBooleanPostfix(elseNode) && loopStack.size() == stackCount) {
+            executeStatement(node);
+        } 
+        node = nextNode(node);
+    }
+    if (loopStack.size() == stackCount) {
+        setProgramCounter(node);
+    }
 }
 
 
