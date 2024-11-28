@@ -48,6 +48,9 @@ class Interpreter {
         Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
         bool evaluateBooleanPostfix(Node*);
         bool performBooleanOperation(int, int, const std::string&);
+        Node* skipBlock(Node*); 
+        Node* executeBlock(Node*);
+
 
 
     public:

@@ -232,7 +232,7 @@ void Interpreter::handleIf(Node* node){
     //new attempt at this function V
     Node* ifNode = node;
     if (evaluateBooleanPostfix(ifNode)) {
-
+        
     } 
     else { // skip the if logic and find the next 
 
@@ -493,4 +493,20 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
     }
 
     return stack.top();  // Return the final boolean value 
+}
+
+Node* Interpreter::skipBlock(Node* node){
+    std::stack<int> scopeStack;
+    scopeStack.push(1);
+    Node* tempNode = nextNode(node);
+
+    while (scopeStack.size() != 0) {
+        if ( node->getValue() == "BEGINBLOCK" ){
+            scopeStack.push(1);
+        } else if ( node->getValue() == "ENDBLOCK" ) {
+            scopeStack.pop();
+        }
+        Node* tempNode = nextNode(tempNode);
+    }
+    return tempNode;
 }
