@@ -232,30 +232,30 @@ void Interpreter::handleIf(Node* node){
     //new attempt at this function V
     Node* ifNode = node;
     if (evaluateBooleanPostfix(ifNode)) {
-        
+        setProgramCounter( skipBlock( executeBlock(nextNode(node)) ) );
     } 
     else { // skip the if logic and find the next 
-
+        setProgramCounter( skipBlock(node) );
     }
     //new attempt at this function ^
     
     //First attempt at this function V
     //Node* ifNode = node;
-    node = nextNode(node);
-    loopStack.push(1);
-    int stackCount = loopStack.size();
-    while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
-        if (node->getValue() == "END_BLOCK") {
-            loopStack.pop();
-        }
-        if (evaluateBooleanPostfix(ifNode) && loopStack.size() == stackCount) {
-            executeStatement(node);
-        } 
-        node = nextNode(node);
-    }
-    if (loopStack.size() == stackCount) {
-        setProgramCounter(node);
-    }
+    // node = nextNode(node);
+    // loopStack.push(1);
+    // int stackCount = loopStack.size();
+    // while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
+    //     if (node->getValue() == "END_BLOCK") {
+    //         loopStack.pop();
+    //     }
+    //     if (evaluateBooleanPostfix(ifNode) && loopStack.size() == stackCount) {
+    //         executeStatement(node);
+    //     } 
+    //     node = nextNode(node);
+    // }
+    // if (loopStack.size() == stackCount) {
+    //     setProgramCounter(node);
+    // }
 }
 
 void Interpreter::handleElse(Node* node){
@@ -505,6 +505,24 @@ Node* Interpreter::skipBlock(Node* node){
             scopeStack.push(1);
         } else if ( node->getValue() == "ENDBLOCK" ) {
             scopeStack.pop();
+        }
+        Node* tempNode = nextNode(tempNode);
+    }
+    return tempNode;
+}
+
+Node* Interpreter::executeBlock(Node* node){
+    std::stack<int> scopeStack;
+    scopeStack.push(1);
+    Node* tempNode = nextNode(node);
+
+    while (scopeStack.size() != 0) {
+        if ( node->getValue() == "BEGINBLOCK" ){
+            scopeStack.push(1);
+        } else if ( node->getValue() == "ENDBLOCK" ) {
+            scopeStack.pop();
+        } else {
+            executeBlock(tempNode);
         }
         Node* tempNode = nextNode(tempNode);
     }
