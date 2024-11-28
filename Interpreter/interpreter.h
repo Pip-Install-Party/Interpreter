@@ -14,6 +14,7 @@ class Interpreter {
         Node* programCounter = nullptr;    // keeps track of AST's current instruction
         Tree* ast = nullptr;
         std::stack<int> expressionStack;    // stack to evaluate expressions
+        std::stack<int> loopStack;
         std::unordered_map<std::string, Entry*> symbolTable;         // stores variable values
         std::vector<std::string> insertOrder = {};
         int curTableIndex = 0;
@@ -21,6 +22,8 @@ class Interpreter {
         void executeStatement(Node*);
 
         Node* nextStatement();
+        Node* nextNode(Node*);
+        void setProgramCounter(Node* node);
         void handleDeclaration(Node*);
         void handleAssignment(Node*);
         void handleSelection(Node*);
