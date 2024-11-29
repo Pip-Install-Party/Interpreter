@@ -22,6 +22,7 @@ class Interpreter {
         std::vector<std::string> insertOrder = {};
         int curTableIndex = 0;
         int mainline = 0;
+        std::string result = "";
 
         void executeStatement(Node*);
 
@@ -39,7 +40,6 @@ class Interpreter {
         void handleElse(Node*);  
         void handleWhile(Node*);   
         void handleFor(Node*);  
-        void handleCall(Node*);  
 
 
         /* ... add more functions as needed */
