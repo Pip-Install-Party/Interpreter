@@ -57,6 +57,7 @@ class Interpreter {
         Node* executeBlock(Node*);
         std::string executeCall(Node*);
         short numFunctions(Entry*);
+            std::string intToHex(int);
 
 
 
