@@ -16,8 +16,12 @@ class Interpreter {
         std::stack<int> expressionStack;    // stack to evaluate expressions
         std::stack<int> loopStack;
         std::unordered_map<std::string, Entry*> symbolTable;         // stores variable values
+        std::map<std::string, Node*> functionMap;    // Stores the node of the start of a function 
+        std::vector<std::string> functionVector;
+        Entry* rawTable;
         std::vector<std::string> insertOrder = {};
         int curTableIndex = 0;
+        int mainline = 0;
 
         void executeStatement(Node*);
 
@@ -28,13 +32,14 @@ class Interpreter {
         void handleAssignment(Node*);
         void handleSelection(Node*);
         void handlePrintf(Node*);
-        void handleReturn(Node*);
+        std::string handleReturn(Node*);
         void handleFunction(Node*);
         void handleProcedure(Node*);   
         void handleIf(Node*);   
         void handleElse(Node*);  
         void handleWhile(Node*);   
         void handleFor(Node*);  
+        void handleCall(Node*);  
 
 
         /* ... add more functions as needed */
@@ -50,13 +55,17 @@ class Interpreter {
         bool performBooleanOperation(int, int, const std::string&);
         Node* skipBlock(Node*); 
         Node* executeBlock(Node*);
+        std::string executeCall(Node*);
+        short numFunctions(Entry*);
 
 
 
     public:
-        Interpreter(Table* table, Tree* tree) {
+        Interpreter(Table* table, Tree* tree, int line) {
             ast = tree;
+            rawTable = table->getHead();
             symbolTable = convertTable(table);
+            mainline = line;
         }
         void begin(Node*);
         ~Interpreter();

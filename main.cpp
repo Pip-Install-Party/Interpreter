@@ -28,6 +28,28 @@ struct componentElements {
     void (*processFunction)(std::ifstream&, std::ostringstream&, int);
 };
 
+int findMain(std::ifstream& file) {
+    if (!file.is_open()) {
+        std::cerr << "Error: File is not open." << std::endl;
+        return -1; // Indicate error
+    }
+
+     // Reset file pointer to the beginning of the file
+    file.clear();  // Clear any error flags
+    file.seekg(0, std::ios::beg);  // Move the pointer to the beginning
+    
+    std::string line;
+    int lineNumber = 0;
+    while (std::getline(file, line)) {
+        lineNumber++;
+        if (line.find("procedure main") != std::string::npos) {
+            return lineNumber;
+        }
+    }
+
+    return -1; // Indicate not found
+}
+
 // function to remove comments
 void removeComments(std::ifstream& testFile, std::ostringstream& outputFile, int) {
     CommentDFA *removeComments = new CommentDFA();
@@ -138,7 +160,9 @@ void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int fi
 
     Tree* tree = new Tree(parser->getHead(), table);
 
-    Interpreter* interpreter = new Interpreter(table, tree);
+    int mainLine = findMain(testFile);
+
+    Interpreter* interpreter = new Interpreter(table, tree, mainLine);
 
     interpreter->begin(tree->getHead());
 
