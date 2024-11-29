@@ -84,7 +84,8 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
         handleReturn(curNode);
         return;
     } else if(curNode->getValue() == "CALL"){       /*❌*/
-        return handleCall(curNode);
+        //executeCall(curNode);
+        return;
     } 
     // else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
     //     return handleFunction(curNode);
@@ -304,8 +305,19 @@ void Interpreter::handlePrintf(Node* node /*pass current AST node here*/) {
 
 std::string Interpreter::handleReturn(Node* node/*pass current AST node here*/){
     if (node->getSibling() != nullptr) {
-        return node->getValue();
+        auto it = symbolTable.find(node->getSibling()->getValue());
+        if (it != symbolTable.end()) {
+            // If found, return the value associated with the symbol in the symbolTable
+            std::cout << "Found in symbolTable: " << it->second->getValue() << std::endl;
+            return it->second->getValue();  // Returning the value found in the symbol table
+        } else {
+            // If the sibling's value is not found in the symbolTable
+            std::cerr << "Error: Symbol '" << node->getSibling()->getValue() << "' not found in symbolTable." << std::endl;
+            return "";  // Return an empty string or an error value
+        }
     } else {
+                std::cout << "Does Not Exist" << std::endl;
+
         return "";
     }
 }
@@ -320,31 +332,15 @@ void Interpreter::handleProcedure(Node* node/*pass current AST node here*/){
 void Interpreter::handleIf(Node* node){
     //new attempt at this function V
     Node* ifNode = node;
+    std::cout << "Testing condition" << std::endl;
     if (evaluateBooleanPostfix(ifNode)) {
-        setProgramCounter( skipBlock( executeBlock(nextNode(node)) ) );
+        std::cout << "Condition Passed" << std::endl;
+        executeBlock(nextNode(node));
+        std::cout << "Returned From executeBlock()" << std::endl;
     } 
     else { // skip the if logic and find the next 
-        setProgramCounter( skipBlock(node) );
+        std::cout << "Condition Failed" << std::endl;
     }
-    //new attempt at this function ^
-    
-    //First attempt at this function V
-    //Node* ifNode = node;
-    // node = nextNode(node);
-    // loopStack.push(1);
-    // int stackCount = loopStack.size();
-    // while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
-    //     if (node->getValue() == "END_BLOCK") {
-    //         loopStack.pop();
-    //     }
-    //     if (evaluateBooleanPostfix(ifNode) && loopStack.size() == stackCount) {
-    //         executeStatement(node);
-    //     } 
-    //     node = nextNode(node);
-    // }
-    // if (loopStack.size() == stackCount) {
-    //     setProgramCounter(node);
-    // }
 }
 
 void Interpreter::handleElse(Node* node){
@@ -365,23 +361,6 @@ void Interpreter::handleElse(Node* node){
         setProgramCounter(node);
     }
 }
-
-void Interpreter::handleCall(Node* node){
-    short blockCount = 1;
-    node = nextNode(node);
-    node = nextNode(node);
-    while (blockCount > 0) {
-        if ( node->getValue() == "BEGIN_BLOCK") {
-            blockCount++;
-        } else if ( node->getValue() == "END_BLOCK") {
-            blockCount--;
-        } 
-        executeStatement(node);
-        node = nextNode(node);
-    }
-}
-
-
 
 // Helper functions 
 
@@ -503,7 +482,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                             // Look up the function in the functionMap
                             auto it = functionMap.find(functionName);
                             if (it != functionMap.end()) {  // If the function exists in the map
-                                return executeCall(it->second);
+                               return executeCall(it->second);
                             } else {
                                 std::cerr << "Error: Function '" << functionName << "' not found in functionMap." << std::endl;
                                 return "0"; // Or some error value
@@ -611,17 +590,16 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
 
 Node* Interpreter::skipBlock(Node* node){
     std::stack<int> scopeStack;
-    scopeStack.push(1);
     Node* tempNode = nextNode(node);
 
-    while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGIN_BLOCK" ){
+    do {
+        if ( tempNode->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "END_BLOCK" ) {
+        } else if ( tempNode->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         }
         tempNode = nextNode(tempNode);
-    }
+    } while (scopeStack.size() != 0);
     return tempNode;
 }
 
@@ -631,9 +609,9 @@ Node* Interpreter::executeBlock(Node* node){
     Node* tempNode = nextNode(node);
 
     while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGIN_BLOCK" ){
+        if ( tempNode->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "END_BLOCK" ) {
+        } else if ( tempNode->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         } else {
             executeStatement(tempNode);
@@ -649,18 +627,28 @@ std::string Interpreter::executeCall(Node* node){
     scopeStack.push(1);
     Node* tempNode = nextNode(node);
 
+    std::cout << "\n\n\n\n CALL!!! \n\n\n\n";
+
     while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGIN_BLOCK" ){
+        if ( tempNode->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "END_BLOCK" ) {
+        } else if ( tempNode->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
-        } else if ( node->getValue() == "RETURN" ){
-            return handleReturn(node);
+        } else if ( tempNode->getValue() == "RETURN" ){
+            std::cout << "Returning: " << handleReturn(tempNode) << std::endl;
+            return  handleReturn(tempNode);
         }
         else {
             executeStatement(tempNode);
         }
-        tempNode = nextNode(tempNode);
+        if (tempNode->getValue() == "IF") {
+            std::cout << "Skipping" << std::endl;
+            tempNode = skipBlock(tempNode);
+            std::cout << "Skipped to: " << tempNode->getValue() << std::endl;;
+            std::cout << "If handled" << std::endl;
+        } else {
+            tempNode = nextNode(tempNode);
+        }
     }
     return "";
 }
