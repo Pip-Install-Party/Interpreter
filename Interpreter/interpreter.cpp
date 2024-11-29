@@ -615,12 +615,12 @@ Node* Interpreter::skipBlock(Node* node){
     Node* tempNode = nextNode(node);
 
     while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGINBLOCK" ){
+        if ( node->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "ENDBLOCK" ) {
+        } else if ( node->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         }
-        Node* tempNode = nextNode(tempNode);
+        tempNode = nextNode(tempNode);
     }
     return tempNode;
 }
@@ -631,14 +631,15 @@ Node* Interpreter::executeBlock(Node* node){
     Node* tempNode = nextNode(node);
 
     while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGINBLOCK" ){
+        if ( node->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "ENDBLOCK" ) {
+        } else if ( node->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         } else {
             executeStatement(tempNode);
         }
-        Node* tempNode = nextNode(tempNode);
+        tempNode = nextNode(tempNode);
+
     }
     return tempNode;
 }
@@ -649,9 +650,9 @@ std::string Interpreter::executeCall(Node* node){
     Node* tempNode = nextNode(node);
 
     while (scopeStack.size() != 0) {
-        if ( node->getValue() == "BEGINBLOCK" ){
+        if ( node->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
-        } else if ( node->getValue() == "ENDBLOCK" ) {
+        } else if ( node->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         } else if ( node->getValue() == "RETURN" ){
             return handleReturn(node);
@@ -659,7 +660,7 @@ std::string Interpreter::executeCall(Node* node){
         else {
             executeStatement(tempNode);
         }
-        Node* tempNode = nextNode(tempNode);
+        tempNode = nextNode(tempNode);
     }
     return "";
 }
