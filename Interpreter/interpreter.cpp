@@ -667,3 +667,40 @@ short Interpreter::numFunctions(Entry* entry) {
     }
     return num;
 }
+
+std::string Interpreter::intToHex(int number) {
+
+    // Handle zero case
+    if (number == 0) {
+        return "0";
+    }
+
+    std::string hexString;
+    bool isNegative = number < 0; // Check if the number is negative
+
+    // Use unsigned int for conversion
+    unsigned int unsignedNumber;
+
+if (isNegative) {
+    unsignedNumber = -number; // Convert negative number to its positive equivalent
+} else {
+    unsignedNumber = number; // Use the number as is if it's positive
+}
+
+    // Map for hexadecimal digits
+    const char hexMap[] = "0123456789ABCDEF";
+
+    // Convert number to hexadecimal
+    while (unsignedNumber > 0) {
+        int remainder = unsignedNumber % 16;
+        hexString = hexMap[remainder] + hexString;
+        unsignedNumber /= 16;
+    }
+
+    // Add a negative sign if the original number was negative
+    if (isNegative) {
+        hexString = "-" + hexString;
+    }
+
+    return hexString;
+}
