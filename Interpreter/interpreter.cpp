@@ -5,11 +5,30 @@ std::string file = "Interpreter_Output.txt";
 std::ofstream output(file);
 
 void Interpreter::begin(Node* node /*pass AST head here*/){
+
+    std::cout << "Main is on line: " << mainline << std::endl;
+    short num = numFunctions(rawTable);
+    std::cout << "Num functions: " << num << std::endl;
+
+    while (node != nullptr) {
+        if (node->getValue() == "DECLARATION") {
+            if (nextNode(node)->getValue() == "BEGIN_BLOCK") {
+                functionMap.emplace(functionVector.at(functionVector.size() - num), node);
+                num--;
+            }
+        }
+
+        if (num == 0) {
+            programCounter = node;
+            break;
+        }
+
+        node = nextNode(node);
+    }
     
-    programCounter = node /*AST head*/;
 
     while(programCounter != nullptr){
-        executeStatement(programCounter);   // pass to executeStatement for further processing
+        executeStatement(programCounter); // pass to executeStatement for further processing
         programCounter = nextStatement(); // need logic to get next statement
     } 
     std::cout << "Execution completed. Results may not be complete as this component is not fully functional." << std::endl;
@@ -41,7 +60,7 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
         return handleDeclaration(curNode);
     }
     else if(curNode->getValue() == "ASSIGNMENT"){   /*✅ might have an error in test case 2 double check */
-        //return handleAssignment(curNode);
+        return handleAssignment(curNode);
     }
     else if(curNode->getValue() == "WHILE"){    /*❌need to add a "handle body" to the handle while*/
         return handleWhile(curNode);
@@ -62,8 +81,11 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
         return handlePrintf(curNode);
     }
     else if(curNode->getValue() == "RETURN"){       /*❌*/
-        return handleReturn(curNode);
-    }
+        handleReturn(curNode);
+        return;
+    } else if(curNode->getValue() == "CALL"){       /*❌*/
+        return handleCall(curNode);
+    } 
     // else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
     //     return handleFunction(curNode);
     // }
@@ -100,40 +122,57 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
 
 // Gets the symbol table entry associated with the current DECLARATION from the AST
 void Interpreter::handleDeclaration(Node* node){
-    Entry* currentEntry = getEntryByIndex(curTableIndex, insertOrder);    // get the entry from the symbol table corresponding to the iterator
-    curTableIndex++;
-    std::cout << "      DECLARATION name: " << currentEntry->getIDName() << std::endl;
-    std::cout << "      " << currentEntry->getIDName() << " is a " << currentEntry->getIDType() << std::endl;
+    // Entry* currentEntry = getEntryByIndex(curTableIndex, insertOrder);    // get the entry from the symbol table corresponding to the iterator
+    // curTableIndex++;
+    // std::cout << "      DECLARATION name: " << currentEntry->getIDName() << std::endl;
+    // std::cout << "      " << currentEntry->getIDName() << " is a " << currentEntry->getIDType() << std::endl;
 
-    if(currentEntry->getIDType() == "function"){
-        std::vector <Entry*> parameters = currentEntry->getParameterList();
+    // if(currentEntry->getIDType() == "function"){
+    //     std::vector <Entry*> parameters = currentEntry->getParameterList();
 
-        Entry* paramList = getParamListForEntry(parameters, currentEntry->getIDName(), currentEntry->getScope());   //this function needs to return the parameter list for the specific entry
+    //     Entry* paramList = getParamListForEntry(parameters, currentEntry->getIDName(), currentEntry->getScope());   //this function needs to return the parameter list for the specific entry
 
-        std::cout << std::endl << "      parameter(s) for " << currentEntry->getIDName() << ": " << std::endl;
-        std::cout << "          " << paramList->getDType() << " " << paramList->getIDName() << std::endl;
-        std::cout << (paramList->getIsArray() ? "               is an array" : "            is not an array") << std::endl;
-        std::cout << "            array size is : " << paramList->getArraySize() << std::endl;
-        std::cout << "            scope is " << paramList->getScope() << std::endl;
-        std::cout << std::endl;
+    //     std::cout << std::endl << "      parameter(s) for " << currentEntry->getIDName() << ": " << std::endl;
+    //     std::cout << "          " << paramList->getDType() << " " << paramList->getIDName() << std::endl;
+    //     std::cout << (paramList->getIsArray() ? "               is an array" : "            is not an array") << std::endl;
+    //     std::cout << "            array size is : " << paramList->getArraySize() << std::endl;
+    //     std::cout << "            scope is " << paramList->getScope() << std::endl;
+    //     std::cout << std::endl;
 
-        // logic needed to actually do something with this information
-    }
-    else if(currentEntry->getIDType() == "procedure"){
-        // needs implementation
-    }
-    else if(currentEntry->getIDType() == "datatype"){ // I don't think this should ever be "datatye". The datatype is the 
-        // needs implementation
-    }
+    //     // logic needed to actually do something with this information
+    // }
+    // else if(currentEntry->getIDType() == "procedure"){
+    //     // needs implementation
+    // }
+    // else if(currentEntry->getIDType() == "datatype"){ // I don't think this should ever be "datatye". The datatype is the 
+    //     // needs implementation
+    // }
 
-    // full implementation still needed
+    // // full implementation still needed
 
 }
 
 void Interpreter::handleAssignment(Node* node) {
-    if (symbolTable.find(node->getValue()) != symbolTable.end()) {
-        symbolTable.find(node->getValue())->second->setValue(evaluatePostfix(node->getSibling())); 
-    }
+    node = node->getSibling();
+    // Print all entries in the symbolTable first
+    // std::cout << "Symbol Table Contents:" << std::endl;
+    // for (const auto& pair : symbolTable) {
+    //     std::cout << "Key: '" << pair.first << "' -> Value: " 
+    //             << (pair.second ? pair.second->getValue() : "null") << std::endl;
+    // }
+
+    // Print the key we're trying to look up
+    // std::cout << "Looking up key: '" << node->getValue() << "'" << std::endl;
+
+    // Now check and update the specific entry
+    auto it = symbolTable.find(node->getValue()); // Perform the lookup once
+    if (it != symbolTable.end()) { // Check if the key exists
+        if (it->second) { // Ensure the value (mapped pointer) is not null
+            it->second->setValue(evaluatePostfix(node));
+        } else {
+            std::cerr << "Error: Value for key '" << node->getValue() << "' is null." << std::endl;
+        }
+    } 
 }
 
 void Interpreter::handleWhile(Node* node) {
@@ -205,20 +244,70 @@ void Interpreter::handleFor(Node* node) {
 void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
 
-void Interpreter::handlePrintf(Node* node/*pass current AST node here*/){
-    Node* curNode = node->getSibling();
+void Interpreter::handlePrintf(Node* node /*pass current AST node here*/) {
+    Node* print = node->getSibling();
+    std::vector<std::string> results;
 
-    while ( curNode != nullptr ) {
-        if( symbolTable.find(curNode->getValue()) != symbolTable.end()) {
-            output << symbolTable.at(curNode->getValue())->getValue();
-        } else {
-            output << curNode->getValue();
+    if (print && print->getSibling() != nullptr) {
+        Node* temp = print->getSibling();
+        while (temp != nullptr) {
+            // Find the value in the symbolTable and validate it
+            auto it = symbolTable.find(temp->getValue());
+            if (it != symbolTable.end() && it->second != nullptr) {
+                results.push_back(it->second->getValue());
+            } else {
+                std::cerr << "Error: Key '" << temp->getValue() 
+                          << "' not found in symbolTable or has a null value." << std::endl;
+            }
+            temp = temp->getSibling();
         }
-        curNode = curNode->getSibling();
-   }
+    }
+
+    // Get the format string from the print node
+    std::string formatString = print ? print->getValue() : "";
+    if (formatString.empty()) {
+        std::cerr << "Error: Print node format string is empty or null." << std::endl;
+        return;
+    }
+
+    // Replace each %d in the format string with elements from results
+    size_t pos = 0;
+    size_t resultIndex = 0;
+
+    while ((pos = formatString.find("%d", pos)) != std::string::npos) {
+        // Check if there are enough elements in the results vector
+        if (resultIndex < results.size()) {
+            // Replace %d with the current result
+            formatString.replace(pos, 2, results[resultIndex]);
+            resultIndex++;
+        } else {
+            std::cerr << "Warning: Not enough results to replace all '%d' placeholders." << std::endl;
+            break;
+        }
+        pos += results[resultIndex - 1].length(); // Move past the inserted string
+    }
+
+    // Split the format string by \n and print each segment
+    size_t newlinePos = 0;
+    while ((newlinePos = formatString.find("\\n")) != std::string::npos) {
+        // Print up to the newline character
+        std::cout << formatString.substr(0, newlinePos) << std::endl;
+        // Remove the part up to and including the newline sequence
+        formatString = formatString.substr(newlinePos + 2);
+    }
+
+    // Print the remaining part of the format string
+    if (!formatString.empty()) {
+        std::cout << formatString << std::endl;
+    }
 }
 
-void Interpreter::handleReturn(Node* node/*pass current AST node here*/){
+std::string Interpreter::handleReturn(Node* node/*pass current AST node here*/){
+    if (node->getSibling() != nullptr) {
+        return node->getValue();
+    } else {
+        return "";
+    }
 }
 
 void Interpreter::handleFunction(Node* node/*pass current AST node here*/){
@@ -274,6 +363,21 @@ void Interpreter::handleElse(Node* node){
     }
     if (loopStack.size() == stackCount) {
         setProgramCounter(node);
+    }
+}
+
+void Interpreter::handleCall(Node* node){
+    short blockCount = 1;
+    node = nextNode(node);
+    node = nextNode(node);
+    while (blockCount > 0) {
+        if ( node->getValue() == "BEGIN_BLOCK") {
+            blockCount++;
+        } else if ( node->getValue() == "END_BLOCK") {
+            blockCount--;
+        } 
+        executeStatement(node);
+        node = nextNode(node);
     }
 }
 
@@ -393,8 +497,17 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                 if (entry != nullptr) {
                     auto idType = entry->getIDType();
                     if (idType == "procedure" || idType == "function") { // This if block will need to be adapted since there is a CALL
-                        std::cout << "Skipping assignment since CALL not yet implemented" << std::endl;
-                        return "0";
+                            // Assuming the function name or identifier is stored in 'node->getValue()'
+                            std::string functionName = node->getValue();
+                            
+                            // Look up the function in the functionMap
+                            auto it = functionMap.find(functionName);
+                            if (it != functionMap.end()) {  // If the function exists in the map
+                                return executeCall(it->second);
+                            } else {
+                                std::cerr << "Error: Function '" << functionName << "' not found in functionMap." << std::endl;
+                                return "0"; // Or some error value
+                            }
                     }
 
                     stack.push(std::stoi(entry->getValue()));
@@ -414,6 +527,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                 if (stack.size() != 1) {
                     throw std::runtime_error("Invalid postfix expression: stack size mismatch at '='");
                 }
+                //std::cout << "Setting to: " << std::to_string(stack.top());
                 return std::to_string(stack.top());
             } else {
                 // Attempt to convert token to a number
@@ -522,9 +636,45 @@ Node* Interpreter::executeBlock(Node* node){
         } else if ( node->getValue() == "ENDBLOCK" ) {
             scopeStack.pop();
         } else {
-            executeBlock(tempNode);
+            executeStatement(tempNode);
         }
         Node* tempNode = nextNode(tempNode);
     }
     return tempNode;
+}
+
+std::string Interpreter::executeCall(Node* node){
+    std::stack<int> scopeStack;
+    scopeStack.push(1);
+    Node* tempNode = nextNode(node);
+
+    while (scopeStack.size() != 0) {
+        if ( node->getValue() == "BEGINBLOCK" ){
+            scopeStack.push(1);
+        } else if ( node->getValue() == "ENDBLOCK" ) {
+            scopeStack.pop();
+        } else if ( node->getValue() == "RETURN" ){
+            return handleReturn(node);
+        }
+        else {
+            executeStatement(tempNode);
+        }
+        Node* tempNode = nextNode(tempNode);
+    }
+    return "";
+}
+
+short Interpreter::numFunctions(Entry* entry) {
+    Entry* temp = entry;
+
+    short num = 0;
+    while (temp != nullptr) {
+        if ( temp->getIDType() == "function"  || temp->getIDType() == "procedure" ) {
+                    std::cout << temp->getIDName() << std::endl;
+                    functionVector.push_back(temp->getIDName());
+            num++;
+        }
+        temp = temp->getNext();
+    }
+    return num;
 }
