@@ -498,7 +498,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                     auto idType = entry->getIDType();
                     if (idType == "procedure" || idType == "function") { // This if block will need to be adapted since there is a CALL
                             // Assuming the function name or identifier is stored in 'node->getValue()'
-                            std::string functionName = node->getValue();
+                            std::string functionName = token;
                             
                             // Look up the function in the functionMap
                             auto it = functionMap.find(functionName);
