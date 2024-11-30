@@ -15,7 +15,7 @@ class Interpreter {
         Tree* ast = nullptr;
         std::stack<int> expressionStack;    // stack to evaluate expressions
         std::stack<int> loopStack;
-        std::unordered_map<std::string, Entry*> symbolTable;         // stores variable values
+        std::unordered_map<std::string, std::vector<Entry*>> symbolTable;         // stores variable values
         std::map<std::string, Node*> functionMap;    // Stores the node of the start of a function 
         std::vector<std::string> functionVector;
         Entry* rawTable;
@@ -23,6 +23,7 @@ class Interpreter {
         int curTableIndex = 0;
         int mainline = 0;
         std::string result = "";
+        short curScope = 0;
 
         void executeStatement(Node*);
 
@@ -45,7 +46,7 @@ class Interpreter {
         /* ... add more functions as needed */
 
         // Helper functions
-        std::unordered_map<std::string, Entry*> convertTable(Table*);
+        std::unordered_map<std::string, std::vector<Entry*>> convertTable(Table*);
         bool isOperator(const std::string&);
         std::string evaluatePostfix(Node*);
         int performPostfixOperation(int, int, const std::string&);
@@ -57,7 +58,9 @@ class Interpreter {
         Node* executeBlock(Node*);
         std::string executeCall(Node*);
         short numFunctions(Entry*);
-            std::string intToHex(int);
+        std::string intToHex(int);
+        std::string hexToInt(std::string);
+
 
 
 

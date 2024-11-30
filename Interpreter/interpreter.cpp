@@ -95,6 +95,9 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
     // } 
     else if(curNode->getValue() == "IF"){         /*❌ needs to handle entire if else no matter which is actually ends up executing*/
         return handleIf(curNode); 
+    } else if(curNode->getValue() == "ELSE"){         /*❌ needs to handle entire if else no matter which is actually ends up executing*/
+        std::cout << "Calling else";
+        return handleElse(curNode); 
     } 
     else if(curNode->getValue() == "WHILE"){        /*❌IN PROG*/
         handleWhile(curNode);
@@ -192,9 +195,9 @@ void Interpreter::handleWhile(Node* node) {
             tempNode = nextNode(tempNode); 
         }
     }
-    if (loopStack.size() == stackCount) {
-        setProgramCounter(tempNode);
-    }
+    // if (loopStack.size() == stackCount) {
+    //     setProgramCounter(tempNode);
+    // }
 }
 
 void Interpreter::handleFor(Node* node) {
@@ -236,19 +239,20 @@ void Interpreter::handleFor(Node* node) {
         // Evaluate the third expression (iteration) to continue loop
         symbolTable.find(expr3->getValue())->second->setValue(evaluatePostfix(expr3));
     }
-    if (loopStack.size() == stackCount) {
-        setProgramCounter(tempNode);
-    }
+    // if (loopStack.size() == stackCount) {
+    //     setProgramCounter(tempNode);
+    // }
 }
 
 
 void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
 
-void Interpreter::handlePrintf(Node* node /*pass current AST node here*/) {
+void Interpreter::handlePrintf(Node* node /* pass current AST node here */) {
     Node* print = node->getSibling();
     std::vector<std::string> results;
 
+    // Collect values to replace in the format string
     if (print && print->getSibling() != nullptr) {
         Node* temp = print->getSibling();
         while (temp != nullptr) {
@@ -271,21 +275,27 @@ void Interpreter::handlePrintf(Node* node /*pass current AST node here*/) {
         return;
     }
 
-    // Replace each %d in the format string with elements from results
+    // Replace each %d and %s in the format string with elements from results
     size_t pos = 0;
     size_t resultIndex = 0;
 
-    while ((pos = formatString.find("%d", pos)) != std::string::npos) {
-        // Check if there are enough elements in the results vector
-        if (resultIndex < results.size()) {
-            // Replace %d with the current result
-            formatString.replace(pos, 2, results[resultIndex]);
-            resultIndex++;
-        } else {
-            std::cerr << "Warning: Not enough results to replace all '%d' placeholders." << std::endl;
-            break;
+    while ((pos = formatString.find("%", pos)) != std::string::npos) {
+        if (pos + 1 < formatString.size()) {
+            char nextChar = formatString[pos + 1];
+
+            // Handle %d (integer replacement)
+            if (nextChar == 'd' && resultIndex < results.size()) {
+                int value = std::stoi(results[resultIndex]);  // Convert to integer
+                formatString.replace(pos, 2, std::to_string(value)); // Replace %d with the integer value
+                resultIndex++;
+            }
+            // Handle %s (string replacement)
+            else if (nextChar == 's' && resultIndex < results.size()) {
+                formatString.replace(pos, 2, results[resultIndex]);  // Replace %s with the string value
+                resultIndex++;
+            }
         }
-        pos += results[resultIndex - 1].length(); // Move past the inserted string
+        pos += 2; // Move past the placeholder
     }
 
     // Split the format string by \n and print each segment
@@ -344,22 +354,19 @@ void Interpreter::handleIf(Node* node){
 }
 
 void Interpreter::handleElse(Node* node){
-    Node* elseNode = node;
+    short stackSize = 0; 
+    std::stack<int> elseStack;
     node = nextNode(node);
-    loopStack.push(1);
-    int stackCount = loopStack.size();
-    while (!(node->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
-        if (node->getValue() == "END_BLOCK") {
-            loopStack.pop();
+   do {
+        if (node->getValue() == "BEGIN_BLOCK") {
+            elseStack.push(1);
+        } else if ( node->getValue() == "END_BLOCK") {
+            elseStack.pop();
         }
-        if (evaluateBooleanPostfix(elseNode) && loopStack.size() == stackCount) {
-            executeStatement(node);
-        } 
+        executeStatement(node);
         node = nextNode(node);
-    }
-    if (loopStack.size() == stackCount) {
-        setProgramCounter(node);
-    }
+
+   } while( stackSize != 0 );
 }
 
 // Helper functions 
@@ -397,20 +404,43 @@ bool Interpreter::performBooleanOperation(int a, int b, const std::string& op) {
 
 // Function called in the interpreter.h to initialize symbolTable
 // IMPORTANT, unordered maps are hashed, so their order does not correspond to insertion order 
-std::unordered_map<std::string, Entry*> Interpreter::convertTable(Table* table) {
+std::unordered_map<std::string, std::vector<Entry*>> Interpreter::convertTable(Table* table) {
     
-    std::unordered_map<std::string, Entry*> symbolMap;
+    std::unordered_map<std::string, std::vector<Entry*>> symbolMap;
 
     Entry* head = table->getHead();
 
     while( head != nullptr) {
-        symbolMap.emplace(head->getIDName(), head);
+
+        auto it = symbolMap.find(head->getIDName());
+        if ( it != symbolMap.end() ) {
+            it->second.push_back(head);
+        } else {
+            std::vector<Entry*> newVec;
+            newVec.push_back(head);
+            symbolMap.emplace(head->getIDName(), newVec);
+
+        }
+
+        // pushes symbol table entry's identifier's name into insertOrder to preserve CORRECT symbol table order
+       // insertOrder.push_back(head->getIDName());   
+
+        head = head->getNext();
+    }
+    // Add parameters
+    head = table->getHead();
+    while( head != nullptr) {
+        auto list = head->getParameterList();
+        for ( Entry* parameter : list ) {
+            symbolMap.emplace(parameter->getIDName(), parameter);
+        }
 
         // pushes symbol table entry's identifier's name into insertOrder to preserve CORRECT symbol table order
         insertOrder.push_back(head->getIDName());   
 
         head = head->getNext();
     }
+    
 
     return symbolMap;
 }
@@ -455,41 +485,104 @@ Entry* Interpreter::getParamListForEntry(std::vector<Entry*> parameters, std::st
 std::string Interpreter::evaluatePostfix(Node* node) {
     std::stack<int> stack;
     Node* current = node->getSibling();
+    bool isString = false;
 
     // This segment will print the expression being evaluated
-    // auto temp = current;
-    // while (temp != nullptr) {
-    //     std::cout << temp->getValue() << " ";
-    //     temp = temp->getSibling();
-    // }
-    // std::cout << std::endl;
+    auto temp = current;
+    while (temp != nullptr) {
+        std::cout << temp->getValue() << " ";
+        temp = temp->getSibling();
+    }
+    std::cout << std::endl;
 
     while (current != nullptr) {
         //std::cout << "Token: " << current->getValue() << std::endl; //This will print the current symbol being processed ****
         const std::string& token = current->getValue();
 
         try {
-            // Check if the token is a variable in the symbol table
             auto it = symbolTable.find(token);
-            if (it != symbolTable.end()) {
+
+            if (token.find("\"") != std::string::npos) {
+                isString = true;
+            } else if (isString) {  
+                return token;
+            }
+            // Check if the token is a variable in the symbol table
+            else if (it != symbolTable.end()) {
+                std::cout << "\nWe're in the symbol table";
                 Entry* entry = it->second;
                 if (entry != nullptr) {
+                    std::cout << "\n Not Null";
                     auto idType = entry->getIDType();
+                    std::cout << "\nGot Type";
                     if (idType == "procedure" || idType == "function") { // This if block will need to be adapted since there is a CALL
                             // Assuming the function name or identifier is stored in 'node->getValue()'
                             std::string functionName = token;
-                            
+                            std::cout << "\nis func";
                             // Look up the function in the functionMap
                             auto it = functionMap.find(functionName);
                             if (it != functionMap.end()) {  // If the function exists in the map
+                                // This may overwrite variables in scope. Will need to adjust if we end up caring about scope. 
+                                if ( current->getSibling() != nullptr ){ 
+                                    Node* sibling = current->getSibling();
+                                    sibling = sibling->getSibling();
+
+                                    std::string ch = "Z"; // For testing
+
+                                    std::cout << "sib is: " << sibling->getValue();
+                                    auto val = symbolTable.find(sibling->getValue());
+                                    if (val != symbolTable.end()) { 
+                                        std::cout << "PASSED THIS";
+                                       if ( val->second->getIsArray() ) {
+                                            std::cout << "here";
+                                            sibling = sibling->getSibling();
+                                            sibling = sibling->getSibling();
+                                            std::cout << "\nVal: " << val->first;
+                                            std::cout << "\nIndex: " << sibling->getValue();
+                                            std::cout << "\nVal->second: " << val->second->getValue();
+                                            std::cout << "\ni: " << symbolTable.at(sibling->getValue())->getValue();
+                                            std::cout << "\ni int: " << std::stoi(symbolTable.at(sibling->getValue())->getValue());
+
+                                           auto temp = val->second->getValue().at(std::stoi(symbolTable.at(sibling->getValue())->getValue()));
+                                           std::cout << "\nTemp: " << temp;
+                                            ch = std::string(1, temp);  // Convert the char 'temp' to a string
+                                                                                    std::cout << "\ndone";
+
+                                       }
+                                       
+                                    }
+
+                                    auto param = symbolTable.find(functionName);
+                                    if (param != symbolTable.end()) { 
+                                        auto temp = param->second->getParameterList();
+                                        std::cout << "LOOK HERE LOOK HERE!";
+                                        std::cout << temp.at(0)->getIDName();
+                                        temp.at(0)->setValue(ch);
+
+                                    } 
+                                       
+
+                                }
                                return executeCall(it->second);
                             } else {
                                 std::cerr << "Error: Function '" << functionName << "' not found in functionMap." << std::endl;
                                 return "0"; // Or some error value
                             }
                     }
+                    std::cout << "\nTraced!";
+                    std::cout << "\nEntry is: " << entry->getValue();
 
-                    stack.push(std::stoi(entry->getValue()));
+                    int value;
+                    if ( entry->getValue().length() > 1 ) {
+                        value = std::stoi(entry->getValue());
+                    } else {
+                        value = std::stoi(hexToInt(entry->getValue()));
+                    }
+                    std::cout << "\nConverted is: " << value;
+
+                    stack.push(value);
+                    std::cout << "\nPushed!";
+
                 } else {
                     std::cerr << "Error: Null entry found for token: " << token << std::endl;
                 }
@@ -506,11 +599,19 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                 if (stack.size() != 1) {
                     throw std::runtime_error("Invalid postfix expression: stack size mismatch at '='");
                 }
-                //std::cout << "Setting to: " << std::to_string(stack.top());
+                std::cout << "Setting to: " << std::to_string(stack.top());
                 return std::to_string(stack.top());
             } else {
-                // Attempt to convert token to a number
-                stack.push(std::stoi(token));
+                 // Attempt to convert token to an integer
+                if ( token != "'") {
+                    int value;
+                    if ( token.length() > 1 ) {
+                        value = std::stoi(token);
+                    } else {
+                        value = std::stoi(hexToInt(token));
+                    }
+                    stack.push(value);
+                }
             }
         } catch (const std::invalid_argument&) {
             throw std::runtime_error("Invalid token in expression: " + token);
@@ -525,20 +626,50 @@ std::string Interpreter::evaluatePostfix(Node* node) {
 }
 
 bool Interpreter::evaluateBooleanPostfix(Node* node) {
+
+    // Print all entries in the symbolTable first
+    std::cout << "Symbol Table Contents:" << std::endl;
+    for (const auto& pair : symbolTable) {
+        std::cout << "Key: '" << pair.first << "' -> Value: " 
+                << (pair.second ? pair.second->getValue() : "null") << std::endl;
+    }
     std::stack<int> stack;  // Use int stack to align with treating booleans as integers (0 or 1)
     Node* current = node->getSibling();
 
     while (current != nullptr) {
         const std::string& token = current->getValue();
+        std::cout << "\nCurrent: " << token;
 
         try {
             // Check if the token is a variable in the symbol table
             auto it = symbolTable.find(token);
             if (it != symbolTable.end()) {
+                std::cout << "Should go here";
                 Entry* entry = it->second;
                 if (entry != nullptr) {
-                    int value = std::stoi(entry->getValue());
-                    stack.push(value);
+                    std::cout << "\nNot nullptr";
+                    std::cout << "\nEntry: " << entry->getIDName();
+                    std::string value = entry->getValue();
+                    std::cout << "\nValue: " << value;
+                    int result = 0;
+                     if ( value.length() > 1 ) {
+                        std::cout << "\nisIndeed\n";
+                        result = std::stoi(value);
+                        std::cout << "Done";
+                    } else {
+                        std::cout << "\nisNot\n";
+                         std::cout << "\nTrying";
+
+                        std::string hex = hexToInt(value);
+                        if ( hex == "-1") {
+                            result = std::stoi(symbolTable.at(value)->getValue());
+                        } else {
+                            std::cout << "\nRight Place";
+                            result = std::stoi(hex);
+                        }
+                    }
+                    std::cout << "Converted: " << result;
+                    stack.push(result);
                 } else {
                     std::cerr << "Error: Null entry found for token: " << token << std::endl;
                 }
@@ -568,12 +699,20 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
                     stack.push(result);
                 }
             } else {
+                std::cout << "In the else";
                 // Attempt to convert token to an integer
-                int value = std::stoi(token);
-                stack.push(value);
+                int value;
+                if ( token != "'") { 
+                    if ( token.length() > 1 ) {
+                        value = std::stoi(token);
+                    } else {
+                        value = std::stoi(hexToInt(token));
+                    }
+                    stack.push(value);
+                }
             }
         } catch (const std::invalid_argument&) {
-            throw std::runtime_error("Invalid token in expression: " + token);
+            throw std::runtime_error("Invalid token in boolean expression: " + token);
         } catch (const std::out_of_range&) {
             throw std::runtime_error("Number out of range: " + token);
         }
@@ -582,6 +721,11 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
     }
 
     if (stack.size() != 1) {
+        std::cout << "Still on stack: ";
+        while(!stack.empty()) {
+            std::cout << " " << stack.top();
+            stack.pop();
+        }
         throw std::runtime_error("Invalid boolean postfix expression: stack size mismatch");
     }
 
@@ -626,7 +770,7 @@ std::string Interpreter::executeCall(Node* node){
     std::stack<int> scopeStack;
     scopeStack.push(1);
     Node* tempNode = nextNode(node);
-
+    
     std::cout << "\n\n\n\n CALL!!! \n\n\n\n";
 
     while (scopeStack.size() != 0) {
@@ -642,8 +786,16 @@ std::string Interpreter::executeCall(Node* node){
             executeStatement(tempNode);
         }
         if (tempNode->getValue() == "IF") {
-            std::cout << "Skipping" << std::endl;
-            tempNode = skipBlock(tempNode);
+             std::cout << "Skipping" << std::endl;
+            if ( evaluateBooleanPostfix(tempNode) ) {
+                tempNode = skipBlock(tempNode);
+                if ( tempNode->getValue() == "ELSE" ) {
+                    tempNode = skipBlock(tempNode);
+                }
+
+            } else {
+                tempNode = skipBlock(tempNode);
+            }
             std::cout << "Skipped to: " << tempNode->getValue() << std::endl;;
             std::cout << "If handled" << std::endl;
         } else {
@@ -703,4 +855,25 @@ if (isNegative) {
     }
 
     return hexString;
+}
+
+std::string Interpreter::hexToInt(std::string ch) {
+    // Ensure the string is not empty
+    if (ch.empty()) {
+        throw std::invalid_argument("Input string is empty");
+    }
+
+    // Convert the first character of the string to a char
+    char hexChar = ch[0];
+
+    // Check and convert the character to its corresponding integer value
+    if (hexChar >= '0' && hexChar <= '9') {
+        return std::to_string(hexChar - '0'); // Converts '0'-'9' to 0-9
+    } else if (hexChar >= 'A' && hexChar <= 'F') {
+        return std::to_string(hexChar - 'A' + 10); // Converts 'A'-'F' to 10-15
+    } else if (hexChar >= 'a' && hexChar <= 'f') {
+        return std::to_string(hexChar - 'a' + 10); // Converts 'a'-'f' to 10-15 (lowercase support)
+    } else {
+        return "-1";
+    }
 }

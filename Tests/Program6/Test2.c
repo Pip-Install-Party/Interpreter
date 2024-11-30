@@ -55,7 +55,7 @@ procedure main (void)
   }
   if (digit > -1)
   {
-    printf ("Hex: 0x%s is %d decimal\n", hexnum, number);
+    printf ("Hex:_0x%s_is_%d_decimal\n", hexnum, number);
   }
 }
 
