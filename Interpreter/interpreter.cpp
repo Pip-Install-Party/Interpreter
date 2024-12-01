@@ -87,7 +87,7 @@ void Interpreter::executeStatement(Node* curNode/*pass current AST node here*/){
         handleReturn(curNode);
         return;
     } else if(curNode->getValue() == "CALL"){       /*❌*/
-        //executeCall(curNode);
+       // returnexecuteCall(curNode);
         return;
     } 
     // else if(curNode->getValue() == "FUNCTION"){     /*❌*/ // maybe this is CALL instead of function
@@ -198,7 +198,11 @@ void Interpreter::handleWhile(Node* node) {
             }
             if (loopStack.size() == stackCount) {
                 std::cout << "Called from while" << std::endl;
-                executeStatement(tempNode);
+                if (tempNode->getValue() == "CALL") {
+                    executeCall(tempNode);
+                } else {
+                    executeStatement(tempNode);
+                }
             }
             if ( tempNode->getValue() == "IF") {
                 break;
@@ -402,7 +406,8 @@ void Interpreter::handleElse(Node* node){
 bool Interpreter::isOperator(const std::string& token) {
     return token == "+" || token == "-" || token == "*" || token == "/" ||
            token == "&&" || token == "||" || token == "!" || token == "<" || 
-           token == ">" || token == "<=" || token == ">=" || token == "==";
+           token == ">" || token == "<=" || token == ">=" || token == "==" ||
+           token == "%" ;
 }
 
 
@@ -410,6 +415,7 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
     if (op == "+") return a + b;
     if (op == "-") return a - b;
     if (op == "*") return a * b;
+    if (op == "%") return a % b;
     if (op == "/") {
         if (b == 0) throw std::runtime_error("Division by zero");
         return a / b;
