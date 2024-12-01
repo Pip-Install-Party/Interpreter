@@ -5,7 +5,7 @@
 function int sum_of_first_n_squares (int n)
 {
   int sum;
-
+  
   sum = 0;
   if (n >= 1)
   {

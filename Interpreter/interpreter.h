@@ -23,7 +23,7 @@ class Interpreter {
         int curTableIndex = 0;
         int mainline = 0;
         std::string result = "";
-        short curScope = 0;
+        short curScope = 2;
 
         void executeStatement(Node*);
 
@@ -60,6 +60,8 @@ class Interpreter {
         short numFunctions(Entry*);
         std::string intToHex(int);
         std::string hexToInt(std::string);
+        Entry* getEntry(std::string);
+        void printSymbols();
 
 
 
