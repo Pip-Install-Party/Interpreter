@@ -5,7 +5,6 @@ std::string file = "Interpreter_Output.txt";
 std::ofstream output(file);
 
 void Interpreter::begin(Node* node /*pass AST head here*/){
-
    // std::cout << "Main is on line: " << mainline << std::endl;
     short num = numFunctions(rawTable);
    // std::cout << "Num functions: " << num << std::endl;
@@ -31,7 +30,6 @@ void Interpreter::begin(Node* node /*pass AST head here*/){
         executeStatement(programCounter); // pass to executeStatement for further processing
         programCounter = nextStatement(); // need logic to get next statement
     } 
-    std::cout << "Execution completed. Results may not be complete as this component is not fully functional." << std::endl;
 }
 
 Node* Interpreter::nextStatement(){
@@ -410,6 +408,7 @@ void Interpreter::handlePrintf(Node* node /* pass current AST node here */) {
         std::cout << formatString.substr(0, newlinePos) << std::endl;
         // Remove the part up to and including the newline sequence
         formatString = formatString.substr(newlinePos + 2);
+        std::cout << "printed newline" << std::endl;
     }
 
     // Print the remaining part of the format string
@@ -1078,7 +1077,7 @@ short Interpreter::numFunctions(Entry* entry) {
     short num = 0;
     while (temp != nullptr) {
         if ( temp->getIDType() == "function"  || temp->getIDType() == "procedure" ) {
-                    std::cout << temp->getIDName() << std::endl;
+                    //std::cout << temp->getIDName() << std::endl;
                     functionVector.push_back(temp->getIDName());
             num++;
         }
