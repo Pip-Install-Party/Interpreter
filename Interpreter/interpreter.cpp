@@ -210,6 +210,7 @@ void Interpreter::handleWhile(Node* node) {
     ////////////////////////////////
     while( evaluateBooleanPostfix(node) ) {
         std::cout << "loop from handleWhile() " << std::endl;
+        //printSymbols();
         tempNode = nextNode(begin);
         loopStack.push(1);
     int stackCount = loopStack.size();
@@ -230,6 +231,25 @@ void Interpreter::handleWhile(Node* node) {
 
 
                     auto functionNode = functionMap.find(tempNode->getSibling()->getValue());
+                                        std::cout << "found!!!!" << std::endl;
+
+                    // Get the value for the parameter 
+                    std::string var = getEntry(tempNode->getSibling()->getSibling()->getSibling()->getValue())->getValue();
+                                        std::cout << "this!!!!" << std::endl;
+
+                    // Set the value of the parameter
+                    auto param = symbolTable.find(functionNode->first);
+                    std::cout << "here!!!!" << std::endl;
+                    if (param != symbolTable.end()) { 
+                        auto temp = getEntry(param->first)->getParameterList();
+            //                            std::cout << "\n\nLOOK HERE LOOK HERE!\n\n";
+            //                            std::cout << "Working with: " << getEntry(param->first)->getIDName();
+            //                            std::cout << "\nSetting: " << temp.at(0)->getIDName() << " at scope " << temp.at(0)->getScope() << " to " << ch;
+                                       // std::cout << temp.at(0)->getIDName();
+                        temp.at(0)->setValue(var);
+          //                              std::cout << "\nConfirming: " << temp.at(0)->getValue();
+
+                    } 
 
 
                     executeCall( nextNode(functionNode->second) ); 
@@ -243,7 +263,15 @@ void Interpreter::handleWhile(Node* node) {
             }
             if ( tempNode->getValue() == "IF") {
                 //break;
-                tempNode = skipBlock(tempNode);
+                if ( evaluateBooleanPostfix(tempNode) ) {
+                    tempNode = skipBlock(tempNode);
+                    if ( tempNode->getValue() == "ELSE" ) {
+                        tempNode = skipBlock(tempNode);
+                    }
+
+                } else {
+                    tempNode = skipBlock(tempNode);     
+                }  
             }
             else {
                 tempNode = nextNode(tempNode); 
@@ -591,6 +619,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
         temp = temp->getSibling();
     }
     std::cout << std::endl;
+    printSymbols();
 
     while (current != nullptr) {
         //std::cout << "Token: " << current->getValue() << std::endl; //This will print the current symbol being processed ****
