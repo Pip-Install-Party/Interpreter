@@ -210,6 +210,7 @@ void Interpreter::handleWhile(Node* node) {
     ////////////////////////////////
     while( evaluateBooleanPostfix(node) ) {
         std::cout << "loop from handleWhile() " << std::endl;
+        //printSymbols();
         tempNode = nextNode(begin);
         loopStack.push(1);
     int stackCount = loopStack.size();
@@ -242,8 +243,16 @@ void Interpreter::handleWhile(Node* node) {
                 }
             }
             if ( tempNode->getValue() == "IF") {
+
+                if (evaluateBooleanPostfix(tempNode)) {
+                    tempNode = skipBlock(tempNode);
+                    if ( tempNode->getValue() == "ELSE"){
+                        tempNode = skipBlock(tempNode);
+                    }
+                } else {
                 //break;
-                tempNode = skipBlock(tempNode);
+                    tempNode = skipBlock(tempNode);
+                }
             }
             else {
                 tempNode = nextNode(tempNode); 
