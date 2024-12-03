@@ -5,7 +5,7 @@
 function int sum_of_first_n_squares (int n)
 {
   int sum;
-  
+
   sum = 0;
   if (n >= 1)
   {
@@ -13,7 +13,7 @@ function int sum_of_first_n_squares (int n)
   }
   return sum;
 }
-  
+
 procedure main (void)
 {
   int n;
@@ -21,5 +21,5 @@ procedure main (void)
 
   n = 100;
   sum = sum_of_first_n_squares (n);
-  printf ("sum_of_the_squares_of_the_first_%d_numbers_=_%d\n", n, sum);
+  printf ("sum of the squares of the first %d numbers = %d\n", n, sum);
 }
