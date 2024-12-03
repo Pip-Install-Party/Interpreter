@@ -64,7 +64,7 @@ procedure main (void)
     counter = counter + 1;
     if (counter <= 100)
     {
-      printf (",");
+      printf (", ");
     }
     else
     {
@@ -72,5 +72,4 @@ procedure main (void)
     }
   }
 }
-
 
