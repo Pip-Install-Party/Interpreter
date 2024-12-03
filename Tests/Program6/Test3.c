@@ -12,7 +12,7 @@
 // * If counter is divisible by both three and five without a remainder, display "Fizzbuzz". *
 // * If counter is NOT divisible by three or five, display the counter.                      *
 // *******************************************************************************************
-procedure fizzbuzz (int counter)
+procedure fizzbuzz (int counter2)
 {
   int state;
 
