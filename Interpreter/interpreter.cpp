@@ -373,8 +373,15 @@ void Interpreter::handlePrintf(Node* node /* pass current AST node here */) {
         return;
     }
 
-    // Replace each %d and %s in the format string with elements from results
+    // Replace each underscore with a space
     size_t pos = 0;
+    while ((pos = formatString.find('_', pos)) != std::string::npos) {
+        formatString.replace(pos, 1, " ");
+        pos++;
+    }
+
+    // Replace each %d and %s in the format string with elements from results
+    pos = 0;
     size_t resultIndex = 0;
 
     while ((pos = formatString.find("%", pos)) != std::string::npos) {
