@@ -160,6 +160,8 @@ void Interpreter::handleDeclaration(Node* node){
 }
 
 void Interpreter::handleAssignment(Node* node) {
+                //std::cout << "Calling handleAssignment() " << std::endl;
+
     //std::cout << "Before Assignment:" << std::endl;
     //printSymbols();
     node = node->getSibling();
@@ -189,6 +191,9 @@ void Interpreter::handleAssignment(Node* node) {
 }
 
 void Interpreter::handleWhile(Node* node) {
+            //std::cout << "Calling handlewhile() " << std::endl;
+        std::cout << "handleWhile() " << std::endl;
+
     Node* tempNode;
     loopStack.push(1);
     int stackCount = loopStack.size();
@@ -196,10 +201,21 @@ void Interpreter::handleWhile(Node* node) {
     // std::cout << "Next is: " << tempNode->getValue() << std::endl;
     // std::cout << "Finally: " << nextNode(tempNode)->getValue() << std::endl;
     auto begin = nextNode(node);
+
+    ////////    Remove this ////////
+    if ( evaluateBooleanPostfix(node)) {
+        std::cout << "Condition Passed" << std::endl;
+    } else {
+        std::cout << "Condition Failed" << std::endl;
+    }
+    ////////////////////////////////
     while( evaluateBooleanPostfix(node) ) {
+        std::cout << "loop from handleWhile() " << std::endl;
         tempNode = nextNode(begin);
-        std::cout << "Temp is: " << tempNode->getValue() << std::endl;
-        while( !(tempNode->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
+       // std::cout << "Temp is: " << tempNode->getValue() << std::endl;
+        while( loopStack.size() >= 1) {
+                    std::cout << "inner loop" << std::endl;
+
             if (tempNode->getValue() == "END_BLOCK") {
                 loopStack.pop();
             }
@@ -215,9 +231,10 @@ void Interpreter::handleWhile(Node* node) {
                     auto functionNode = functionMap.find(tempNode->getSibling()->getValue());
 
 
+                    executeCall( nextNode(functionNode->second) ); 
+                    //curScope++;
+                        std::cout << "                                                              Scope incremented from handleWhile()" << std::endl;
 
-                    executeCall(functionNode->second); 
-                    curScope++;
                 } else {
                     std::cout << "Its a: " << tempNode->getValue();
                     executeStatement(tempNode);
@@ -232,6 +249,7 @@ void Interpreter::handleWhile(Node* node) {
             }
         }
     }
+    std::cout << "Scope exhausted" << std::endl;
     // if (loopStack.size() == stackCount) {
     //     setProgramCounter(tempNode);
     // }
@@ -454,7 +472,7 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
 }
 
 bool Interpreter::performBooleanOperation(int a, int b, const std::string& op) {
-    std::cout << "Prob here" << std::endl;
+    //std::cout << "Prob here" << std::endl;
     if (op == "&&") return a && b;
     if (op == "||") return a || b;
     if (op == "!") return !a;
@@ -651,6 +669,8 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                                 }
                                auto result = executeCall(it->second);
                                curScope++;
+                                   std::cout << "                                                              Scope incremented from postfix" << std::endl;
+
                                return result;
                             } else {
                                 std::cerr << "Error: Function '" << functionName << "' not found in functionMap." << std::endl;
@@ -719,14 +739,14 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
          std::cout << std::endl;
      std::cout << std::endl;
 
-    while ( tempNode != nullptr ){
-        std::cout << tempNode->getValue(); 
-        tempNode  = tempNode->getSibling();
-    }
+    // while ( tempNode != nullptr ){
+    //     std::cout << tempNode->getValue(); 
+    //     tempNode  = tempNode->getSibling();
+    // }
     std::cout << std::endl;
      std::cout << std::endl;
 
-    std::cout << "Beginning boolean" << std::endl;
+    // boolean" << std::endl;
 
    // std::cout << "Beginning Boolean Check" << std::endl;
 
@@ -757,7 +777,7 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
             break;
         }
         if (tempHead == nullptr) {
-            std::cout << "Setting head to " << newNode->getValue() << std::endl;
+            //std::cout << "Setting head to " << newNode->getValue() << std::endl;
             tempHead = newNode;
             Node* secondaryNode = new Node(temp->getValue(), false); // This adds a duplicate since evaluatePostfix() skips the first
             tempHead->setSibling(secondaryNode);
@@ -766,7 +786,7 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
             continue;
         }
         if (prev != nullptr) {
-            std::cout << "Appending" << newNode->getValue() << " to " << prev->getValue() << std::endl;
+            //std::cout << "Appending" << newNode->getValue() << " to " << prev->getValue() << std::endl;
             prev->setSibling(newNode);
             prev = newNode;
         } else {
@@ -775,15 +795,15 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
         temp = temp->getSibling();
 
     }
-    // Remove this ///////
-    auto doubleTemp = tempHead;
-    std::cout << "\n      Printing sub expression: ";
-    while ( doubleTemp!= nullptr) {
-        std::cout << doubleTemp->getValue();
-        doubleTemp = doubleTemp->getSibling();
-    }
-    std::cout << std::endl;
-    //////////////////////
+    // // Remove this ///////
+    // auto doubleTemp = tempHead;
+    // std::cout << "\n      Printing sub expression: ";
+    // while ( doubleTemp!= nullptr) {
+    //     std::cout << doubleTemp->getValue();
+    //     doubleTemp = doubleTemp->getSibling();
+    // }
+    // std::cout << std::endl;
+    // //////////////////////
     while (current != nullptr) {
     //    std::cout << "Into While" << std::endl;
 
@@ -955,7 +975,7 @@ std::string Interpreter::executeCall(Node* node){
     std::cout << "\nScope: " << curScope << std::endl;
 
     while (scopeStack.size() != 0) {
-            std::cout << "Scope Good" << std::endl;
+            std::cout << "scope is: " << scopeStack.size() << std::endl;
 
         if ( tempNode->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
@@ -970,7 +990,6 @@ std::string Interpreter::executeCall(Node* node){
 
             executeStatement(tempNode);
             std::cout << "EXECUTION COMPLETE" << std::endl;
-
         }
         if (tempNode->getValue() == "IF") {
             // std::cout << "Skipping" << std::endl;
@@ -978,7 +997,8 @@ std::string Interpreter::executeCall(Node* node){
                 tempNode = skipBlock(tempNode);
                 if ( tempNode->getValue() == "ELSE" ) {
                     tempNode = skipBlock(tempNode);
-                }
+                } 
+                std::cout << "If returned: " << tempNode->getValue() << std::endl;
 
             } else {
                 std::cout << "Skipping!" << std::endl;
@@ -987,11 +1007,13 @@ std::string Interpreter::executeCall(Node* node){
          //   std::cout << "Skipped to: " << tempNode->getValue() << std::endl;;
          //   std::cout << "If handled" << std::endl;
         } else {
+            std::cout << "after " << tempNode->getValue();
             tempNode = nextNode(tempNode);
+            std::cout << " got " << tempNode->getValue() << std::endl;
         }
     }
     curScope++;
-    std::cout << "                                                              Scope incremented" << std::endl;
+    std::cout << "                                                              Scope incremented from executeCall()" << std::endl;
     return "";
 }
 
