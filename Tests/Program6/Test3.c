@@ -47,7 +47,6 @@ procedure fizzbuzz (int counter)
       }
     }
   }
-  printf("Shouldreturnnow");
 }
 
 
