@@ -195,8 +195,7 @@ void Interpreter::handleWhile(Node* node) {
         std::cout << "handleWhile() " << std::endl;
 
     Node* tempNode;
-    loopStack.push(1);
-    int stackCount = loopStack.size();
+    
     // std::cout << "Node is: " << node->getValue() << std::endl;
     // std::cout << "Next is: " << tempNode->getValue() << std::endl;
     // std::cout << "Finally: " << nextNode(tempNode)->getValue() << std::endl;
@@ -212,6 +211,8 @@ void Interpreter::handleWhile(Node* node) {
     while( evaluateBooleanPostfix(node) ) {
         std::cout << "loop from handleWhile() " << std::endl;
         tempNode = nextNode(begin);
+        loopStack.push(1);
+    int stackCount = loopStack.size();
        // std::cout << "Temp is: " << tempNode->getValue() << std::endl;
         while( loopStack.size() >= 1) {
                     std::cout << "inner loop" << std::endl;
