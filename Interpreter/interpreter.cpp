@@ -184,14 +184,21 @@ void Interpreter::handleAssignment(Node* node) {
         } else {
             std::cerr << "Error: Value for key " << node->getValue() << " is null." << std::endl;
         }
+                  //  printSymbols();
+
 }
 
 void Interpreter::handleWhile(Node* node) {
     Node* tempNode;
     loopStack.push(1);
     int stackCount = loopStack.size();
+    // std::cout << "Node is: " << node->getValue() << std::endl;
+    // std::cout << "Next is: " << tempNode->getValue() << std::endl;
+    // std::cout << "Finally: " << nextNode(tempNode)->getValue() << std::endl;
+    auto begin = nextNode(node);
     while( evaluateBooleanPostfix(node) ) {
-        tempNode = nextNode(node);
+        tempNode = nextNode(begin);
+        std::cout << "Temp is: " << tempNode->getValue() << std::endl;
         while( !(tempNode->getValue() == "END_BLOCK" && loopStack.size() == stackCount)) {
             if (tempNode->getValue() == "END_BLOCK") {
                 loopStack.pop();
@@ -199,13 +206,26 @@ void Interpreter::handleWhile(Node* node) {
             if (loopStack.size() == stackCount) {
                 std::cout << "Called from while" << std::endl;
                 if (tempNode->getValue() == "CALL") {
-                    executeCall(tempNode);
+                    std::cout << "Its a call";
+
+                    // auto it = functionMap.find(functionName);
+                    //         if (it != functionMap.end()) 
+
+
+                    auto functionNode = functionMap.find(tempNode->getSibling()->getValue());
+
+
+
+                    executeCall(functionNode->second); 
+                    curScope++;
                 } else {
+                    std::cout << "Its a: " << tempNode->getValue();
                     executeStatement(tempNode);
                 }
             }
             if ( tempNode->getValue() == "IF") {
-                break;
+                //break;
+                tempNode = skipBlock(tempNode);
             }
             else {
                 tempNode = nextNode(tempNode); 
@@ -264,7 +284,7 @@ void Interpreter::handleFor(Node* node) {
         }
 
          std::cout << std::endl;
-        printSymbols();
+        //printSymbols();
         std::cout << std::endl;
         // Evaluate the third expression (iteration) to continue loop
         getEntry(expr3->getValue())->setValue(evaluatePostfix(expr3));
@@ -279,6 +299,7 @@ void Interpreter::handleSelection(Node* node/*pass current AST node here*/){
 }
 
 void Interpreter::handlePrintf(Node* node /* pass current AST node here */) {
+    std::cout << "                                          Printing: ";
     Node* print = node->getSibling();
     std::vector<std::string> results;
 
@@ -376,12 +397,12 @@ void Interpreter::handleIf(Node* node){
     Node* ifNode = node;
     //std::cout << "Testing condition" << std::endl;
     if (evaluateBooleanPostfix(ifNode)) {
-      //  std::cout << "Condition Passed" << std::endl;
+        std::cout << "Condition Passed" << std::endl;
         executeBlock(nextNode(node));
-        //std::cout << "Returned From executeBlock()" << std::endl;
+        std::cout << "Returned From executeBlock()" << std::endl;
     } 
     else { // skip the if logic and find the next 
-       // std::cout << "Condition Failed" << std::endl;
+        std::cout << "Condition Failed" << std::endl;
     }
 }
 
@@ -410,6 +431,15 @@ bool Interpreter::isOperator(const std::string& token) {
            token == "%" ;
 }
 
+bool Interpreter::isArithmeticOperator(const std::string& token) {
+    return token == "+" || token == "-" || token == "*" || token == "/" || token == "%";
+}
+
+bool Interpreter::isBooleanOperator(const std::string& token) {
+    return token == "&&" || token == "||" || token == "!" || token == "<" || 
+           token == ">" || token == "<=" || token == ">=" || token == "==";
+}
+
 
 int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
     if (op == "+") return a + b;
@@ -424,6 +454,7 @@ int Interpreter::performPostfixOperation(int a, int b, const std::string& op) {
 }
 
 bool Interpreter::performBooleanOperation(int a, int b, const std::string& op) {
+    std::cout << "Prob here" << std::endl;
     if (op == "&&") return a && b;
     if (op == "||") return a || b;
     if (op == "!") return !a;
@@ -432,7 +463,7 @@ bool Interpreter::performBooleanOperation(int a, int b, const std::string& op) {
     if (op == "<") return a < b;
     if (op == ">") return a > b;
     if (op == "==") return a == b;
-
+    std::cout << "FAILED FOR SURE" << std::endl;
     throw std::invalid_argument("Invalid boolean operator");
 }
 
@@ -683,6 +714,20 @@ std::string Interpreter::evaluatePostfix(Node* node) {
 }
 
 bool Interpreter::evaluateBooleanPostfix(Node* node) {
+    // print expression to be evaluated ( for testing )
+    auto tempNode = node; 
+         std::cout << std::endl;
+     std::cout << std::endl;
+
+    while ( tempNode != nullptr ){
+        std::cout << tempNode->getValue(); 
+        tempNode  = tempNode->getSibling();
+    }
+    std::cout << std::endl;
+     std::cout << std::endl;
+
+    std::cout << "Beginning boolean" << std::endl;
+
    // std::cout << "Beginning Boolean Check" << std::endl;
 
     // Print all entries in the symbolTable first
@@ -692,12 +737,65 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
     //             << (pair.second ? pair.second->getValue() : "null") << std::endl;
     // }
     std::stack<int> stack;  // Use int stack to align with treating booleans as integers (0 or 1)
+  
     Node* current = node->getSibling();
 
+    Node* temp = current;
+    Node* prev = nullptr;
+    Node* tempHead = nullptr;
+    Node* next = nullptr;
+    bool containsSubexpression = false;
+    while ( temp != nullptr ) {
+
+        Node* newNode = new Node(temp->getValue(), false);
+        if ( isArithmeticOperator(temp->getValue()) ) {
+            containsSubexpression = true;
+            next = temp->getSibling();
+            prev->setSibling(newNode);
+            Node* equalNode = new Node("=", false); // This adds an equal sign so stack is appropriate size in evaluatePostfix()
+            newNode->setSibling(equalNode);
+            break;
+        }
+        if (tempHead == nullptr) {
+            std::cout << "Setting head to " << newNode->getValue() << std::endl;
+            tempHead = newNode;
+            Node* secondaryNode = new Node(temp->getValue(), false); // This adds a duplicate since evaluatePostfix() skips the first
+            tempHead->setSibling(secondaryNode);
+            temp = temp->getSibling();
+            prev = secondaryNode;
+            continue;
+        }
+        if (prev != nullptr) {
+            std::cout << "Appending" << newNode->getValue() << " to " << prev->getValue() << std::endl;
+            prev->setSibling(newNode);
+            prev = newNode;
+        } else {
+            prev = newNode;
+        }
+        temp = temp->getSibling();
+
+    }
+    // Remove this ///////
+    auto doubleTemp = tempHead;
+    std::cout << "\n      Printing sub expression: ";
+    while ( doubleTemp!= nullptr) {
+        std::cout << doubleTemp->getValue();
+        doubleTemp = doubleTemp->getSibling();
+    }
+    std::cout << std::endl;
+    //////////////////////
     while (current != nullptr) {
     //    std::cout << "Into While" << std::endl;
 
         const std::string& token = current->getValue();
+
+        if ( containsSubexpression ) {
+            std::cout << "                                  using subexpression" << std::endl;
+            const std::string& token = evaluatePostfix(tempHead);
+        }
+
+
+
         //std::cout << "\nCurrent: " << token;
         // if (token == "hex_digit"){ // Remove this block 
         //     //std::cout << "Found: " << getEntry("hex_digit")->getIDName() << std::endl;
@@ -786,8 +884,13 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
         } catch (const std::out_of_range&) {
             throw std::runtime_error("Number out of range: " + token);
         }
-
-        current = current->getSibling();
+        if ( containsSubexpression) {
+            current = next;
+            containsSubexpression = false;
+        } else {
+            current = current->getSibling();
+        }
+       
     }
 
     if (stack.size() != 1) {
@@ -838,6 +941,8 @@ Node* Interpreter::executeBlock(Node* node){
 
 std::string Interpreter::executeCall(Node* node){
     curScope--;
+    std::cout << "                                                              Scope decremented" << std::endl;
+
     std::stack<int> scopeStack;
     scopeStack.push(1);
     Node* tempNode = nextNode(node);
@@ -850,16 +955,22 @@ std::string Interpreter::executeCall(Node* node){
     std::cout << "\nScope: " << curScope << std::endl;
 
     while (scopeStack.size() != 0) {
+            std::cout << "Scope Good" << std::endl;
+
         if ( tempNode->getValue() == "BEGIN_BLOCK" ){
             scopeStack.push(1);
         } else if ( tempNode->getValue() == "END_BLOCK" ) {
             scopeStack.pop();
         } else if ( tempNode->getValue() == "RETURN" ){
-            std::cout << "Returning: " << handleReturn(tempNode) << std::endl;
+            std::cout << "Returning!!! : " << handleReturn(tempNode) << std::endl;
             return  handleReturn(tempNode);
         }
         else {
+                        std::cout << "EXECUTING" << std::endl;
+
             executeStatement(tempNode);
+            std::cout << "EXECUTION COMPLETE" << std::endl;
+
         }
         if (tempNode->getValue() == "IF") {
             // std::cout << "Skipping" << std::endl;
@@ -870,6 +981,7 @@ std::string Interpreter::executeCall(Node* node){
                 }
 
             } else {
+                std::cout << "Skipping!" << std::endl;
                 tempNode = skipBlock(tempNode);
             }
          //   std::cout << "Skipped to: " << tempNode->getValue() << std::endl;;
@@ -879,6 +991,7 @@ std::string Interpreter::executeCall(Node* node){
         }
     }
     curScope++;
+    std::cout << "                                                              Scope incremented" << std::endl;
     return "";
 }
 
@@ -971,16 +1084,14 @@ Entry* Interpreter::getEntry(std::string name) {
 }
 
 void Interpreter::printSymbols() {
-    //std::cout << "\n\nPrinting Symbols\n";
+    std::cout << "\n\nPrinting Symbols\n";
     std::cout << "Current Scope: " << curScope << std::endl;
     for (const auto& pair : symbolTable) {
-        if (pair.first == "digit" || pair.first == "hex_digit" || pair.first == "number") {
             for (Entry* entry : pair.second) {
                 std::cout << entry->getIDName() << " Scope: " << entry->getScope() << " Value: " << entry->getValue() << std::endl;
             }
 
             std::cout << std::endl;
-        }
 
     }
 }

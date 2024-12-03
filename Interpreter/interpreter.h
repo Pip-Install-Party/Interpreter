@@ -48,6 +48,8 @@ class Interpreter {
         // Helper functions
         std::unordered_map<std::string, std::vector<Entry*>> convertTable(Table*);
         bool isOperator(const std::string&);
+        bool isBooleanOperator(const std::string&);
+        bool isArithmeticOperator(const std::string&);
         std::string evaluatePostfix(Node*);
         int performPostfixOperation(int, int, const std::string&);
         Entry* getEntryByIndex(int, std::vector<std::string>&);
