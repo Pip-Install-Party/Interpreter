@@ -447,7 +447,7 @@ Node* Tree::saveTree(std::ostringstream& buffer){
     // }
 
     // temporary output file for the AST to help with Interpreter
-    std::ofstream outFile("ASToutput.txt"); // Open the file for writing
+    std::ofstream outFile("Output.txt"); // Open the file for writing
 
     if (outFile.is_open()) {  // Check if the file opened successfully
         for (char ch : content) {
