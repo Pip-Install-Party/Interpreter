@@ -613,6 +613,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
     bool isString = false;
 
     // This segment will print the expression being evaluated
+    std::cout << "Evaluating postfix" << std::endl;
     auto temp = current;
     while (temp != nullptr) {
         std::cout << temp->getValue() << " ";
@@ -737,7 +738,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
                 if (stack.size() != 1) {
                     throw std::runtime_error("Invalid postfix expression: stack size mismatch at '='");
                 }
-      //          std::cout << "Setting to: " << std::to_string(stack.top());
+                std::cout << "Setting to: " << std::to_string(stack.top());
                 return std::to_string(stack.top());
             } else {
                  // Attempt to convert token to an integer
@@ -837,25 +838,36 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
     while (current != nullptr) {
     //    std::cout << "Into While" << std::endl;
 
-        const std::string& token = current->getValue();
+        std::string token = current->getValue();
+        std::cout << "On the first iteration: " << token << std::endl;
 
+        std::string token2 = "";
         if ( containsSubexpression ) {
             std::cout << "                                  using subexpression" << std::endl;
-            const std::string& token = evaluatePostfix(tempHead);
+            std::string token = evaluatePostfix(tempHead);
+            token2 = token;
+            std::cout << "\nToken: " << token << std::endl;
         }
-
-
+        std::cout << "Immediately After: " << token << std::endl;
+        std::cout << "Token2: " << token2 << std::endl;
 
         //std::cout << "\nCurrent: " << token;
         // if (token == "hex_digit"){ // Remove this block 
         //     //std::cout << "Found: " << getEntry("hex_digit")->getIDName() << std::endl;
         //     printSymbols();
         // }
+        std::cout << "Entering try" << std::endl;
+        std::cout << "Before Try: " << token << std::endl;
 
         try {
-            // Check if the token is a variable in the symbol table
             auto it = symbolTable.find(token);
-            if (it != symbolTable.end()) {
+
+             if ( containsSubexpression ) {
+                        std::cout << "Pushing Result: " << token2 << std::endl;
+                        stack.push(std::stoi(token2));
+            }
+            // Check if the token is a variable in the symbol table
+            else if (it != symbolTable.end()) {
            //     std::cout << "Should go here";
                 Entry* entry = getEntry(it->first);
                 if (entry != nullptr) {
@@ -881,7 +893,8 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
                         }
                     }
              //       std::cout << "Converted: " << result;
-                    stack.push(result);
+                
+                     stack.push(result);
                 } else {
                     std::cerr << "Error: Null entry found for token: " << token << std::endl;
                 }
@@ -936,6 +949,11 @@ bool Interpreter::evaluateBooleanPostfix(Node* node) {
         }
         if ( containsSubexpression) {
             current = next;
+            std::cout << "Current :" << current->getValue() << std::endl;
+            std::cout << "Next: " << current->getSibling()->getValue() << std::endl;
+            if ( current->getSibling()->getSibling() != nullptr) {
+                std::cout << "Shouldn't be here: " << current->getSibling()->getValue() << std::endl;
+            }
             containsSubexpression = false;
         } else {
             current = current->getSibling();
