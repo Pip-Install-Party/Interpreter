@@ -1,153 +1,138 @@
-// commentDFA.cpp
-
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <filesystem>
-#include <sstream> 
-
+#include <sstream>
 #include "commentDFA.h"
+
+
+
+// Helper function: Read the next character and update line count
+bool getNextChar(std::ifstream& file, char& ch, int& lineCount) {
+    file.get(ch);
+    if (file.eof()) return false;
+    if (ch == '\n') lineCount++;
+    return true;
+}
+
+// Helper function: Report error and terminate
+void reportError(const std::string& message, int errorLine) {
+    std::cerr << "ERROR: " << message << " on line " << errorLine << std::endl;
+    exit(1);
+}
 
 // State 0: Normal state, reading and printing code character by character
 void CommentDFA::state0(std::ifstream& file, int& lineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  // Read a character from the file
-    if (file.eof()) {  // Check if the end of file is reached
-        buffer << "\n";
-        return;  // End of input, stop the function
-    } else if (ch == '/') {  // If the character is '/', move to state1
-        return state1(file, lineCount, buffer);
-    } else if (ch == '*'){
-        if(!state6(file, lineCount, buffer)) {
-            std::cerr << "ERROR: Program contains C-style, unterminated quote on line " << lineCount;
-            exit(1);
-        }
+    char ch;
+    if (!getNextChar(file, ch, lineCount)) {
+        buffer << "\n"; // End of input
         return;
+    }
+
+    if (ch == '/') {
+        state1(file, lineCount, buffer);
+    } else if (ch == '*') {
+        if (!state6(file, lineCount, buffer)) {
+            reportError("Program contains C-style, unterminated comment", lineCount);
+        }
     } else if (ch == '"') {
-        int quoteLineCount = 0;
         buffer << ch;
+        int quoteLineCount = lineCount;
         if (!state5(file, lineCount, quoteLineCount, buffer)) {
-            std::cerr << "ERROR: Program contains C-style, unterminated quote on line " << lineCount;
-            exit(1);
+            reportError("Program contains C-style, unterminated quote", quoteLineCount);
         }
-        return; 
-    } else {  // Otherwise, print the character and stay in state0
-        if (ch == '\n') {
-            lineCount++;
-        }
+    } else {
         buffer << ch;
-        return state0(file, lineCount, buffer);
+        state0(file, lineCount, buffer);
     }
 }
 
-// State 1: After hitting a '/', figure out if it's a comment or a division operator
+// State 1: After encountering '/', decide if it's a comment or division operator
 void CommentDFA::state1(std::ifstream& file, int& lineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  // Read the next character
-    if (file.eof()) {  // Check for end of file
-        return; 
-    } else if (ch == '/') {  // If it's another '/', we have a C++-style comment, move to state2
-        buffer << "  "; // Add whitespace
-        return state2(file, lineCount, buffer);
-    } else if (ch == '*') {  // If it's a '*', we have a C-style block comment, move to state3
+    char ch;
+    if (!getNextChar(file, ch, lineCount)) return;
+
+    if (ch == '/') {
+        buffer << "  "; // Add whitespace for single-line comment
+        state2(file, lineCount, buffer);
+    } else if (ch == '*') {
+        buffer << "  "; // Add whitespace for block comment
+        int startCommentLine = lineCount;
         int commentLineCount = 0;
-            buffer << "  "; // Add whitespace
-        if (!state3(file, lineCount, commentLineCount, buffer)) {
-            std::cerr << "ERROR: Program contains C-style, unterminated comment on line " << lineCount;
-            exit(0);
+        if (!state3(file, lineCount, commentLineCount, startCommentLine, buffer)) {
+            reportError("Program contains C-style, unterminated comment", startCommentLine);
         }
-       return; 
-    } else {  // Otherwise, it's just a '/', print it and return to state0
-        if (ch == '\n') {
-            lineCount++;
-        }
-        buffer << '/';  // Don't forget to print the first '/' since it's not part of a comment
-        buffer << ch;   // Also print the current character
-        return state0(file, lineCount, buffer);
+    } else {
+        buffer << '/' << ch;
+        state0(file, lineCount, buffer);
     }
 }
 
-// State 2: Inside a C++-style line comment, skip characters until newline is reached
+// State 2: Inside a C++-style single-line comment
 void CommentDFA::state2(std::ifstream& file, int& lineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  // Read the next character
-    if (ch == '\n') {  // If it's a newline, return to state0 to process the next line
-        lineCount++;
-        buffer << "\n"; // Add newline
-        return state0(file, lineCount, buffer);
-    } else {
-        buffer << " "; // Add whitespace
+    char ch;
+    if (!getNextChar(file, ch, lineCount) || ch == '\n') {
+        buffer << "\n"; // End of single-line comment
+        state0(file, lineCount, buffer);
+        return;
     }
-    return state2(file, lineCount, buffer);  // Otherwise, stay in state2, ignoring characters
+    buffer << " "; // Replace comment content with spaces
+    state2(file, lineCount, buffer);
 }
 
-// State 3: Inside a C-style block comment, look for the closing '*/'
-bool CommentDFA::state3(std::ifstream& file, int& lineCount, int& commentLineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  // Read the next character
-    if (ch == '*') {  // If it's a '*', check if it's the start of '*/' (end of comment)
-        return state4(file, lineCount, commentLineCount, buffer);
+// State 3: Inside a C-style block comment
+bool CommentDFA::state3(std::ifstream& file, int& lineCount, int& commentLineCount, int startCommentLine, std::ostringstream& buffer) {
+    char ch;
+    if (!getNextChar(file, ch, lineCount)) return false;
+
+    if (ch == '*') {
+        return state4(file, lineCount, commentLineCount, startCommentLine, buffer);
     } else if (ch == '\n') {
-        buffer << "\n"; // Add newline
+        buffer << "\n";
         commentLineCount++;
-    }else if (file.eof()){
-       return false;
     } else {
-         buffer << " "; // Add whitespace
+        buffer << " ";
     }
-    return state3(file, lineCount, commentLineCount, buffer);  // Otherwise, stay in state3, ignoring characters
+    return state3(file, lineCount, commentLineCount, startCommentLine, buffer);
 }
 
-// State 4: Looking for '/' to close the C-style block comment
-bool CommentDFA::state4(std::ifstream& file, int& lineCount, int& commentLineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  // Read the next character
-    if (ch == '/') {  // If it's '/', the block comment is closed, return to state0
-        buffer << "  "; // Add whitespace
-        lineCount += commentLineCount; 
+// State 4: Check for '/' to close the C-style block comment
+bool CommentDFA::state4(std::ifstream& file, int& lineCount, int& commentLineCount, int startCommentLine, std::ostringstream& buffer) {
+    char ch;
+    if (!getNextChar(file, ch, lineCount)) return false;
+
+    if (ch == '/') {
+        buffer << "  "; // Close block comment
         state0(file, lineCount, buffer);
         return true;
-    } else if (ch == '\n') {
-        buffer << "\n"; // Add newline
-        commentLineCount++;
-    } else if (file.eof()){
-       return false;
     } else if (ch == '*') {
         file.putback(ch);
+    } else {
+        buffer << " ";
     }
-    buffer << " "; // Add whitespace
-    return state3(file, lineCount, commentLineCount, buffer);  // Otherwise, continue checking inside the block comment
+    return state3(file, lineCount, commentLineCount, startCommentLine, buffer);
 }
 
-// State 5: Inside a quoted string (either single or double quotes), 
-// ignore characters inside until the closing quote is found
+// State 5: Inside a quoted string
 bool CommentDFA::state5(std::ifstream& file, int& lineCount, int& quoteLineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  
-    if (file.eof()) { // If end of file is reached, return false
-        return false;
-    } else if (ch == '"') { // If a closing quote is found, return to state 0
-        buffer << ch; // Output the character
-        lineCount += quoteLineCount; // Increment the line counter
-        state0(file, lineCount, buffer); // Go back to state 0
-        return true; // And finally return true
-    } else {  
-        buffer << ch; // Otherwise, go to state 5
-        return state5(file, lineCount, quoteLineCount, buffer);
+    char ch;
+    if (!getNextChar(file, ch, lineCount)) return false;
+
+    buffer << ch;
+    if (ch == '"') {
+        state0(file, lineCount, buffer);
+        return true;
     }
+    return state5(file, lineCount, quoteLineCount, buffer);
 }
 
-// State 6: Detected an asterisk ('*'),
-// check if it's an unterminated C-style block comment
+// State 6: Detected an asterisk ('*'), check for unterminated C-style block comment
 bool CommentDFA::state6(std::ifstream& file, int& lineCount, std::ostringstream& buffer) {
-    char ch; 
-    file.get(ch);  
-    if (ch == '/') { // If a slash is found, return false
-        return false;
-    } else {  
+    char ch;
+    if (!getNextChar(file, ch, lineCount) || ch != '/') {
         buffer << '*';
-        file.putback(ch); // Otherwise, put the character back
-        state0(file, lineCount, buffer); // Go to state 0
-        return true; // And return true
+        if (ch != '/') file.putback(ch);
+        state0(file, lineCount, buffer);
+        return true;
     }
+    return false;
 }

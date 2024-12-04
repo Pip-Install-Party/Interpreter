@@ -7,75 +7,96 @@
 #include "../Tokens/tokenizer.h"
 #include <queue>
 
+// Namespace TokenTypes contains constants for token types that the parser recognizes.
+// These constants represent various elements of the language syntax.
 namespace TokenTypes {
-    constexpr const char* IDENTIFIER            = "IDENTIFIER";
-    constexpr const char* INTEGER               = "INTEGER";
-    constexpr const char* DOUBLE_QUOTE          = "DOUBLE_QUOTE";
-    constexpr const char* SINGLE_QUOTE          = "SINGLE_QUOTE";
-    constexpr const char* COMMA                 = "COMMA";
-    constexpr const char* SEMICOLON             = "SEMICOLON";
-    constexpr const char* ASSIGNMENT_OPERATOR   = "ASSIGNMENT_OPERATOR";
-    constexpr const char* L_BRACE               = "L_BRACE";
-    constexpr const char* R_BRACE               = "R_BRACE";
-    constexpr const char* L_BRACKET             = "L_BRACKET";
-    constexpr const char* R_BRACKET             = "R_BRACKET";
-    constexpr const char* L_PAREN               = "L_PAREN";
-    constexpr const char* R_PAREN               = "R_PAREN";
-    constexpr const char* STRING                = "STRING";
-    constexpr const char* PLUS                  = "PLUS";
-    constexpr const char* MINUS                 = "MINUS";
-    constexpr const char* LT_EQUAL              = "LT_EQUAL";
-    constexpr const char* GT_EQUAL              = "GT_EQUAL";
-    constexpr const char* GT                    = "GT";
-    constexpr const char* LT                    = "LT";
-    constexpr const char* BOOLEAN_EQUAL         = "BOOLEAN_EQUAL";
-    constexpr const char* BOOLEAN_AND           = "BOOLEAN_AND";
-    constexpr const char* BOOLEAN_NOT           = "BOOLEAN_NOT";
-    constexpr const char* ASTERISK              = "ASTERISK";
-    constexpr const char* CHARACTER             = "CHARACTER";
+    constexpr const char* IDENTIFIER            = "IDENTIFIER";             // Represents an identifier (variable, function name, etc.).
+    constexpr const char* INTEGER               = "INTEGER";                // Represents an integer value.
+    constexpr const char* DOUBLE_QUOTE          = "DOUBLE_QUOTE";           // Represents a double-quoted string.
+    constexpr const char* SINGLE_QUOTE          = "SINGLE_QUOTE";           // Represents a single-quoted character.
+    constexpr const char* COMMA                 = "COMMA";                  // Represents a comma.
+    constexpr const char* SEMICOLON             = "SEMICOLON";              // Represents a semicolon.
+    constexpr const char* ASSIGNMENT_OPERATOR   = "ASSIGNMENT_OPERATOR";    // Represents an assignment operator (`=`).
+    constexpr const char* L_BRACE               = "L_BRACE";                // Represents a left brace (`{`).
+    constexpr const char* R_BRACE               = "R_BRACE";                // Represents a right brace (`}`).
+    constexpr const char* L_BRACKET             = "L_BRACKET";              // Represents a left bracket (`[`).
+    constexpr const char* R_BRACKET             = "R_BRACKET";              // Represents a right bracket (`]`).
+    constexpr const char* L_PAREN               = "L_PAREN";                // Represents a left parenthesis (`(`).
+    constexpr const char* R_PAREN               = "R_PAREN";                // Represents a right parenthesis (`)`).
+    constexpr const char* STRING                = "STRING";                 // Represents a string literal.
+    constexpr const char* PLUS                  = "PLUS";                   // Represents a plus operator (`+`).
+    constexpr const char* MINUS                 = "MINUS";                  // Represents a minus operator (`-`).
+    constexpr const char* LT_EQUAL              = "LT_EQUAL";               // Represents a less-than-or-equal operator (`<=`).
+    constexpr const char* GT_EQUAL              = "GT_EQUAL";               // Represents a greater-than-or-equal operator (`>=`).
+    constexpr const char* GT                    = "GT";                     // Represents a greater-than operator (`>`).
+    constexpr const char* LT                    = "LT";                     // Represents a less-than operator (`<`).
+    constexpr const char* BOOLEAN_EQUAL         = "BOOLEAN_EQUAL";          // Represents an equality operator (`==`).
+    constexpr const char* BOOLEAN_AND           = "BOOLEAN_AND";            // Represents a logical AND operator (`&&`).
+    constexpr const char* BOOLEAN_NOT           = "BOOLEAN_NOT";            // Represents a logical NOT operator (`!`).
+    constexpr const char* ASTERISK              = "ASTERISK";               // Represents an asterisk (`*`).
+    constexpr const char* CHARACTER             = "CHARACTER";              // Represents a character literal.
 }
 
 using namespace TokenTypes;
 
-// Usage example
-extern std::string tokenType; //= TokenTypes::IDENTIFIER; // or TokenTypes::INTEGER
+// External token type variable used for processing.
+extern std::string tokenType;
 
-// The Parser class is responsible for utilizing a vector of tokens created with the tokenizer
-// and converting it into a concrete syntax tree using a recursive descent parsing technique.
-// This class utilizes a LCRS binary tree to store the CST.
+// The Parser class is responsible for analyzing a sequence of tokens generated by the tokenizer
+// and constructing a Concrete Syntax Tree (CST) using recursive descent parsing.
 class Parser 
 {
 private:
+    // List of reserved keywords that cannot be used as identifiers (e.g., variable names).
     std::vector<std::string> reserved = {"printf", "int", "void", "char", "bool", "procedure", "function"};
 
-    Token *head;
-    // Vector holding all of the tokens in order from the tokenizer.s
+    // Pointer to the root token of the Concrete Syntax Tree.
+    Token* head;
+
+    // List of tokens produced by the tokenizer.
     std::vector<Token> tokenList;
 
-    // Variable to track the current position in the token list.
+    // Variable to track the current position within the token list during parsing.
     int index;
 
-    // Counter for ignoring stuff
+    // Counter to temporarily ignore tokens (used for specific scenarios like `for` loops).
     int ignore = 0;
 
+    // Queue to facilitate sequential processing of tokens during parsing.
     std::queue<Token*> tokenQueue;
 
+    // State 0: Initializes the parsing process and prepares the queue.
     void state0();
-    void state1(Token *);
-    void state2(Token *);
-    void state3(Token *);
-    void state4(Token *, Token *);
-    void state5(Token *, Token *);
-    bool contains(std::string);
 
+    // State 1: Primary parsing loop, processes tokens and transitions based on token types.
+    void state1(Token*);
+
+    // State 2: Handles tokens after semicolons and braces, processes block structures.
+    void state2(Token*);
+
+    // State 3: Validates and processes tokens within square brackets (e.g., array indices).
+    void state3(Token*);
+
+    // State 4: Handles reserved words and identifiers, ensuring proper usage and syntax.
+    void state4(Token*, Token*);
+
+    // State 5: Processes function names and ensures reserved words are not misused.
+    void state5(Token*, Token*);
+
+    // Checks if a string is a reserved keyword.
+    bool contains(std::string token);
 
 public:
-    // Parser construtor that is passed a vector of tokens from tokenizer.
+    // Constructor: Initializes the parser with a vector of tokens generated by the tokenizer.
     Parser(std::vector<Token>& tokenList);
 
-    // Begin the parsing process.
-    void begin(){ state0(); };
-    Token* getHead(){ return head; };
+    // Starts the parsing process by entering the initial state.
+    void begin() { state0(); }
+
+    // Returns the root of the Concrete Syntax Tree.
+    Token* getHead() { return head; }
+
+    // Prints the Concrete Syntax Tree to the provided output stream in a structured format.
     void printTree(std::ofstream&);
 };
 

@@ -1,38 +1,58 @@
-// The Token class defines the attributes of a Token, including its type, contents, and line number.
+
+
 #ifndef TOKEN_H
 #define TOKEN_H
+
+#include <string>
+
 class Token 
 {
 private: 
-    Token *lChild = nullptr;
-    Token *rSibling = nullptr;
-    std::string tokenType = "";
-    std::string token = "";
-    int lineNumber = 0;
-public:
+    Token* lChild = nullptr;           
+    Token* rSibling = nullptr;         
+    std::string tokenType = "";         
+    std::string token = "";           
+    int lineNumber = 0;              
 
+public:
+    // Constructor: Initializes the token with its type, value, and line number.
     Token(const std::string& tokenType, const std::string& token, int lineNumber)
         : tokenType(tokenType), token(token), lineNumber(lineNumber) {}
 
-    // Get the type of the token.
+    // Get the type of the token (e.g., IDENTIFIER, INTEGER).
     std::string getType() const {
         return tokenType;
     }
 
-    // Get the value of the token.
+    // Get the value of the token (e.g., variable name, literal value).
     std::string getValue() const {
         return token;
     }
 
-    // Get the line number where the token was found
-    int getLineNumber() const { return lineNumber;}
+    // Get the line number where the token was found in the source code.
+    int getLineNumber() const {
+        return lineNumber;
+    }
 
-    void setSibling(Token *newSibling) { rSibling = newSibling; }
+    // Set the sibling node for the current token.
+    void setSibling(Token* newSibling) {
+        rSibling = newSibling;
+    }
 
-    Token* getSibling(){ return rSibling; }
+    // Get the sibling node of the current token.
+    Token* getSibling() {
+        return rSibling;
+    }
 
-    void setChild(Token *newChild) { lChild = newChild; }
+    // Set the child node for the current token.
+    void setChild(Token* newChild) {
+        lChild = newChild;
+    }
 
-    Token* getChild(){ return lChild; }
+    // Get the child node of the current token.
+    Token* getChild() {
+        return lChild;
+    }
 };
+
 #endif // TOKEN_H

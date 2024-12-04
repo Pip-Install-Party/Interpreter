@@ -1,132 +1,110 @@
 #include <iostream>
 #include "parser.h"
 #include <string>
+
 using namespace TokenTypes;
 std::string currTokenType;
 
-// Constructor that takes in our tokenList that our tokenizer created and builds a queue with it
-Parser::Parser(std::vector<Token>& tokenList)
-{
-    this->tokenList = tokenList;
-    head = &tokenList.at(0);
-    // Populate the queue with pointers to each token in the token list
-    for(int i = 0; i < tokenList.size(); i++){
+// Constructor: Initializes the parser with a list of tokens and prepares a queue for processing.
+Parser::Parser(std::vector<Token>& tokenList) {
+    this->tokenList = tokenList; // Store the list of tokens.
+    head = &tokenList.at(0);     // Set the head pointer to the first token.
+
+    // Populate the queue with pointers to each token in the token list.
+    for (int i = 0; i < tokenList.size(); i++) {
         tokenQueue.push(&tokenList.at(i));
     }
 }
 
-// Begin state, preps queue and the pointer for being passed into state 1
-void Parser::state0(){
-    Token *token = tokenQueue.front();
-    tokenQueue.pop();
-    currTokenType = token->getType();
-    state1(token);
+// State 0: The starting point of the parser. Prepares the queue and transitions to state 1.
+void Parser::state0() {
+    Token* token = tokenQueue.front(); // Get the first token from the queue.
+    tokenQueue.pop();                  // Remove it from the queue.
+    currTokenType = token->getType();  // Store the type of the current token.
+    state1(token);                     // Transition to state 1 with the current token.
 }
 
-// Main loop state that doesn't stop until the queue is empty
-// Basically our "outer while loop" for the states
+// State 1: The main loop of the parser. Processes tokens and determines the appropriate next state.
 void Parser::state1(Token* lastToken) {
     while (!tokenQueue.empty()) {
-
-        Token *token = tokenQueue.front();
+        Token* token = tokenQueue.front();
         tokenQueue.pop();
         currTokenType = token->getType();
 
-        // Checks if we have a semicolon or braces
+        // Check for semicolons and braces to determine the next action.
         if (currTokenType == SEMICOLON) {
-            // Checks if we need to ignore semicolons at all
-            if (this->ignore > 0) {
+            if (this->ignore > 0) { // Handle cases where semicolons are ignored (e.g., `for` loops).
                 lastToken->setSibling(token);
                 ignore--;
                 state1(token);
-            }
-            // Otherwise go to state 2
-            else {
+            } else { // Otherwise, transition to state 2.
                 lastToken->setSibling(token);
                 state2(token);
             }
-        } else if (currTokenType == L_BRACE ) {
-            // Set the last token's child to the current token
+        } else if (currTokenType == L_BRACE) { // Handle the start of a block.
             lastToken->setChild(token);
             state2(token);
-        } else if (lastToken->getType() == R_BRACE) {
-            // Set the last token's child to the current token if the last token is a right brace
+        } else if (lastToken->getType() == R_BRACE) { // Handle the end of a block.
             lastToken->setChild(token);
-        } else if (lastToken->getType() == L_BRACKET) {
-            // Handle left bracket by going to state 3
+        } else if (lastToken->getType() == L_BRACKET) { // Handle array indexing.
             state3(token);
             lastToken->setSibling(token);
-        } else if (token->getType() == IDENTIFIER){
-            // Set the last token's sibling to the current token if it's an identifier
+        } else if (token->getType() == IDENTIFIER) { // Handle identifiers.
             lastToken->setSibling(token);
-            if (contains(lastToken->getValue())) {
-                // Handle reserved words
+            if (contains(lastToken->getValue())) { // Check for reserved words.
                 lastToken->setSibling(token);
                 state4(lastToken, token);
             }
-        } else {
-            // Set the last token's sibling to the current token for all other cases
+        } else { // Default behavior: set sibling token.
             lastToken->setSibling(token);
         }
-        // Continue to the next iteration of state 1
-        state1(token);
+        state1(token); // Continue processing.
     }
 }
 
-// Handles the next state after processing a semicolon or left brace
-void Parser::state2(Token* lastToken){
-    // Base case for if the queue is empty
-    if (tokenQueue.empty()) return;
+// State 2: Handles tokens after semicolons or braces and manages block structures.
+void Parser::state2(Token* lastToken) {
+    if (tokenQueue.empty()) return; // Exit if no tokens remain.
 
-    // Storing the first token in the queue
-    Token *token = tokenQueue.front();
-    tokenQueue.pop(); // Popping it off
-    // Setting lastToken's child to be token
-    lastToken->setChild(token);
+    Token* token = tokenQueue.front();
+    tokenQueue.pop();
+    lastToken->setChild(token); // Set the current token as a child.
 
-    // Check for "for" loops
+    // Handle "for" loops by ignoring the next two semicolons.
     if (token->getValue() == "for") {
-        // Figure out a way to ignore the next two semicolons
         this->ignore += 2;
     }
-    // Go back to state 1
-    state1(token);
+
+    state1(token); // Transition back to state 1.
 }
 
-// Handles the tokens inside square brackets, performs validation
-void Parser::state3(Token* token){
-    if (token->getType() != INTEGER) {
-        if (token->getType() == IDENTIFIER) {
+// State 3: Validates and processes tokens inside square brackets (e.g., array indices).
+void Parser::state3(Token* token) {
+    if (token->getType() != INTEGER) { // Check if the token is not an integer.
+        if (token->getType() == IDENTIFIER) { // Check if it is an identifier.
             if (contains(token->getValue())) {
-                std::cout << currTokenType;
-                std::cerr << "Error on line: " << token->getLineNumber() << " incompatbile token within square braces.";
+                std::cerr << "Error on line: " << token->getLineNumber() << " incompatible token within square braces.";
                 exit(1);
             }
-        } else {
-            // If the token is not an integer or identifier, output an error
-            std::cout << currTokenType;
-            std::cerr << "Error on line :" << token->getLineNumber() << " incompatbile token within square braces.";
+        } else { // Handle invalid tokens inside square brackets.
+            std::cerr << "Error on line: " << token->getLineNumber() << " incompatible token within square braces.";
             exit(1);
         }
-    } else if (std::stoi(token->getValue()) < 0) {
-        // Array declaration size must be positive
-        std::cerr << "Error on line :" << token->getLineNumber() << " array declaration size must be a positive integer.";
+    } else if (std::stoi(token->getValue()) < 0) { // Ensure array size is positive.
+        std::cerr << "Error on line: " << token->getLineNumber() << " array declaration size must be positive.";
         exit(1);
     }
-    return;
 }
 
-// Handles special cases involving reserved words and identifiers
-void Parser::state4(Token* lastToken, Token* token){
+// State 4: Handles reserved words and identifiers, ensuring correct usage.
+void Parser::state4(Token* lastToken, Token* token) {
     if (lastToken->getValue() != "procedure" && lastToken->getValue() != "function") {
-        if (contains(token->getValue())) {
-            // Error if reserved word is used as a variable name
-            std::cerr << "Syntax error on line " << token->getLineNumber() << ": reserved word \"" << token->getValue()  << "\" cannot be used for the name of a variable.";
+        if (contains(token->getValue())) { // Error for reserved word misuse.
+            std::cerr << "Syntax error on line " << token->getLineNumber() << ": reserved word \"" << token->getValue() << "\" cannot be used for a variable name.";
             exit(1);
         }
         lastToken->setSibling(token);
-    } else {
-        // Handle function or procedure case
+    } else { // Handle procedures or functions.
         lastToken = token;
         token = tokenQueue.front();
         lastToken->setSibling(token);
@@ -138,60 +116,52 @@ void Parser::state4(Token* lastToken, Token* token){
     }
 }
 
-// Handles reserved word checks for function names
-void Parser::state5(Token* lastToken, Token* token){
-    if (contains(lastToken->getValue()) && contains(token->getValue())) {
-        // Error if reserved word is used as a function name
-        std::cerr << "Syntax error on line " << token->getLineNumber() << ": reserved word \"" << token->getValue()  << "\" cannot be used for the name of a function.";
+// State 5: Processes function names and checks for reserved word misuse.
+void Parser::state5(Token* lastToken, Token* token) {
+    if (contains(lastToken->getValue()) && contains(token->getValue())) { // Error for reserved words as function names.
+        std::cerr << "Syntax error on line " << token->getLineNumber() << ": reserved word \"" << token->getValue() << "\" cannot be used for a function name.";
         exit(1);
     } else {
         lastToken->setSibling(token);
     }
 }
 
-// Checks if the token is a reserved word
-bool Parser::contains(std::string token){
+// Helper function to check if a string is a reserved word.
+bool Parser::contains(std::string token) {
     for (int i = 0; i < reserved.size(); i++) {
-        if (token == reserved.at(i)){
+        if (token == reserved.at(i)) {
             return true;
         }
     }
     return false;
 }
 
-// Prints the syntax tree to the provided output stream
-void Parser::printTree(std::ofstream &rdpOutput){
-    // Pointer for root of tree and counters for width/height
-    Token *temp = head;
-    int colCount = 0;
+// Prints the syntax tree to the provided output stream in a structured format.
+void Parser::printTree(std::ofstream& rdpOutput) {
+    Token* temp = head; // Start from the root of the tree.
+    int colCount = 0;   // Track column width for formatting.
 
-    // Main loop for printing the nodes
     while (temp != nullptr) {
-        // Grab the first token value and print it
-        std::string tokenName = temp->getValue();
-        rdpOutput << tokenName;
-        colCount += tokenName.size(); // Adjust column width
+        std::string tokenName = temp->getValue(); // Get the token's value.
+        rdpOutput << tokenName;                  // Print the token.
+        colCount += tokenName.size();            // Update column width.
 
-        // Check if there is a sibling
-        if (temp->getSibling() != nullptr) {
+        if (temp->getSibling() != nullptr) { // Check for siblings.
             rdpOutput << "--->";
-            colCount += 4; // Adjust column width
+            colCount += 4;
             temp = temp->getSibling();
-        } else if (temp->getChild() != nullptr) { // Check if there is a child
+        } else if (temp->getChild() != nullptr) { // Check for children.
             rdpOutput << '\n';
             for (int j = 1; j < colCount; j++) {
-                // Loop that prints spaces for our width
-                rdpOutput << " ";
+                rdpOutput << " "; // Print spaces for formatting.
             }
             rdpOutput << "|\n";
             for (int k = 1; k < colCount; k++) {
-                // Loop that prints spaces for our width
-                rdpOutput << " ";
+                rdpOutput << " "; // Print spaces for formatting.
             }
             rdpOutput << "⌄\n";
             for (int i = 0; i < colCount; i++) {
-                // Loop that prints spaces for our width
-                rdpOutput << " ";
+                rdpOutput << " "; // Print spaces for formatting.
             }
             temp = temp->getChild();
         } else {
