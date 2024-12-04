@@ -159,7 +159,7 @@ The following components can be selected:
 5. Abstract Syntax Tree
 6. Interpreter
 
-The results from the selected component will printed to `Output.txt`.
+The results from the selected component will print to `Output.txt`.
 
 
 <!-- CONTRIBUTORS -->
@@ -184,7 +184,7 @@ Rolando Yax - [LinkedIn](https://www.linkedin.com/in/rolandoyax)
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See `LICENSE.` for more information.
 
 <!-- LICENSE -->
 ## Acknowledgments
@@ -205,7 +205,7 @@ Test files were provided by Robert Bruce.
 [issues-url]: https://github.com/Pip-Install-Party/Interpreter/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 
-[license-url]: https://github.com/Pip-Install-Party/Interpreter/blob/main/LICENSE.txt
+[license-url]: https://github.com/Pip-Install-Party/Interpreter/blob/main/LICENSE.
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
