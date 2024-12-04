@@ -321,8 +321,14 @@ int main() {
     // Display results
         interpreterOutput.flush();
         interpreterOutput.close();
+
+        #if defined(__APPLE__) || defined(__unix__)
         displayMessage("Results printed to Output.txt\n\n"
                        "Press any key to quit. . .");
+        #else 
+        displayMessage("Results printed to Output.txt\n\n");
+        #endif
+
 
     waitForInput();  // Wait for user to press a key before exiting
 
