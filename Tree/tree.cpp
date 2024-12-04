@@ -48,7 +48,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
             head = head->getSibling();
         }
         if (head->getSibling() != nullptr && contains(equationOperators, head->getSibling()->getValue())) {
-            ASTOutput << " ----> ";
+            ASTOutput << " ---->";
 	    spaceCount += 7;
             head = handleAssignment(head, ASTOutput); 
             prevToken = nullptr;
@@ -63,7 +63,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
         }
     } else if (head->getValue() == "if"){
         ignore = false;
-        ASTOutput << "IF ----> ";
+        ASTOutput << "IF ---->";
 	spaceCount += 9;
         // This needs to break out to handleAssignment();
         head = head->getSibling();
@@ -72,7 +72,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
         
     } else if (head->getValue() == "while"){
         ignore = false;
-        ASTOutput << "WHILE ----> ";
+        ASTOutput << "WHILE ---->";
 	spaceCount += 12;
         // This needs to break out to handleAssignment();
         head = head->getSibling();
@@ -89,7 +89,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
         while (head->getSibling() != nullptr) {
             head = head->getSibling();
             if (head->getType() != "L_PAREN" && head->getType() != "R_PAREN" && head->getType() != "DOUBLE_QUOTE" && head->getType() != "COMMA" && head->getType() != "SEMICOLON") {
-                ASTOutput << " ----> ";
+                ASTOutput << " ---->";
 		spaceCount += 7;
                 ASTOutput << head->getValue();
 		spaceCount += head->getValue().length();
@@ -103,7 +103,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
         short forCount = 0;
         ignore = false;
         while (forCount < 3){
-            ASTOutput << "FOR_EXPRESSION" << forCount+1 << " ----> ";
+            ASTOutput << "FOR_EXPRESSION" << forCount+1 << " ---->";
 	    spaceCount += 23;
             head = head->getSibling();
             head = handleAssignment(head, ASTOutput); 
@@ -135,13 +135,13 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
     } else if (head->getType() == "IDENTIFIER") {  
         if (head->getSibling() != nullptr && head->getSibling()->getValue() == "=") {
             ignore = false;
-            ASTOutput << "ASSIGNMENT" << " ----> ";
+            ASTOutput << "ASSIGNMENT" << " ---->";
 	    spaceCount += 17;
             // This needs to break out to handleAssignment();
             head = handleAssignment(head, ASTOutput); 
             prevToken = nullptr;
         } else if (head->getSibling() != nullptr && isIndex(head->getSibling()->getType())){ // checks for "L_BRACKET" to see if assigning an index... if so print extra characters and resume as normal
-            ASTOutput << "ASSIGNMENT" << " ----> ";
+            ASTOutput << "ASSIGNMENT" << " ---->";
 	    spaceCount += 17;
             head = handleAssignment(head, ASTOutput);
             lineNumber += 6;
@@ -153,7 +153,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
 	    spaceCount += 4;
             while(head->getSibling() != nullptr) {
                 if (head->getType() == "IDENTIFIER" || head->getType() == "L_PAREN" || head->getType() == "R_PAREN"){
-                    ASTOutput << " ----> " << head->getValue();
+                    ASTOutput << " ---->" << head->getValue();
 		    spaceCount += 7 + head->getValue().length();
                 }
                 head = head->getSibling();
@@ -165,7 +165,7 @@ void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutpu
     }
     if (head->getSibling() != nullptr) {
         if (!ignore){
-            ASTOutput << " ----> ";
+            ASTOutput << " ---->";
             ASTOutput << head->getValue();
 	    spaceCount += 7 + head->getValue().length();
         }
@@ -432,11 +432,11 @@ Node* Tree::saveTree(std::ostringstream& buffer){
         return nullptr; // Handle empty buffer case
     }
 
-    const std::string targets[] = {"---->", "|"}; // Substrings to replace
+    const std::string targets[] = {" ---->", "|"}; // Substrings to replace
     for (const auto& target : targets) {
         std::size_t pos;
         while ((pos = content.find(target)) != std::string::npos) {
-            content.replace(pos, target.length(), " "); // Replace with a single space
+            content.replace(pos, target.length(), "~"); // Replace with a single space
         }
     }
 
@@ -461,7 +461,7 @@ Node* Tree::saveTree(std::ostringstream& buffer){
 
     // Iterate through each character of the buffer
     for (char ch : content) {
-        if(ch == ' ' || ch == '\n') { // If we reach a space (delimiter)
+        if(ch == '~' || ch == '\n') { // If we reach a space (delimiter)
             if (tempString != "") { // Make sure the string is not empty before creating a node
            // std::cout << "|" << tempString << "|" << std::endl;
                 if (isReserved(tempString)) { // If it is reserved, it must be a child (or the first)
@@ -485,7 +485,13 @@ Node* Tree::saveTree(std::ostringstream& buffer){
             }
             tempString = ""; // Reset the string for the next word
         } else {
-            tempString += ch; // If we have not reached a space, we must still be reading a string
+            if ( ch == ' ') {
+                if ( tempString != "" ) {
+                    tempString += ch;
+                }
+            } else {
+                tempString += ch; // If we have not reached a space, we must still be reading a string
+            }
         }
     }
     // Check to see if there is anything at the end since the file likely doesn't end with a space
