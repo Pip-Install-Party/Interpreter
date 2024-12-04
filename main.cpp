@@ -6,8 +6,7 @@
 #if defined(_WIN32) || defined(_WIN64)
     #include <iostream> // Use standard output stream on Windows
 #else
-    //#include <ncurses.h> // Use ncurses on Unix-based systems
-    #include <iostream> // Use standard output stream on Windows
+    #include <ncurses.h> // Use ncurses on Unix-based systems
 #endif
 
 #include "Comments/commentDFA.h"
@@ -17,7 +16,6 @@
 #include "Tree/tree.h"
 #include "Tests/testFiles.h"
 #include "Interpreter/interpreter.h"
-
 
 struct componentElements {
     int componentNum;
@@ -205,10 +203,9 @@ std::ifstream openSelectedFile(const componentElements& config, int fileNum) {
 
 void displayMessage(const std::string& message) {
 #if defined(__APPLE__) || defined(__unix__)
-    //clear();
-    //printw(message.c_str());
-   // refresh();
-       std::cout << message;
+    clear();
+    printw(message.c_str());
+    refresh();
 
 #else
     std::cout << message;
@@ -217,8 +214,7 @@ void displayMessage(const std::string& message) {
 
 void waitForInput() {
 #if defined(__APPLE__) || defined(__unix__)
-    //getch();  // ncurses-specific wait
-        std::cin.get();  // For Windows, wait for input via std::cin
+    getch();  // ncurses-specific wait
 #else
     std::cin.get();  // For Windows, wait for input via std::cin
 #endif
@@ -227,9 +223,8 @@ void waitForInput() {
 int getComponentSelection() {
     int selection = 0;
 #if defined(__APPLE__) || defined(__unix__)
-    // echo();
-    // mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &selection);
-        std::cin >> selection;
+     echo();
+     mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &selection);
 
 #else
     std::cin >> selection;
@@ -242,8 +237,7 @@ int getFileSelection(int numFiles) {
     displayMessage("Choose A Test File 1 - " + std::to_string(numFiles) + ",\nSelection: ");
     
 #if defined(__APPLE__) || defined(__unix__)
-    // mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &fileNum);
-        std::cin >> fileNum;
+     mvscanw(getcury(stdscr), getcurx(stdscr), (char*)"%d", &fileNum);
     --fileNum;
 #else
     std::cin >> fileNum;
@@ -257,10 +251,10 @@ int main() {
 
     // Initialize ncurses for Unix systems
 #if defined(__APPLE__) || defined(__unix__)
-    // initscr();               // Start ncurses mode
-    // cbreak();                // Disable line buffering
-    // noecho();                // Disable echoing of typed characters
-    // keypad(stdscr, TRUE);    // Enable function keys like arrow keys
+     initscr();               // Start ncurses mode
+     cbreak();                // Disable line buffering
+     noecho();                // Disable echoing of typed characters
+     keypad(stdscr, TRUE);    // Enable function keys like arrow keys
 #endif
 
     // Common introduction message
@@ -284,7 +278,8 @@ int main() {
                    "\nPress any key to continue. . .");
 
     waitForInput(); // Wait for user input
-
+    std::string filename = "Output.txt";
+    std::ofstream interpreterOutput(filename);
     displayMessage("\nSelect A Component:\n"
                    "1 - Comment Removal\n"
                    "2 - Tokenization\n"
@@ -300,7 +295,7 @@ int main() {
         displayMessage("Invalid component selection. Exiting.\n");
         waitForInput();
 #if defined(__APPLE__) || defined(__unix__)
-      //  endwin();
+        endwin();
 #endif
         return 1;
     }
@@ -315,7 +310,7 @@ int main() {
         displayMessage("Error: Could not open selected file.\n");
         waitForInput();
 #if defined(__APPLE__) || defined(__unix__)
-      //  endwin();
+        endwin();
 #endif
         return 1;
     }
@@ -324,15 +319,15 @@ int main() {
     config.processFunction(file, buffer, fileNum); // Process based on selection
 
     // Display results
-        //interpreterOutput.flush();
-        //interpreterOutput.close();
-        //displayMessage("Results printed to Interpreter_Output.txt\n\n"
-                       //"Press any key to quit. . .");
+        interpreterOutput.flush();
+        interpreterOutput.close();
+        displayMessage("Results printed to Output.txt\n\n"
+                       "Press any key to quit. . .");
 
     waitForInput();  // Wait for user to press a key before exiting
 
 #if defined(__APPLE__) || defined(__unix__)
-   //endwin(); // End ncurses mode
+   endwin(); // End ncurses mode
 #endif
 
     return 0;
