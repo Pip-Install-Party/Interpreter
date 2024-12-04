@@ -423,34 +423,13 @@ bool Tree::isIndex(std::string headType) {
 }
 
 Node* Tree::saveTree(std::ostringstream& buffer){
+
     Node* root = nullptr;
     Node* prevNode = nullptr;
     std::string tempString;
     std::string content = buffer.str(); // Convert the buffer to a string
-    
-    if (content.empty()) {
-        return nullptr; // Handle empty buffer case
-    }
 
-    const std::string targets[] = {" ---->", "|"}; // Substrings to replace
-    for (const auto& target : targets) {
-        std::size_t pos;
-        while ((pos = content.find(target)) != std::string::npos) {
-            content.replace(pos, target.length(), "~"); // Replace with a single space
-        }
-    }
-
-    // std::cout << "Reading characters: \n";
-    // Print to check validity
-    // for (char ch : content) {
-    //    std::cout << ch;
-    // }
-
-    // if full interpreter is selected in main, do not output to file    
-    bool name = interpreterSelected;
-    //std::cout << "value passed to tree is " << interpreterSelected << std::endl;
-    
-    if (interpreterSelected == false) {
+     if (interpreterSelected == false) {
 
         //std::cout << "FULL INTERPRETER NOT SELECTED" << std::endl;
         // temporary output file for the AST to help with Interpreter
@@ -466,8 +445,17 @@ Node* Tree::saveTree(std::ostringstream& buffer){
             std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
         }
     }
-    else {
-        //std::cout << "FULL INTERPRETER SELECTED" << std::endl;
+    
+    if (content.empty()) {
+        return nullptr; // Handle empty buffer case
+    }
+
+    const std::string targets[] = {" ---->", "|"}; // Substrings to replace
+    for (const auto& target : targets) {
+        std::size_t pos;
+        while ((pos = content.find(target)) != std::string::npos) {
+            content.replace(pos, target.length(), "~"); // Replace with a single space
+        }
     }
 
     // Iterate through each character of the buffer

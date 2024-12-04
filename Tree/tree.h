@@ -41,13 +41,14 @@ class Tree {
         Tree(Token* head, Table* table, bool isInterpreter) { 
             
             interpreterSelected = isInterpreter;
-            //std::cout << interpreterSelected << std::endl;
             
             symbolTable = table; 
             std::ostringstream ASTOutput;
             buildTree(head, nullptr, ASTOutput);
-            root = saveTree(ASTOutput);
-            printTree(saveTree(ASTOutput)); 
+            if ( interpreterSelected ) {
+                root = saveTree(ASTOutput);
+            }
+            //printTree(saveTree(ASTOutput)); 
         }
         Node* getHead() { return root; }
         ~Tree();    
