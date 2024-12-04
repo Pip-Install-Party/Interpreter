@@ -1,6 +1,10 @@
 #include "interpreter.h"
+
+
 #include <iostream>
+#if defined(__APPLE__) || defined(__unix__)
 #include <ncurses.h>
+#endif
 
 std::string fileName = "Output.txt";
 std::ofstream cursesBuffer(fileName);
