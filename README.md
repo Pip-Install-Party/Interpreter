@@ -47,7 +47,6 @@
     <li>
       <a href="#getting-started">Getting Started</a>
     </li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#contributors">Contributors</a></li>
     <li><a href="#connect-with-us">Connect</a></li>
@@ -134,20 +133,6 @@ make
 ### File Output 
 
 Output will be written to ```Output.txt``` in the working directory.
-<!-- ROADMAP -->
-## Roadmap
-
-This project was implemented in stages. Each stage builds from the last and ultimately constructs an interpreter. 
-
-1️⃣ - [Comment Removal](https://github.com/Pip-Install-Party/Ignoring-Comments)  
-2️⃣ - [Tokenization](https://github.com/Pip-Install-Party/Tokenization)  
-3️⃣ - [Recursive Descent Parser](https://github.com/Pip-Install-Party/Recursive-Descent-Parser)  
-4️⃣ - [Symbol Table](https://github.com/Pip-Install-Party/Symbol-Table)  
-5️⃣ - [Abstract Syntax Tree](https://github.com/Pip-Install-Party/Abstract-Syntax-Tree)  
-6️⃣ - [Interpreter](https://github.com/Pip-Install-Party/Interpreter)
-
-See the [open issues](https://github.com/Pip-Install-Party/Interpreter/issues) for a full list of proposed features (and known issues).
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
