@@ -41,6 +41,7 @@ void Interpreter::begin(Node* node) {
             programCounter = nextStatement();
         }
     }
+    cursesBuffer.close();
 }
 
 /**
