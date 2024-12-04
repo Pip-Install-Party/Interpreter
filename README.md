@@ -88,23 +88,39 @@ This repository contains additional functionality to further integrate these com
 
 The interpreter is compatible with Windows, MacOS, and Linux. 
 
+### Dependencies
+
+This project utlizes ncurses when run on MacOS / Linux. This library can be insalled via:
+
+#### MacOS 
+```sh
+brew install ncurses
+```
+
+#### Linux 
+
+```sh
+sudo apt-get install libncurses-dev
+```
+
+
 ### Running The Program
 
-### MacOS / Linux 
+#### MacOS / Linux 
   1. Clone the repo
    ```sh
-   git clone https://github.com/Pip-Install-Party/Interpreter.git
+git clone https://github.com/Pip-Install-Party/Interpreter.git
    ```
   2. Run the makefile
   ```sh
-   make
+make
    ```
   3. Run the executable
   ```sh
-   ./interpreter.x
+./interpreter.x
   ```
 
-### Windows 
+#### Windows 
  1. Clone the repo
    ```sh
    git clone https://github.com/Pip-Install-Party/Interpreter.git
