@@ -30,9 +30,7 @@ class Interpreter {
         Node* nextStatement();
         Node* nextNode(Node*);
         void setProgramCounter(Node* node);
-        void handleDeclaration(Node*);
         void handleAssignment(Node*);
-        void handleSelection(Node*);
         void handlePrintf(Node*);
         std::string handleReturn(Node*);
         void handleFunction(Node*);
@@ -52,8 +50,6 @@ class Interpreter {
         bool isArithmeticOperator(const std::string&);
         std::string evaluatePostfix(Node*);
         int performPostfixOperation(int, int, const std::string&);
-        Entry* getEntryByIndex(int, std::vector<std::string>&);
-        Entry* getParamListForEntry(std::vector<Entry*>, std::string, int);
         bool evaluateBooleanPostfix(Node*);
         bool performBooleanOperation(int, int, const std::string&);
         Node* skipBlock(Node*); 
