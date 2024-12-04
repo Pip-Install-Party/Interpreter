@@ -18,8 +18,6 @@
 #include "Tests/testFiles.h"
 #include "Interpreter/interpreter.h"
 
-std::string filename = "Interpreter_Output.txt";
-std::ofstream interpreterOutput(filename);
 
 struct componentElements {
     int componentNum;
@@ -52,6 +50,9 @@ int findMain(std::ifstream& file) {
 
 // function to remove comments
 void removeComments(std::ifstream& testFile, std::ostringstream& outputFile, int) {
+    std::string filename = "Output.txt";
+    std::ofstream interpreterOutput(filename);
+    
     CommentDFA *removeComments = new CommentDFA();
     std::ostringstream tempBuffer;
     removeComments->begin(testFile, tempBuffer);
@@ -65,6 +66,9 @@ void removeComments(std::ifstream& testFile, std::ostringstream& outputFile, int
 
 // function to remove comments then tokenize input
 void tokenize(std::ifstream& testFile, std::ostringstream& outputFile, int) {
+    std::string filename = "Output.txt";
+    std::ofstream interpreterOutput(filename);
+    
     CommentDFA *removeComments = new CommentDFA();
     std::ostringstream tempBuffer;
     removeComments->begin(testFile, tempBuffer);
@@ -84,6 +88,9 @@ void tokenize(std::ifstream& testFile, std::ostringstream& outputFile, int) {
 
 // function to remove comments, tokenize input, then put the input into a CST
 void parse(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
+    std::string filename = "Output.txt";
+    std::ofstream interpreterOutput(filename);
+    
     CommentDFA *removeComments = new CommentDFA();
     std::ostringstream tempBuffer;
     removeComments->begin(testFile, tempBuffer);
@@ -102,6 +109,9 @@ void parse(std::ifstream& testFile, std::ostringstream& outputFile, int filenum)
 
 // function to remove comments, tokenize input, create a CST, and generate symbol tables
 void symbolTable(std::ifstream& testFile, std::ostringstream& outputFile, int) {
+    std::string filename = "Output.txt";
+    std::ofstream interpreterOutput(filename);
+    
     CommentDFA *removeComments = new CommentDFA();
     std::ostringstream tempBuffer;
     removeComments->begin(testFile, tempBuffer);
@@ -138,11 +148,13 @@ void abstractSyntaxTree(std::ifstream& testFile, std::ostringstream& outputFile,
     Table *table = new Table;
 
     table->begin(parser->getHead());
-
-    Tree* tree = new Tree(parser->getHead(), table);
+        
+    bool isInterpreter = false;
+    Tree* tree = new Tree(parser->getHead(), table, isInterpreter);
 }
 
 void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int filenum) {
+    
     CommentDFA *removeComments = new CommentDFA();
     std::ostringstream tempBuffer;
     removeComments->begin(testFile, tempBuffer);
@@ -158,27 +170,15 @@ void interpreter(std::ifstream& testFile, std::ostringstream& outputFile, int fi
     Table *table = new Table;
     table->begin(parser->getHead());
 
-    Tree* tree = new Tree(parser->getHead(), table);
+
+    bool isInterpreter = true;
+    Tree* tree = new Tree(parser->getHead(), table, isInterpreter);
 
     int mainLine = findMain(testFile);
 
     Interpreter* interpreter = new Interpreter(table, tree, mainLine);
 
     interpreter->begin(tree->getHead());
-
-    /*
-        WAIT!!! Before uncommenting this, remove the check in main that causes the output
-
-        "This component is not yet functional.".
-
-        If this function has been implemented, we should print 
-
-        "Results printed to Interpreter_Output.txt"
-
-        regardless of component seleciton. 
-    */
-
-
 
 }
 

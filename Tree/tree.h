@@ -36,18 +36,21 @@ class Tree {
 	    short spaceCount = 0;
         Node* saveTree(std::ostringstream&);
         bool isReserved(std::string);
+        bool interpreterSelected = false;
     public: 
-        Tree(Token* head, Table* table) { 
+        Tree(Token* head, Table* table, bool isInterpreter) { 
+            
+            interpreterSelected = isInterpreter;
+            //std::cout << interpreterSelected << std::endl;
+            
             symbolTable = table; 
-             // Make an output filestream
-            //std::string filename = "Interpreter_Output.txt";
             std::ostringstream ASTOutput;
             buildTree(head, nullptr, ASTOutput);
             root = saveTree(ASTOutput);
-            printTree(saveTree(ASTOutput));
+            printTree(saveTree(ASTOutput)); 
         }
         Node* getHead() { return root; }
-        ~Tree();
+        ~Tree();    
 };
 
 #endif // TREE_H

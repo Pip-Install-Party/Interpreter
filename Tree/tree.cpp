@@ -446,17 +446,28 @@ Node* Tree::saveTree(std::ostringstream& buffer){
     //    std::cout << ch;
     // }
 
-    // temporary output file for the AST to help with Interpreter
-    std::ofstream outFile("Output.txt"); // Open the file for writing
+    // if full interpreter is selected in main, do not output to file    
+    bool name = interpreterSelected;
+    //std::cout << "value passed to tree is " << interpreterSelected << std::endl;
+    
+    if (interpreterSelected == false) {
 
-    if (outFile.is_open()) {  // Check if the file opened successfully
-        for (char ch : content) {
-            outFile << ch; // Write each character to the file
+        //std::cout << "FULL INTERPRETER NOT SELECTED" << std::endl;
+        // temporary output file for the AST to help with Interpreter
+        std::ofstream outFile("Output.txt"); // Open the file for writing
+
+        if (outFile.is_open()) {  // Check if the file opened successfully
+            for (char ch : content) {
+                outFile << ch; // Write each character to the file
+            }
+            outFile.close(); // Close the file when done
+        } 
+        else {
+            std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
         }
-        outFile.close(); // Close the file when done
-    } 
+    }
     else {
-        std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
+        //std::cout << "FULL INTERPRETER SELECTED" << std::endl;
     }
 
     // Iterate through each character of the buffer
