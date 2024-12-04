@@ -28,7 +28,11 @@ void Interpreter::begin(Node* node /*pass AST head here*/){
 
     while(programCounter != nullptr){
         executeStatement(programCounter); // pass to executeStatement for further processing
-        programCounter = nextStatement(); // need logic to get next statement
+        if (programCounter->getValue() == "WHILE") {
+            programCounter = skipBlock(programCounter);
+        } else {
+            programCounter = nextStatement(); // need logic to get next statement
+        }
     } 
 }
 
@@ -199,19 +203,12 @@ void Interpreter::handleWhile(Node* node) {
     // std::cout << "Finally: " << nextNode(tempNode)->getValue() << std::endl;
     auto begin = nextNode(node);
 
-    ////////    Remove this ////////
-    if ( evaluateBooleanPostfix(node)) {
-        //std::cout << "Condition Passed" << std::endl;
-    } else {
-        //std::cout << "Condition Failed" << std::endl;
-    }
-    ////////////////////////////////
     while( evaluateBooleanPostfix(node) ) {
         // std::cout << "loop from handleWhile() " << std::endl;
         //printSymbols();
         tempNode = nextNode(begin);
         loopStack.push(1);
-    int stackCount = loopStack.size();
+        int stackCount = loopStack.size();
        // std::cout << "Temp is: " << tempNode->getValue() << std::endl;
         while( loopStack.size() >= 1) {
                     //std::cout << "inner loop" << std::endl;
@@ -408,7 +405,6 @@ void Interpreter::handlePrintf(Node* node /* pass current AST node here */) {
         std::cout << formatString.substr(0, newlinePos) << std::endl;
         // Remove the part up to and including the newline sequence
         formatString = formatString.substr(newlinePos + 2);
-        std::cout << "printed newline" << std::endl;
     }
 
     // Print the remaining part of the format string
@@ -773,6 +769,7 @@ std::string Interpreter::evaluatePostfix(Node* node) {
 bool Interpreter::evaluateBooleanPostfix(Node* node) {
     // print expression to be evaluated ( for testing )
     auto tempNode = node; 
+    //printSymbols();
     //      std::cout << std::endl;
     //  std::cout << std::endl;
 
@@ -1164,7 +1161,7 @@ void Interpreter::printSymbols() {
     //std::cout << "Current Scope: " << curScope << std::endl;
     for (const auto& pair : symbolTable) {
             for (Entry* entry : pair.second) {
-                //std::cout << entry->getIDName() << " Scope: " << entry->getScope() << " Value: " << entry->getValue() << std::endl;
+                std::cout << entry->getIDName() << " Scope: " << entry->getScope() << " Value: " << entry->getValue() << std::endl;
             }
 
             std::cout << std::endl;
