@@ -8,7 +8,6 @@
 #include "../Tree/tree.h"
 #include "../Tree/Node.h"
 
-
 class Interpreter {
     private:
         Node* programCounter = nullptr;    // keeps track of AST's current instruction
