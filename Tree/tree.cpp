@@ -20,7 +20,6 @@ void Tree::printArrow(int spaces, std::ostringstream& ASTOutput){
 
 // Prints the abstract syntax tree to the provided output stream
 void Tree::buildTree(Token* head, Token* prevToken, std::ostringstream& ASTOutput){
-    
     int lineNumber = 1;
     bool ignore = true;
 
@@ -430,21 +429,22 @@ Node* Tree::saveTree(std::ostringstream& buffer){
     std::string content = buffer.str(); // Convert the buffer to a string
 
      if (interpreterSelected == false) {
-
         //std::cout << "FULL INTERPRETER NOT SELECTED" << std::endl;
         // temporary output file for the AST to help with Interpreter
-        std::ofstream outFile("Output.txt"); // Open the file for writing
+        // std::ofstream outFile("Output.txt"); // Open the file for writing
+        std::string fileName = "Output.txt";
+        std::ofstream outFile(fileName);
 
-        if (outFile.is_open()) {  // Check if the file opened successfully
+        //if (outFile.is_open()) {  // Check if the file opened successfully
             for (char ch : content) {
                 outFile << ch; // Write each character to the file
             }
             outFile.close(); // Close the file when done
-        } 
-        else {
-            std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
-        }
-    }
+        ///} 
+        //else {
+       //     std::cerr << "Error opening file!" << std::endl; // Handle error if the file can't be opened
+       // }
+    } 
     
     if (content.empty()) {
         return nullptr; // Handle empty buffer case
