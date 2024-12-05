@@ -45,9 +45,8 @@ class Tree {
             symbolTable = table; 
             std::ostringstream ASTOutput;
             buildTree(head, nullptr, ASTOutput);
-            if ( interpreterSelected ) {
-                root = saveTree(ASTOutput);
-            }
+            root = saveTree(ASTOutput);
+            
             //printTree(saveTree(ASTOutput)); 
         }
         Node* getHead() { return root; }
