@@ -31,7 +31,8 @@
     An interpreter for code in Backus-Naur Form. 
     <br />
     <br />
-    <a href="https://github.com/Pip-Install-Party/Interpreter/blob/main/README.md"><strong>Explore the docs »</strong></a>
+    🎥 Watch the project
+    <a href="https://youtu.be/EpM51CfAIRo"><strong>video</strong></a>
   </p>
 </div>
 
