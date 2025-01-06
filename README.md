@@ -202,7 +202,7 @@ Test files were provided by Robert Bruce.
 [stars-url]: https://github.com/Pip-Install-Party/Interpreter/stargazers
 [issues-shield]: https://img.shields.io/github/issues/Pip-Install-Party/Interpreter.svg?style=for-the-badge
 [issues-url]: https://github.com/Pip-Install-Party/Interpreter/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/Pip-Install-Party/Interpreter.svg?style=for-the-badge
 
 [license-url]: https://github.com/Pip-Install-Party/Interpreter/blob/main/LICENSE.
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
