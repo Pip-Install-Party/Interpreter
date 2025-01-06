@@ -77,7 +77,7 @@ The interpreter was constructed through a modular design, composed of several ke
 
 Each component builds on the outputs of the previous stage, concluding in a fully functional interpreter capable of processing complex inputs and producing correct results. This layered approach highlights the importance of modularity and abstraction in software engineering and programming language design.
 
-This repository contains additional functionality to further integrate these compoents and enable the interpreter's functionality. 
+This repository contains additional functionality to further integrate these components and enable the interpreter's functionality. 
 
 <!-- GETTING STARTED -->
 <a id="readme-getting-started"></a>
